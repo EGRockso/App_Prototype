@@ -26,10 +26,10 @@ const state = {
   },
   weekly: { load: 73, hours: 4.6, readiness: 82 },
   sports: [
-    { name: "Course", color: "#00b37a" },
-    { name: "Cyclisme", color: "#3abff8" },
-    { name: "Padel", color: "#f59e0b" },
-    { name: "Renfo", color: "#a78bfa" }
+    { name: "Course",   color: "#EB6E9A" }, // rose
+    { name: "Cyclisme", color: "#00B37A" }, // vert
+    { name: "Padel",    color: "#F2A65A" }, // orange
+    { name: "Renfo",    color: "#E9DDC9" }  // beige
   ]
 };
 
@@ -90,8 +90,10 @@ function hydrateActivity(){
     const points = a.route.map(([x,y])=>`${x/100*w},${y/100*h}`).join(' ');
     const svg = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
       <defs>
-        <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="#00d08f"/><stop offset="100%" stop-color="#00b37a"/>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%"   stop-color="#EB6E9A"/>
+          <stop offset="50%"  stop-color="#F2A65A"/>
+          <stop offset="100%" stop-color="#00B37A"/>
         </linearGradient>
       </defs>
       <polyline points="${points}" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>

@@ -175,3 +175,107 @@ body{
 
 /* Typo Rockso */
 body{ font-family: "Manrope", system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif; }
+
+/* === ROCKSO THEME — palette & décor === */
+:root {
+  --rockso-green:  #00B37A;
+  --rockso-beige:  #E9DDC9;
+  --rockso-orange: #F2A65A;
+  --rockso-pink:   #EB6E9A;
+  --ink: #0A0E0C;
+}
+
+/* Fond global plus expressif (dégradés colorés Rockso) */
+.theme-rockso .viewport{
+  background:
+    radial-gradient(1200px 600px at 50% -200px, rgba(233,221,201,.25), transparent 60%),
+    radial-gradient(900px 500px at 0% 0%, rgba(235,110,154,.20), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(242,166,90,.18), transparent 60%),
+    radial-gradient(1000px 700px at 50% 120%, rgba(0,179,122,.22), transparent 60%),
+    var(--bg);
+}
+
+/* Carte / appareil : léger warm tint + watermark logo */
+.theme-rockso .device{
+  background:
+    linear-gradient(180deg, rgba(233,221,201,.06), rgba(0,0,0,0) 20%),
+    var(--surface);
+  position: relative;
+}
+.theme-rockso .device::after{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    radial-gradient(1000px 600px at 80% 20%, rgba(235,110,154,.06), transparent 50%),
+    url("assets/img/Nom_Baseline.png") center/80% no-repeat;
+  opacity:.08;
+  mix-blend-mode: luminosity;
+  pointer-events:none;
+}
+
+/* Hero : teinte colorée au-dessus de l’image */
+.theme-rockso .hero-overlay{
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.45) 100%),
+    radial-gradient(600px 240px at 70% 0%, rgba(235,110,154,.18), transparent 60%),
+    radial-gradient(600px 240px at 20% 0%, rgba(242,166,90,.16), transparent 60%);
+}
+
+/* Badges & boutons : dégradés Rockso luxueux */
+.theme-rockso .badge{
+  background: linear-gradient(180deg, rgba(233,221,201,.22), rgba(0,179,122,.18));
+  color: #071b14;
+  border: 1px solid rgba(0,179,122,.28);
+  box-shadow: 0 6px 14px rgba(0,179,122,.20);
+}
+.theme-rockso .btn{
+  background: linear-gradient(120deg, var(--rockso-pink), var(--rockso-orange) 45%, var(--rockso-green) 100%);
+  color: #0a0e0c;
+  box-shadow: 0 10px 22px rgba(0,179,122,.25);
+}
+.theme-rockso .btn.ghost{
+  border-color: rgba(233,221,201,.45);
+}
+
+/* Chips sports : capsules colorées harmonisées */
+.theme-rockso .chip{
+  background: rgba(233,221,201,.14);
+  border-color: rgba(233,221,201,.35);
+}
+.theme-rockso .chip .dot{
+  box-shadow: 0 0 0 4px rgba(233,221,201,.18);
+}
+
+/* Jauge readiness : liseré plus premium */
+.theme-rockso .gauge{
+  background:
+    conic-gradient(var(--rockso-pink) 0 var(--p,75%),
+                   #1a1f27 var(--p,75%) 100%);
+}
+.theme-rockso .gauge::after{
+  border-color: rgba(233,221,201,.18);
+}
+
+/* Tabbar : verre fumé chaud */
+.theme-rockso .tabbar{
+  background: linear-gradient(180deg, rgba(19,22,27,.85), rgba(19,22,27,.92));
+  border-color: rgba(233,221,201,.20);
+}
+.theme-rockso .tab.active{
+  background: linear-gradient(180deg, rgba(233,221,201,.18), rgba(0,0,0,.0));
+}
+
+/* Cartes & métriques : un peu de chaleur sur les bordures */
+.theme-rockso .metric,
+.theme-rockso .quick-card,
+.theme-rockso .card,
+.theme-rockso .activity-card{
+  border-color: rgba(233,221,201,.22);
+}
+.theme-rockso .activity-card{
+  background: linear-gradient(180deg, #12161c, #0f1318);
+  box-shadow: 0 10px 24px rgba(0,0,0,.24), 0 0 0 1px rgba(233,221,201,.08) inset;
+}
+
+/* Titres secondaires avec légère teinte beige */
+.theme-rockso .section-title{ color: rgba(233,221,201,.85); }
