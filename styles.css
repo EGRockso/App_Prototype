@@ -195,38 +195,32 @@ body{
 .btn.ghost{ background: transparent; color: var(--text); border:1px solid var(--line); box-shadow:none; }
 .btn[disabled]{ filter:saturate(.85) opacity(.8); cursor:not-allowed; }
 
-/* Tabbar — App Store Glass (couleurs visibles, formes fondues) */
+/* Tabbar — Chroma Boost (couleurs plus vives, formes fondues) */
 .tabbar{
-  position: absolute; left: 0; right: 0; bottom: 0;
-  display: flex; gap: 10px;
-  padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
-  height: 68px;
+  position:absolute; left:0; right:0; bottom:0;
+  display:flex; gap:10px;
+  padding:8px 12px calc(10px + env(safe-area-inset-bottom));
+  height:68px;
 
-  /* Très transparent pour laisser passer la couleur,
-     blur très fort pour supprimer les détails */
-  background: rgba(255,255,255,.38);
-  -webkit-backdrop-filter: saturate(180%) blur(28px) contrast(105%);
-  backdrop-filter: saturate(180%) blur(28px) contrast(105%);
+  /* Laisse bien passer la couleur */
+  background: rgba(255,255,255,.30);
 
-  /* Liseré + petit relief interne pour l’aspect “verre” */
-  border-top: 1px solid rgba(231,222,207,.90); /* ~ var(--rockso-line) plus visible */
-  box-shadow:
-    0 -1px 0 rgba(255,255,255,.25) inset,   /* highlight interne */
-    0 -10px 24px rgba(0,0,0,.06);           /* légère ombre vers le haut */
+  /* Couleurs ↑, détails ↓ (flou fort + contraste un peu réduit) */
+  -webkit-backdrop-filter: saturate(240%) brightness(1.08) contrast(0.95) blur(34px);
+  backdrop-filter: saturate(240%) brightness(1.08) contrast(0.95) blur(34px);
 
-  border-radius: 0;
-  z-index: 10;
+  border-top:1px solid rgba(231,222,207,.92);
+  box-shadow: 0 -1px 0 rgba(255,255,255,.28) inset, 0 -10px 24px rgba(0,0,0,.06);
+  border-radius:0; z-index:10;
 }
-.tab{
-  flex: 1;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
-  text-decoration:none; color:#6b7d74;
-  background:transparent; border:0; border-radius:12px;
+
+/* Légère pellicule screen pour “ré-éclairer” la couleur derrière sans révéler les formes */
+.tabbar::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background: radial-gradient(150% 110% at 50% 0, rgba(255,255,255,.10), rgba(255,255,255,0) 60%);
+  mix-blend-mode: screen;
 }
-.tab svg{ display:block }
-.tab span{ font-weight:600 }
-.tab.active{ color: var(--text); font-weight:800 }
-.tab.disabled{ pointer-events:none; opacity:.5 }
+
 
 /* Fallback si le blur n’est pas supporté (vieux Android / vieux Safari) */
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))){
