@@ -155,3 +155,23 @@ body{
 .gauge .val{ position:relative; font-size:24px; font-weight:800; color:#afffe3; }
 .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
 .badge.outline{ background:transparent; color:var(--brand-2); border:1px solid rgba(0,179,122,.45); }
+
+/* === Rockso brand overrides (collez à la fin) === */
+:root{
+  --brand:  #508c6e;  /* vert Rockso principal (sage) */
+  --brand-2:#72a288;  /* variante pour les dégradés */
+}
+
+/* Harmoniser badge & bouton avec le nouveau vert */
+.badge{
+  background: rgba(80,140,110,.12);
+  color: #e9fff5;
+  border: 1px solid rgba(80,140,110,.28);
+}
+.btn{
+  background: linear-gradient(180deg, var(--brand-2), var(--brand));
+  box-shadow: 0 8px 16px rgba(80,140,110,.25);
+}
+
+/* Typo Rockso */
+body{ font-family: "Manrope", system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif; }
