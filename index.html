@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Rockso • Prototype</title>
+  <link rel="icon" href="assets/img/rockso_logo_mark.png">
+  <meta name="theme-color" content="#0d0f12">
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <main class="viewport">
+    <div class="device">
+      <header class="app-header">
+        <div class="brand">
+          <img src="assets/img/rockso_logo_mark.png" alt="Rockso" class="brand-mark"/>
+          <span class="brand-name">Rockso</span>
+        </div>
+        <button class="icon-btn" aria-label="profile">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 20c0-4.4183 3.5817-8 8-8s8 3.5817 8 8"></path>
+          </svg>
+        </button>
+      </header>
+
+      <section class="content scroll">
+        <div class="hero">
+          <img src="assets/img/rockso_banner.png" alt="Hero" class="hero-img"/>
+          <div class="hero-overlay">
+            <h1>Bonjour 👋</h1>
+            <p>Prêt·e à bouger intelligemment ?</p>
+          </div>
+        </div>
+
+        <div class="quick-grid">
+          <div class="quick-card">
+            <span class="qc-label">Charge hebdo</span>
+            <strong class="qc-value" id="metric-load">—</strong>
+          </div>
+          <div class="quick-card">
+            <span class="qc-label">Heures</span>
+            <strong class="qc-value" id="metric-hours">—</strong>
+          </div>
+          <div class="quick-card">
+            <span class="qc-label">Readiness</span>
+            <strong class="qc-value" id="metric-readiness">—</strong>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2 class="section-title">Catégories</h2>
+          <div class="chips" id="sport-chips"></div>
+        </div>
+
+        <div class="section">
+          <h2 class="section-title">Dernière activité</h2>
+          <a class="activity-card" id="last-activity" href="#">
+            <div class="ac-head">
+              <span class="badge" id="last-type">—</span>
+              <time id="last-date">—</time>
+            </div>
+            <div class="ac-body">
+              <div class="metric">
+                <span class="metric-label">Distance</span>
+                <span class="metric-value" id="last-distance">—</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Durée</span>
+                <span class="metric-value" id="last-duration">—</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Allure</span>
+                <span class="metric-value" id="last-pace">—</span>
+              </div>
+            </div>
+          </a>
+
+          <a class="journal-btn" href="./activities.html">Journal des activités</a>
+        </div>
+
+        <div class="section future">
+          <h2 class="section-title">Aperçu des futures démos</h2>
+          <div class="card">
+            <p class="muted">Ici, on ajoutera :</p>
+            <ul class="muted">
+              <li>Un bouton <em>Importer des données</em> (CSV/FIT/JSON).</li>
+              <li>Un bouton <em>Lancer le modèle IA</em> (prédiction blessure / readiness).</li>
+              <li>Un panneau <em>Résultats</em> (score + explications).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <nav class="tabbar">
+        <a class="tab active" href="./index.html">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9z"></path></svg>
+          <span>Accueil</span>
+        </a>
+        <a class="tab" href="./activity.html?id=sample">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 12h4l3 8 3-16 3 8h4"></path></svg>
+          <span>Activité</span>
+        </a>
+        <a class="tab" href="./profile.html">
+          <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="8"></circle></svg>
+          <span>Profil</span>
+        </a>
+      </nav>
+    </div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
