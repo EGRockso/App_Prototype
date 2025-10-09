@@ -226,7 +226,7 @@ body{
 .tab svg{ display:block }
 .tab span{ font-weight:600 }
 .tab.active{ color: var(--text); font-weight:800 }
-.tab.disabled{ pointer-events:none; opacity:.5 }
+.tab.disabled{ pointer-events:none; opacity:.2 }
 
 /* Fallback si le blur n’est pas supporté (vieux Android / vieux Safari) */
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))){
