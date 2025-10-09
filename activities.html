@@ -13,17 +13,17 @@
   <main class="viewport">
     <div class="device">
       <header class="app-header">
-        <button class="icon-btn" onclick="history.back()" aria-label="retour">
-          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
         <div class="brand">
           <img src="assets/img/rockso_logo_mark.png" alt="Rockso" class="brand-mark"/>
           <span class="brand-name">Journal</span>
         </div>
-        <a class="icon-btn" href="./profile.html" aria-label="profil">
-          <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="8"></circle></svg>
+        <a class="icon-btn" href="./profile.html" aria-label="Profil">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"></circle>
+          </svg>
         </a>
       </header>
+
 
       <section class="content scroll">
         <div class="section">
@@ -31,21 +31,19 @@
           <div class="list" id="activity-list"></div>
         </div>
       </section>
-
+      
       <nav class="tabbar">
         <a class="tab" href="./index.html">
           <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9z"></path></svg>
-          <span>Accueil</span>
-        </a>
-        <a class="tab active" href="./activities.html">
+        <span>Accueil</span></a>
+        <a class="tab" href="./activity.html?id=sample">
           <svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 12h4l3 8 3-16 3 8h4"></path></svg>
-          <span>Journal</span>
-        </a>
+        <span>Activité</span></a>
         <a class="tab" href="./profile.html">
           <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="8"></circle></svg>
-          <span>Profil</span>
-        </a>
+        <span>Profil</span></a>
       </nav>
+
     </div>
   </main>
   <script src="app.js"></script>
