@@ -491,3 +491,29 @@ body{
 
 /* Petite amélioration d’accessibilité : logo cliquable */
 .brand-link{ text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; }
+
+/* === SYNC PAGE === */
+.sync-hero{
+  display:grid; place-items:center;
+  padding: 12px;
+  background: linear-gradient(180deg,#FFFDF8,#F6F0E6);
+}
+.watch{ display:grid; place-items:center; }
+.watch-svg{
+  width: 240px; height:auto;
+  filter: drop-shadow(0 10px 24px rgba(0,0,0,.12));
+}
+
+.sync-panel{ margin-top:12px; }
+.sync-rows{ display:flex; flex-direction:column; gap:8px; }
+.sync-row{
+  display:grid; grid-template-columns: 22px 1fr auto; align-items:center;
+  gap:10px; padding:8px 10px; border:1px solid var(--line); border-radius:12px;
+  background:#FFFDF8;
+}
+.sync-ico{ color: var(--muted); display:grid; place-items:center; }
+.sync-label{ color: var(--muted); font-size:14px; }
+.sync-val{ font-weight:800; color: var(--text); }
+
+.sync-actions{ display:flex; justify-content:flex-start; margin-top:10px; }
+.sync-actions .btn[disabled]{ filter:saturate(.85) opacity(.7); cursor:not-allowed; }
