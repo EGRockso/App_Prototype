@@ -402,15 +402,34 @@ body{
 }
 .chips::-webkit-scrollbar{ display:none; } /* cache la barre de scroll */
 
-/* chaque chip reste compacte et non extensible */
+/* === Catégories : 1 ligne, scroll horizontal doux === */
+.chips{
+  display:flex;
+  flex-wrap:nowrap;             /* une seule ligne */
+  gap:8px;
+  overflow-x:auto;              /* défilement latéral si ça dépasse */
+  overflow-y:visible;
+  padding: 2px 2px 4px;         /* un poil d’air sous la rangée */
+  white-space:nowrap;
+  scroll-snap-type:x proximity; /* feeling iOS */
+  -webkit-overflow-scrolling:touch;
+  /* fondu aux bords pour indiquer qu’on peut glisser */
+  mask-image: linear-gradient(to right,
+      transparent 0, black 16px,
+      black calc(100% - 16px), transparent 100%);
+}
+.chips::-webkit-scrollbar{ display:none; } /* pas de barre grise */
+
+/* chaque chip reste compacte et ne s’étire pas */
 .chip{
-  flex: 0 0 auto;
-  scroll-snap-align: start;
+  flex:0 0 auto;
+  scroll-snap-align:start;
 }
 
-/* mini resserrage interne pour aider à tenir sur 1 ligne */
-.chip{ padding:6px 8px; gap:3px; }
-.chip svg{ width:16px; height:16px; margin:0 2px; }  /* icône un poil plus serrée */
+/* resserrage léger interne pour tenir sur 1 ligne sans rapetisser les pastilles */
+.chip{ padding:6px 8px; gap:4px; }
+.chip svg{ width:16px; height:16px; margin:0 1px; }
+.chip .dot{ width:10px; height:10px; box-shadow:0 0 0 4px rgba(242,231,210,.6); }
 
 /* Avatar rond à la place de la jauge */
 .avatar{
