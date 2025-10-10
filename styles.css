@@ -332,3 +332,25 @@ body{
 .evol-row{ margin: 4px 0 !important; }
 .evol-label{ font-size: 11px !important; }
 .evol-val{ font-size: 15px !important; }
+
+/* === PATCH — Chips plus compactes (tout tient sur une ligne) === */
+.chips{ gap:6px !important; }                    /* un peu moins d’espace entre chips */
+
+.chip{
+  padding:6px 8px !important;                    /* moins haut/large */
+  gap:4px !important;                            /* espace interne réduit */
+  white-space: nowrap;                           /* force le contenu sur une seule ligne */
+}
+
+.chip .dot{
+  width:7px; height:7px;                         /* pastille un poil plus petite */
+  box-shadow: 0 0 0 3px rgba(242,231,210,.55);   /* halo plus fin */
+}
+
+/* icône sport collée au texte (et plus petite) */
+.chip svg{
+  width:16px; height:16px;                       /* 18 -> 16 */
+  display:inline-block;
+  vertical-align: middle;
+  margin: 0 3px 0 2px;                           /* ↓ espace dot↔icône et icône↔texte */
+}
