@@ -1,17 +1,17 @@
 /* ─────────────────────────────────────────────────────────────
    ROCKSO — Mobile prototype (light theme)
-   - Palette claire inspirée de tes slides
-   - Motifs discrets (triangle/cercles/croix)
-   - Texte vert Rockso partout
-   - Conserve toutes les classes existantes (HTML inchangé)
+   ─ Palette claire + motifs discrets
+   ─ Texte vert Rockso
+   ─ Tabbar iOS (frosted) corrigée
+   ─ Hero : slogan seul, lisible
    ───────────────────────────────────────────────────────────── */
 
 :root{
   /* Palette Rockso */
-  --rockso-green:  #3F8C6A; /* vert texte/bouton */
-  --rockso-beige:  #F5EFE3; /* fond device */
-  --rockso-cream:  #FFFBF4; /* cartes */
-  --rockso-line:   #E7DECF; /* séparateurs */
+  --rockso-green:  #3F8C6A;   /* vert texte/bouton */
+  --rockso-beige:  #F5EFE3;   /* fond device */
+  --rockso-cream:  #FFFBF4;   /* cartes */
+  --rockso-line:   #E7DECF;   /* séparateurs */
 
   --rockso-pink:   #EB6E9A;
   --rockso-orange: #F2A65A;
@@ -22,10 +22,10 @@
   --surface:  var(--rockso-beige);
   --surface-2:var(--rockso-cream);
   --text:     #2E6E55;           /* texte principal (vert) */
-  --muted:    #6C8E7E;           /* texte secondaire (vert désaturé) */
+  --muted:    #6C8E7E;           /* texte secondaire */
   --line:     var(--rockso-line);
   --brand:    var(--rockso-green);
-  --brand-2:  #72A88A;           /* variante pour dégradés */
+  --brand-2:  #72A88A;           /* variante dégradés */
   --danger:   #C65353;
 
   --radius:   22px;
@@ -97,22 +97,34 @@ body{
 .icon-btn{ background:none; border:none; color:var(--muted); padding:6px; border-radius:12px; }
 .icon-btn:hover{ background:rgba(255,255,255,.6); color:var(--text); }
 
-/* Contenu défilant */
-.content.scroll{ flex:1; overflow:auto; padding: 14px 14px 120px; }
+/* Contenu défilant (laisser place à la tabbar) */
+.content.scroll{ flex:1; overflow:auto; padding: 14px 14px 140px; }
 
-/* Hero */
-.hero{ position:relative; overflow:hidden; border-radius: var(--radius); }
+/* Hero — image + slogan seul lisible */
+.hero{ position:relative; overflow:hidden; border-radius: var(--radius); height:176px; }
 .hero-img{
-  width:100%; height:160px; object-fit:cover; display:block;
+  width:100%; height:176px; object-fit:cover; display:block;
   filter: saturate(.98) contrast(1.02) brightness(.98);
 }
 .hero-overlay{
   position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
-  padding: 14px;
-  background: linear-gradient(180deg, rgba(255,255,255,0) 30%, rgba(245,239,227,.75) 100%);
+  padding: 18px 16px 24px; /* texte un peu plus bas */
+  background:
+    linear-gradient(180deg,
+      rgba(245,239,227,0) 42%,
+      rgba(245,239,227,.72) 78%,
+      rgba(245,239,227,.94) 100%);
+  -webkit-backdrop-filter: blur(2px) saturate(120%);
+  backdrop-filter: blur(2px) saturate(120%);
 }
-.hero-overlay h1{ margin:0 0 4px; font-size:22px; color:var(--text); }
-.hero-overlay p{ margin:0; color:var(--muted); }
+/* Slogan (remplace le duo Hello+p) */
+.tagline{
+  margin:0;
+  font-size:26px;        /* passe à 28px si tu veux plus présent */
+  font-weight:800;
+  letter-spacing:.2px;
+  color:var(--text);
+}
 
 /* Quick stats */
 .quick-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin:12px 0 4px; }
@@ -181,35 +193,24 @@ body{
 .chart{ height:160px; display:grid; place-items:center; overflow:hidden; }
 .chart svg{ width:100%; height:100%; display:block; }
 
-/* Footer actions */
-.footer-cta{
-  display:flex; gap:10px; padding:12px 14px; border-top:1px solid var(--line);
-  background:linear-gradient(180deg,#FFFDF8,#F6F0E6);
-}
-.btn{
-  height:44px; padding:0 16px; border:none; border-radius:12px;
-  background: linear-gradient(120deg, var(--brand-2), var(--brand));
-  color:#0A120F; font-weight:800; letter-spacing:.2px;
-  box-shadow: 0 8px 18px rgba(63,140,106,.20);
-}
-.btn.ghost{ background: transparent; color: var(--text); border:1px solid var(--line); box-shadow:none; }
-.btn[disabled]{ filter:saturate(.85) opacity(.8); cursor:not-allowed; }
-
-/* Tabbar — Chroma Boost (couleurs plus vives, formes fondues) --- (no underline, correct colors, layering) --- */
+/* ───────────────── Tabbar — Chroma Boost (fix liens) ───────────────── */
 .tabbar{
   position:absolute; left:0; right:0; bottom:0;
   display:flex; gap:10px;
   padding:8px 12px calc(10px + env(safe-area-inset-bottom));
   height:68px;
+
+  /* Couleurs qui ressortent, formes fondues */
   background: rgba(255,255,255,.30);
   -webkit-backdrop-filter: saturate(240%) brightness(1.08) contrast(0.95) blur(34px);
   backdrop-filter: saturate(240%) brightness(1.08) contrast(0.95) blur(34px);
+
   border-top:1px solid rgba(231,222,207,.92);
   box-shadow: 0 -1px 0 rgba(255,255,255,.28) inset, 0 -10px 24px rgba(0,0,0,.06);
-  border-radius:0; z-index:10;
+  border-radius:0;
+  z-index:10;
 
-  position:absolute; /* déjà là, mais on s'assure de la couche interne */
-  isolation:isolate; /* crée un nouveau contexte pour ::before */
+  isolation:isolate; /* pour le ::before */
 }
 .tabbar::before{
   content:""; position:absolute; inset:0; pointer-events:none;
@@ -225,9 +226,9 @@ body{
   flex:1;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
   border:0; background:transparent; border-radius:12px;
-  text-decoration:none !important;       /* enlève le soulignement */
-  color:#6b7d74 !important;              /* évite le violet des liens visités */
-  position:relative; z-index:1;          /* au-dessus du ::before */
+  text-decoration:none !important;        /* pas de soulignement */
+  color:#6b7d74 !important;               /* pas de violet “visited” */
+  position:relative; z-index:1;           /* au-dessus du ::before */
   -webkit-tap-highlight-color: transparent;
 }
 .tab svg{ display:block }
@@ -241,11 +242,9 @@ body{
   font-weight:800;
 }
 
-/* Fallback si le blur n’est pas supporté (vieux Android / vieux Safari) */
+/* Fallback si blur non supporté */
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))){
-  .tabbar{
-    background: rgba(255,255,255,.85);  /* un peu plus opaque sans blur */
-  }
+  .tabbar{ background: rgba(255,255,255,.85); }
 }
 
 /* Blocs "future" */
@@ -280,7 +279,7 @@ body{
 .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
 .badge.outline{ background:transparent; color:var(--brand-2); border:1px solid rgba(63,140,106,.45); }
 
-/* Micro-interactions sobres (optionnel) */
+/* Micro-interactions sobres */
 * { transition: color .15s ease, background-color .15s ease, border-color .15s ease; }
 .btn, .tab, .chip, .activity-card, .metric, .quick-card {
   transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
