@@ -31,28 +31,50 @@
 
         <!-- Bloc héros : montre + check vert dans l’écran -->
         <div class="sync-hero card">
-          <div class="watch" aria-hidden="true">
-            <!-- Illustration “montre” (SVG inline, style Rockso) -->
-            <svg viewBox="0 0 260 330" class="watch-svg">
-              <!-- bracelet haut -->
-              <rect x="100" y="0" width="60" height="60" rx="12" fill="#dcd3c5"/>
-              <!-- boîtier -->
-              <rect x="35" y="50" width="190" height="190" rx="32" fill="#1e2925" />
-              <!-- bague -->
-              <circle cx="130" cy="145" r="86" fill="#2b3a33"/>
-              <!-- écran -->
-              <circle cx="130" cy="145" r="76" fill="#0f1512" />
-              <!-- check Rockso dans l’écran -->
-              <path d="M92 146 l25 25 46-54" fill="none" stroke="#3F8C6A" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-              <!-- boutons latéraux -->
-              <rect x="225" y="95" width="12" height="26" rx="6" fill="#cdbfae"/>
-              <rect x="225" y="130" width="12" height="26" rx="6" fill="#cdbfae"/>
-              <rect x="225" y="165" width="12" height="26" rx="6" fill="#cdbfae"/>
-              <!-- bracelet bas -->
-              <rect x="100" y="240" width="60" height="60" rx="12" fill="#dcd3c5"/>
-            </svg>
-          </div>
+            <div class="watch" aria-hidden="true">
+                <svg viewBox="0 0 260 330" class="watch-svg">
+                    <!-- bracelet haut -->
+                    <rect x="100" y="0" width="60" height="60" rx="12" fill="#dcd3c5"/>
+                    <!-- boîtier -->
+                    <rect x="35" y="50" width="190" height="190" rx="32" fill="#1e2925" />
+                    <!-- bague -->
+                    <circle cx="130" cy="145" r="86" fill="#2b3a33"/>
+                    <!-- écran -->
+                    <circle cx="130" cy="145" r="76" fill="#0f1512" />
+
+                    <!-- === Calque PROGRESS (caché par défaut) === -->
+                    <g id="sync-progress" style="display:none">
+                        <!-- piste grise -->
+                        <circle cx="130" cy="145" r="60"
+                                fill="none" stroke="rgba(255,255,255,.18)" stroke-width="8"/>
+                        <!-- barre verte (animée en JS via strokeDashoffset) -->
+                        <circle id="sync-progress-bar" cx="130" cy="145" r="60"
+                                fill="none" stroke="#3F8C6A" stroke-width="8"
+                                stroke-linecap="round"
+                                stroke-dasharray="377" stroke-dashoffset="377"/>
+                        <!-- “ondes” -->
+                        <g id="sync-waves" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.8">
+                            <path class="wave w1" d="M150 135 A20 20 0 0 1 165 145"/>
+                            <path class="wave w2" d="M140 130 A28 28 0 0 1 168 150"/>
+                            <path class="wave w3" d="M132 126 A36 36 0 0 1 172 150"/>
+                        </g>
+                    </g>
+
+                    <!-- === Calque CHECK (visible au repos & à la fin) === -->
+                    <path id="sync-check" d="M92 146 l25 25 46-54"
+                            fill="none" stroke="#3F8C6A" stroke-width="14"
+                            stroke-linecap="round" stroke-linejoin="round"/>
+
+                    <!-- boutons latéraux -->
+                    <rect x="225" y="95"  width="12" height="26" rx="6" fill="#cdbfae"/>
+                    <rect x="225" y="130" width="12" height="26" rx="6" fill="#cdbfae"/>
+                    <rect x="225" y="165" width="12" height="26" rx="6" fill="#cdbfae"/>
+                    <!-- bracelet bas -->
+                    <rect x="100" y="240" width="60" height="60" rx="12" fill="#dcd3c5"/>
+                </svg>
+            </div>
         </div>
+        <p id="sync-status" class="muted" style="margin:10px 0 0">Prêt</p>
 
         <!-- Infos (batterie + état) + bouton -->
         <div class="sync-panel card">
@@ -90,12 +112,12 @@
                 </svg>
               </span>
               <span class="sync-label">Dernière synchronisation</span>
-              <strong class="sync-val">—</strong>
+              <strong class="sync-val" data-sync-last>—</strong>
             </div>
           </div>
 
           <div class="sync-actions">
-            <button class="btn" disabled title="À venir">Synchroniser</button>
+            <button id="btn-sync" class="btn">Synchroniser</button>
           </div>
         </div>
       </section>

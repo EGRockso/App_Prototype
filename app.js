@@ -270,6 +270,82 @@ document.addEventListener('DOMContentLoaded', ()=>{
   hydrateSync();   // <— ajout
 });
 
+// ---- SYNC ANIMATION ----
+(function setupSyncAnimation(){
+  const btn   = document.getElementById('btn-sync');
+  const bar   = document.getElementById('sync-progress-bar');
+  const gProg = document.getElementById('sync-progress');
+  const gChk  = document.getElementById('sync-check');
+  const status= document.getElementById('sync-status');
+
+  if(!btn || !bar || !gProg || !gChk) return; // pas sur cette page
+
+  const CIRC = 2*Math.PI*60; // r=60 -> ~377 (déjà dans stroke-dasharray)
+
+  const steps = [
+    { label: "Connexion…",                          dur: 700,  start: 0,  end: 10 },
+    { label: "Préparation de la synchronisation…",  dur: 900,  start:10,  end: 22 },
+    { label: "Données d’activité",                  dur:1200,  start:22,  end: 40 },
+    { label: "Données sur le sommeil",              dur:1200,  start:40,  end: 58 },
+    { label: "Données de ressources",               dur:1200,  start:58,  end: 74 },
+    { label: "Optimisation du GPS (1/2)",           dur:1000,  start:74,  end: 88 },
+    { label: "Optimisation du GPS",                 dur:1000,  start:88,  end:100 },
+  ];
+
+  function setProgress(pct){
+    const off = CIRC * (1 - pct/100);
+    bar.style.strokeDashoffset = off.toFixed(1);
+  }
+
+  async function runStep(step){
+    status && (status.textContent = step.label);
+    const t0 = performance.now();
+    const tEnd = t0 + step.dur;
+    return new Promise(res=>{
+      function tick(now){
+        const k = Math.min(1, (now - t0) / (step.dur));
+        const v = step.start + (step.end - step.start) * k;
+        setProgress(v);
+        if(now < tEnd) requestAnimationFrame(tick);
+        else res();
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+
+  async function startSync(){
+    // UI: check -> progress
+    gChk.style.display = 'none';
+    gProg.style.display = 'block';
+    btn.disabled = true;
+
+    // reset anneau
+    setProgress(0);
+
+    // déroule la timeline
+    for(const s of steps){ /* eslint-disable no-await-in-loop */
+      await runStep(s);
+    }
+
+    // fin : check visible + date simulée
+    gProg.style.display = 'none';
+    gChk.style.display  = 'block';
+    status && (status.textContent = "Synchronisation terminée");
+
+    // si tu as un champ "Dernière synchronisation", mets-le à jour:
+    const last = document.querySelector('.sync-row .sync-label + .sync-val, .sync-val[data-sync-last]');
+    if(last){
+      const d = new Date();
+      const txt = d.toLocaleString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+      last.textContent = `aujourd’hui ${txt}`;
+    }
+
+    btn.disabled = false;
+  }
+
+  btn.addEventListener('click', startSync);
+})();
+
 // ---- Boot
 document.addEventListener('DOMContentLoaded', ()=>{
   hydrateHome();
