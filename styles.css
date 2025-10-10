@@ -195,32 +195,51 @@ body{
 .btn.ghost{ background: transparent; color: var(--text); border:1px solid var(--line); box-shadow:none; }
 .btn[disabled]{ filter:saturate(.85) opacity(.8); cursor:not-allowed; }
 
-/* Tabbar — Chroma Boost (couleurs plus vives, formes fondues) */
+/* Tabbar — Chroma Boost (couleurs plus vives, formes fondues) --- (no underline, correct colors, layering) --- */
 .tabbar{
   position:absolute; left:0; right:0; bottom:0;
   display:flex; gap:10px;
   padding:8px 12px calc(10px + env(safe-area-inset-bottom));
   height:68px;
-
-  /* Laisse bien passer la couleur */
   background: rgba(255,255,255,.30);
-
-  /* Couleurs ↑, détails ↓ (flou fort + contraste un peu réduit) */
   -webkit-backdrop-filter: saturate(240%) brightness(1.08) contrast(0.95) blur(34px);
   backdrop-filter: saturate(240%) brightness(1.08) contrast(0.95) blur(34px);
-
   border-top:1px solid rgba(231,222,207,.92);
   box-shadow: 0 -1px 0 rgba(255,255,255,.28) inset, 0 -10px 24px rgba(0,0,0,.06);
   border-radius:0; z-index:10;
-}
 
-/* Légère pellicule screen pour “ré-éclairer” la couleur derrière sans révéler les formes */
+  position:absolute; /* déjà là, mais on s'assure de la couche interne */
+  isolation:isolate; /* crée un nouveau contexte pour ::before */
+}
 .tabbar::before{
   content:""; position:absolute; inset:0; pointer-events:none;
   background: radial-gradient(150% 110% at 50% 0, rgba(255,255,255,.10), rgba(255,255,255,0) 60%);
   mix-blend-mode: screen;
+  z-index:0; /* derrière le contenu */
 }
 
+/* liens = onglets */
+.tab,
+.tab:link,
+.tab:visited{
+  flex:1;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  border:0; background:transparent; border-radius:12px;
+  text-decoration:none !important;       /* enlève le soulignement */
+  color:#6b7d74 !important;              /* évite le violet des liens visités */
+  position:relative; z-index:1;          /* au-dessus du ::before */
+  -webkit-tap-highlight-color: transparent;
+}
+.tab svg{ display:block }
+.tab span{ font-weight:600 }
+
+/* état actif */
+.tab.active,
+.tab.active:link,
+.tab.active:visited{
+  color: var(--text) !important;
+  font-weight:800;
+}
 
 /* Fallback si le blur n’est pas supporté (vieux Android / vieux Safari) */
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))){
