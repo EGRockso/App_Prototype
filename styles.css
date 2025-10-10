@@ -356,3 +356,28 @@ body{
   display:inline-block; vertical-align:middle;
   margin: 0 2px;                               /* colle texte et pastille */
 }
+
+/* === BACKDROP HORS TÉLÉPHONE — sombre + nuances Rockso === */
+.viewport{ position: relative; } /* pour le ::after */
+body{
+  /* fond global très sombre */
+  background: #0b0e12 !important;
+}
+
+/* dégradés colorés autour du device (pas dans le device) */
+.theme-rockso .viewport{
+  background:
+    radial-gradient(900px 520px at 0% 0%,    rgba(235,110,154,.18), transparent 60%),
+    radial-gradient(900px 520px at 100% 0%,  rgba(242,166,90,.16),  transparent 60%),
+    radial-gradient(1100px 700px at 50% 120%,rgba(0,179,122,.20),   transparent 60%),
+    linear-gradient(180deg,#11151a,#0b0e12);
+}
+
+/* léger halo sous le téléphone pour le contraste (optionnel) */
+.theme-rockso .viewport::after{
+  content:""; pointer-events:none; position:absolute; inset:0;
+  background:
+    radial-gradient(60% 25% at 50% 95%, rgba(0,0,0,.35), transparent 60%),
+    radial-gradient(50% 18% at 50% 98%, rgba(0,179,122,.14), transparent 65%);
+  mix-blend-mode: normal;
+}
