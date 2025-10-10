@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>Rockso • Prototype</title>
   <link rel="icon" href="assets/img/rockso_logo_mark.png">
-  <!-- thème clair -->
-  <meta name="theme-color" content="#F5EFE3">
+  <meta name="theme-color" content="#F5EFE3"><!-- thème clair -->
   <link rel="stylesheet" href="styles.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
+
 <body class="theme-rockso">
   <main class="viewport">
     <div class="device">
+      <!-- Header -->
       <header class="app-header">
         <div class="brand">
           <img src="assets/img/rockso_logo_mark.png" alt="Rockso" class="brand-mark"/>
@@ -25,7 +26,9 @@
         </a>
       </header>
 
+      <!-- Contenu -->
       <section class="content scroll">
+        <!-- Hero -->
         <div class="hero">
           <img src="assets/img/rockso_banner.png" alt="Bannière Rockso" class="hero-img"/>
           <div class="hero-overlay">
@@ -33,15 +36,19 @@
           </div>
         </div>
 
+        <!-- Quick stats -->
         <div class="quick-grid">
           <div class="quick-card">
             <span class="qc-label">Charge hebdo</span>
             <strong class="qc-value" id="metric-load">—</strong>
           </div>
+
           <div class="quick-card">
             <span class="qc-label">Heures</span>
             <strong class="qc-value" id="metric-hours">—</strong>
           </div>
+
+          <!-- Évolution (Volume / Intensité) -->
           <div class="quick-card qc-evol">
             <span class="qc-label">Évolution</span>
 
@@ -63,11 +70,13 @@
           </div>
         </div>
 
+        <!-- Catégories -->
         <div class="section">
           <h2 class="section-title">Catégories</h2>
           <div class="chips" id="sport-chips"></div>
         </div>
 
+        <!-- Dernière activité -->
         <div class="section">
           <h2 class="section-title">Dernière activité</h2>
           <a class="activity-card" id="last-activity" href="#">
@@ -94,6 +103,7 @@
           <a class="journal-btn" href="./activities.html">Journal des activités</a>
         </div>
 
+        <!-- Placeholder démos -->
         <div class="section future">
           <h2 class="section-title">Aperçu des futures démos</h2>
           <div class="card">
@@ -107,7 +117,7 @@
         </div>
       </section>
 
-      <!-- Tabbar iOS-like, pleine largeur, frosted glass -->
+      <!-- Tabbar iOS-like -->
       <nav class="tabbar" role="navigation" aria-label="Navigation principale">
         <a class="tab active" href="./index.html" aria-current="page">
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -130,6 +140,7 @@
       </nav>
     </div>
   </main>
+
   <script src="app.js"></script>
 </body>
 </html>

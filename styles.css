@@ -2,7 +2,7 @@
    ROCKSO — Mobile prototype (light theme)
    ─ Palette claire + motifs discrets
    ─ Texte vert Rockso
-   ─ Tabbar iOS (frosted) corrigée
+   ─ Tabbar iOS (frosted)
    ─ Hero : slogan seul, lisible
    ───────────────────────────────────────────────────────────── */
 
@@ -17,7 +17,7 @@
   --rockso-orange: #F2A65A;
   --rockso-yellow: #F2C14E;
 
-  /* Variables UI (écrasent l’ancien thème sombre) */
+  /* Variables UI */
   --bg:       #F1ECE1;           /* fond page derrière le device */
   --surface:  var(--rockso-beige);
   --surface-2:var(--rockso-cream);
@@ -30,6 +30,9 @@
 
   --radius:   22px;
   --shadow:   0 10px 24px rgba(160,140,120,.20);
+
+  /* Hauteur du dock iOS-like */
+  --tabbar-h: 68px;
 }
 
 *{ box-sizing:border-box }
@@ -62,21 +65,18 @@ body{
   position:relative;
 }
 
-/* Motifs Rockso sur le device (triangle rose, cercles jaunes, croix vertes/orange) */
+/* Motifs Rockso */
 .device::after{
   content:""; position:absolute; inset:0; pointer-events:none; opacity:.20;
   background:
-    /* triangle rose en haut-gauche */
     linear-gradient(135deg, rgba(235,110,154,.25) 0 140px, transparent 140px),
-    /* grand cercle jaune en bas */
     radial-gradient(240px 240px at 60% 115%, rgba(242,193,78,.15) 0 60%, transparent 60%),
-    /* petites croix */
     radial-gradient(4px 4px at 10% 40%, rgba(63,140,106,.35) 98%, transparent 99%),
     radial-gradient(4px 4px at 16% 44%, rgba(242,166,90,.35) 98%, transparent 99%),
     radial-gradient(4px 4px at 86% 22%, rgba(63,140,106,.35) 98%, transparent 99%);
 }
 
-/* Notch (sobre) */
+/* Notch */
 .device::before{
   content:"";
   position:absolute; left:50%; transform:translateX(-50%);
@@ -97,37 +97,32 @@ body{
 .icon-btn{ background:none; border:none; color:var(--muted); padding:6px; border-radius:12px; }
 .icon-btn:hover{ background:rgba(255,255,255,.6); color:var(--text); }
 
-/* Contenu défilant (laisser place à la tabbar) */
-.content.scroll{ flex:1; overflow:auto; padding: 14px 14px 140px; }
+/* Contenu défilant (place pour le dock) */
+.content.scroll{
+  flex:1; overflow:auto;
+  padding: 14px 14px calc(40px + var(--tabbar-h));
+}
 
-/* Hero — garder l'image nette, juste un voile en bas */
+/* Hero — image nette + voile en bas */
 .hero{ position:relative; overflow:hidden; border-radius: var(--radius); height:176px; }
 .hero-img{
   width:100%; height:176px; object-fit:cover; display:block;
-  filter: saturate(.98) contrast(1.02) brightness(.98); /* pas de blur ici */
+  filter: saturate(.98) contrast(1.02) brightness(.98);
 }
 .hero-overlay{
   position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
-  /* ↓ texte un peu plus bas */
-  padding: 18px 16px 28px;
-
-  /* voile doux uniquement en bas (aucun backdrop-filter => image 100% nette) */
-  background: linear-gradient(
-    180deg,
+  padding: 18px 16px 28px; /* texte un peu plus bas */
+  background: linear-gradient(180deg,
     rgba(245,239,227,0) 48%,
     rgba(245,239,227,.72) 82%,
-    rgba(245,239,227,.94) 100%
-  );
+    rgba(245,239,227,.94) 100%);
 }
-
-/* Slogan seul : plus discret mais bien gras */
 .tagline{
   margin:0;
-  font-size:24px;          /* plus petit */
+  font-size:24px;
   font-weight:800;
   letter-spacing:.2px;
   color:var(--text);
-  /* micro rehaut pour la lisibilité sans flouter l'image */
   text-shadow: 0 1px 0 rgba(255,255,255,.30);
 }
 
@@ -139,7 +134,8 @@ body{
 }
 .qc-label{ color:var(--muted); font-size:12px }
 .qc-value{ font-size:18px; margin-top:2px; display:block; color:#1c3b2f }
-/* Quick card "Évolution" : 2 lignes Volume/Intensité */
+
+/* Quick card "Évolution" compacte */
 .qc-evol{ padding-top: 8px; padding-bottom: 8px; }
 .evol-row{
   display:flex; align-items:center; justify-content:space-between;
@@ -149,12 +145,11 @@ body{
 .evol-label{ color: var(--muted); font-size:12px; }
 .evol-val{ font-size:16px; }
 
-/* Pastilles statut (mêmes codes que les chips) */
+/* Pastilles statut */
 .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; box-shadow:0 0 0 4px rgba(242,231,210,.6); }
-.dot--ok   { background: var(--brand); }          /* variation raisonnable */
-.dot--warn { background: var(--rockso-yellow); }  /* moyen */
-.dot--risk { background: var(--danger); }         /* trop élevé */
-
+.dot--ok   { background: var(--brand); }
+.dot--warn { background: var(--rockso-yellow); }
+.dot--risk { background: var(--danger); }
 
 /* Sections & titres */
 .section{ margin:16px 0 10px; }
@@ -214,14 +209,13 @@ body{
 .chart{ height:160px; display:grid; place-items:center; overflow:hidden; }
 .chart svg{ width:100%; height:100%; display:block; }
 
-/* ───────────────── Tabbar — Chroma Boost (fix liens) ───────────────── */
+/* ─────────────── Tabbar — iOS frosted + liens propres ─────────────── */
 .tabbar{
   position:absolute; left:0; right:0; bottom:0;
   display:flex; gap:10px;
   padding:8px 12px calc(10px + env(safe-area-inset-bottom));
-  height:68px;
+  height:var(--tabbar-h);
 
-  /* Couleurs qui ressortent, formes fondues */
   background: rgba(255,255,255,.30);
   -webkit-backdrop-filter: saturate(240%) brightness(1.08) contrast(0.95) blur(34px);
   backdrop-filter: saturate(240%) brightness(1.08) contrast(0.95) blur(34px);
@@ -230,32 +224,29 @@ body{
   box-shadow: 0 -1px 0 rgba(255,255,255,.28) inset, 0 -10px 24px rgba(0,0,0,.06);
   border-radius:0;
   z-index:10;
-
-  isolation:isolate; /* pour le ::before */
+  isolation:isolate;
 }
 .tabbar::before{
   content:""; position:absolute; inset:0; pointer-events:none;
   background: radial-gradient(150% 110% at 50% 0, rgba(255,255,255,.10), rgba(255,255,255,0) 60%);
   mix-blend-mode: screen;
-  z-index:0; /* derrière le contenu */
+  z-index:0;
 }
 
-/* liens = onglets */
 .tab,
 .tab:link,
 .tab:visited{
   flex:1;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
   border:0; background:transparent; border-radius:12px;
-  text-decoration:none !important;        /* pas de soulignement */
-  color:#6b7d74 !important;               /* pas de violet “visited” */
-  position:relative; z-index:1;           /* au-dessus du ::before */
+  text-decoration:none !important;
+  color:#6b7d74 !important;
+  position:relative; z-index:1;
   -webkit-tap-highlight-color: transparent;
 }
-.tab svg{ display:block }
+.tab svg{ display:block; stroke: currentColor; fill: none; } /* icônes = couleur de l'onglet */
 .tab span{ font-weight:600 }
 
-/* état actif */
 .tab.active,
 .tab.active:link,
 .tab.active:visited{
@@ -292,9 +283,7 @@ body{
                    #EAE3D6 var(--p,75%) 100%);
   display:grid; place-items:center;
 }
-.gauge::after{
-  content:""; position:absolute; inset:8px; background:var(--surface); border-radius:999px; border:1px solid var(--line);
-}
+.gauge::after{ content:""; position:absolute; inset:8px; background:var(--surface); border-radius:999px; border:1px solid var(--line); }
 .gauge .val{ position:relative; font-size:24px; font-weight:800; color:#1c3b2f; }
 
 .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
@@ -311,11 +300,11 @@ body{
 .tab:active { transform: translateY(1px); }
 @media (prefers-reduced-motion: reduce) { *{ transition:none !important; } }
 
-/* === Force hero tagline (taille + position), passe au-dessus de tout === */
-.hero-overlay{ padding-bottom: 40px !important; }  /* ↓ descendre nettement le texte */
+/* === Force hero tagline (taille + position) === */
+.hero-overlay{ padding-bottom: 40px !important; }
 .hero .tagline{
   margin: 0 !important;
-  font-size: 22px !important;   /* plus petit */
+  font-size: 22px !important;
   font-weight: 800 !important;
   line-height: 1.1 !important;
   letter-spacing: .2px !important;
