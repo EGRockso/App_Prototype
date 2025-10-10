@@ -385,3 +385,29 @@ body{
 /* Icônes tabbar en style "plein" piloté par la couleur de l'onglet */
 .tab svg{ width:22px; height:22px; display:block; fill: currentColor; }
 .tab svg path{ stroke: none; }
+
+/* === Catégories en 1 seule ligne (scroll horizontal doux) === */
+.chips{
+  display:flex;
+  flex-wrap: nowrap;              /* une seule ligne */
+  gap:8px;
+  overflow-x:auto;                /* scroll horizontal si ça dépasse */
+  overflow-y:visible;
+  padding-bottom:2px;
+  white-space: nowrap;
+  scroll-snap-type: x proximity;  /* feeling iOS */
+  -webkit-overflow-scrolling: touch;
+  mask-image: linear-gradient(to right,
+    transparent 0, black 16px, black calc(100% - 16px), transparent 100%); /* fondu bords */
+}
+.chips::-webkit-scrollbar{ display:none; } /* cache la barre de scroll */
+
+/* chaque chip reste compacte et non extensible */
+.chip{
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+/* mini resserrage interne pour aider à tenir sur 1 ligne */
+.chip{ padding:6px 8px; gap:3px; }
+.chip svg{ width:16px; height:16px; margin:0 2px; }  /* icône un poil plus serrée */
