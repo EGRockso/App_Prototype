@@ -93,6 +93,14 @@ function setEvolution(baseId, valuePct=0){
   else                               dotEl.classList.add('dot--risk');
 }
 
+function formatKm(val){
+  if (val == null) return '—';
+  const n = Number(val);
+  if (!Number.isFinite(n)) return '—';
+  return `${n.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} km`;
+}
+
+
 // =======================
 // Hydrations par page
 // =======================
@@ -105,7 +113,7 @@ function hydrateHome(){
     const { weekly, lastActivity, sports } = state;
 
     // Quick cards
-    $('#metric-load').textContent = weekly.load ?? '—';
+    $('#metric-load').textContent = formatKm(weekly.load);
     $('#metric-hours').textContent = formatHoursDecimalToHM(
       typeof weekly.hours === 'number' ? weekly.hours : 0
     );
@@ -224,7 +232,7 @@ function hydrateProfile(){
     const readiness = w.readiness || 82;
     $('#gauge').style.setProperty('--p', readiness);
     $('#gauge-val').textContent = readiness + '%';
-    $('#p-load').textContent  = w.load ?? '—';
+    $('#p-load').textContent  = formatKm(w.load);
     $('#p-hours').textContent = formatHoursDecimalToHM(typeof w.hours === 'number' ? w.hours : 0);
 
     const chips = document.getElementById('p-sports');
