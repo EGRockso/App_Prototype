@@ -381,3 +381,7 @@ body{
     radial-gradient(50% 18% at 50% 98%, rgba(0,179,122,.14), transparent 65%);
   mix-blend-mode: normal;
 }
+
+/* Icônes tabbar en style "plein" piloté par la couleur de l'onglet */
+.tab svg{ width:22px; height:22px; display:block; fill: currentColor; }
+.tab svg path{ stroke: none; }
