@@ -294,3 +294,15 @@ body{
 .tab:hover { opacity:.95; }
 .tab:active { transform: translateY(1px); }
 @media (prefers-reduced-motion: reduce) { *{ transition:none !important; } }
+
+/* === Force hero tagline (taille + position), passe au-dessus de tout === */
+.hero-overlay{ padding-bottom: 40px !important; }  /* ↓ descendre nettement le texte */
+.hero .tagline{
+  margin: 0 !important;
+  font-size: 22px !important;   /* plus petit */
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  letter-spacing: .2px !important;
+  color: var(--text) !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.30) !important;
+}
