@@ -108,7 +108,7 @@ body{
 }
 .hero-overlay{
   position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
-  padding: 18px 16px 30px; /* ↓ un peu plus bas (était 24px) */
+  padding: 18px 16px 24px; /* texte un peu plus bas */
   background:
     linear-gradient(180deg,
       rgba(245,239,227,0) 42%,
@@ -120,7 +120,7 @@ body{
 /* Slogan (remplace le duo Hello+p) */
 .tagline{
   margin:0;
-  font-size:24px;        /* ↓ un peu plus discret (était 26px) */
+  font-size:26px;        /* passe à 28px si tu veux plus présent */
   font-weight:800;
   letter-spacing:.2px;
   color:var(--text);
