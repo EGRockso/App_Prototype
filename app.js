@@ -46,13 +46,55 @@ function fmtDate(iso){
   return d.toLocaleString('fr-FR', { weekday:'short', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
 }
 
+// --- Helpers ---
+function formatHoursDecimalToHM(hDecimal) {
+  const h = Math.floor(hDecimal || 0);
+  const m = Math.round(((hDecimal || 0) - h) * 60);
+  const mm = String(m).padStart(2, '0');
+  return `${h}h ${mm}`;
+}
+
+// Seuils pour colorer les pastilles (absolu du pourcentage)
+const EVOL_THRESHOLDS = { ok: 10, warn: 20 }; // <=10% vert, <=20% jaune, >20% rouge
+
+function setEvolution(baseId, valuePct) {
+  const valEl = document.getElementById(baseId);
+  const dotEl = document.getElementById(`${baseId}-dot`);
+  if (!valEl || !dotEl) return;
+
+  const sign = valuePct > 0 ? '+' : '';
+  valEl.textContent = `${sign}${Math.round(valuePct)}%`;
+
+  const a = Math.abs(valuePct);
+  dotEl.classList.remove('dot--ok','dot--warn','dot--risk');
+  if (a <= EVOL_THRESHOLDS.ok) dotEl.classList.add('dot--ok');
+  else if (a <= EVOL_THRESHOLDS.warn) dotEl.classList.add('dot--warn');
+  else dotEl.classList.add('dot--risk');
+}
+
+
 function hydrateHome(){
   const { weekly, lastActivity, sports } = state;
   const $ = (s)=>document.querySelector(s);
-  if($('#metric-load')){
-    $('#metric-load').textContent = weekly.load;
-    $('#metric-hours').textContent = weekly.hours.toFixed(1);
-    $('#metric-readiness').textContent = weekly.readiness + '%';
+if($('#metric-load')){
+  // Charge hebdo (inchangé)
+  $('#metric-load').textContent = weekly.load ?? '—';
+
+  // Heures -> format "h mm" (ex: 4.6 => 4h 36)
+  const h = typeof weekly.hours === 'number' ? weekly.hours : 0;
+  $('#metric-hours').textContent = formatHoursDecimalToHM(h);
+
+  // Remplace "Readiness" par "Évolution" (Volume / Intensité)
+  // -> fournis ces deux % depuis ta logique; valeurs démo si absent
+  const evolVolumePct    = typeof weekly.evolVolumePct === 'number' ? weekly.evolVolumePct : 6;
+  const evolIntensityPct = typeof weekly.evolIntensityPct === 'number' ? weekly.evolIntensityPct : -12;
+
+  setEvolution('evol-vol', evolVolumePct);
+  setEvolution('evol-int', evolIntensityPct);
+
+  // Si l'ancien élément existe encore, on le vide pour éviter des restes
+  const r = $('#metric-readiness');
+  if (r) r.textContent = '';
 
     const chips = document.getElementById('sport-chips');
     sports.forEach(sp=>{

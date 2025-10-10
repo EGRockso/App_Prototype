@@ -139,6 +139,22 @@ body{
 }
 .qc-label{ color:var(--muted); font-size:12px }
 .qc-value{ font-size:18px; margin-top:2px; display:block; color:#1c3b2f }
+/* Quick card "Évolution" : 2 lignes Volume/Intensité */
+.qc-evol{ padding-top: 8px; padding-bottom: 8px; }
+.evol-row{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin:6px 0;
+}
+.evol-left{ display:flex; align-items:center; gap:8px; }
+.evol-label{ color: var(--muted); font-size:12px; }
+.evol-val{ font-size:16px; }
+
+/* Pastilles statut (mêmes codes que les chips) */
+.dot{ width:8px; height:8px; border-radius:50%; display:inline-block; box-shadow:0 0 0 4px rgba(242,231,210,.6); }
+.dot--ok   { background: var(--brand); }          /* variation raisonnable */
+.dot--warn { background: var(--rockso-yellow); }  /* moyen */
+.dot--risk { background: var(--danger); }         /* trop élevé */
+
 
 /* Sections & titres */
 .section{ margin:16px 0 10px; }
