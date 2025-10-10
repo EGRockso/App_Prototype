@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Rockso • Synchronisation</title>
+  <link rel="icon" href="assets/img/rockso_logo_mark.png">
+  <meta name="theme-color" content="#F5EFE3">
+  <link rel="stylesheet" href="styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body class="theme-rockso">
+  <main class="viewport">
+    <div class="device">
+      <!-- Header identique, logo cliquable -->
+      <header class="app-header">
+        <a class="brand brand-link" href="./sync.html" aria-label="Synchronisation (vous êtes ici)">
+          <img src="assets/img/rockso_logo_mark.png" alt="Rockso" class="brand-mark"/>
+          <span class="brand-name">Rockso</span>
+        </a>
+        <a class="icon-btn" href="./profile.html" aria-label="Profil">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"></circle>
+          </svg>
+        </a>
+      </header>
+
+      <section class="content scroll">
+        <div class="section">
+          <h2 class="section-title">Synchronisation</h2>
+
+          <div class="sync-card">
+            <!-- Montre stylisée + coche verte -->
+            <div class="watch">
+              <div class="watch-bezel">
+                <div class="watch-face">
+                  <svg class="watch-check" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="watch-body"></div>
+            </div>
+
+            <div class="sync-infos">
+              <div class="sync-battery">
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <rect x="2" y="7" width="18" height="10" rx="2" ry="2" stroke="currentColor" fill="none" stroke-width="2"/>
+                  <rect x="20" y="10" width="2" height="4" rx="1" fill="currentColor"/>
+                </svg>
+                <span id="sync-battery-val">—</span>
+              </div>
+              <div class="muted" id="sync-last">Dernière synchronisation : —</div>
+            </div>
+
+            <button class="sync-btn" type="button" disabled aria-disabled="true" title="Bientôt">
+              Synchroniser
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tabbar inchangée -->
+      <nav class="tabbar" role="navigation" aria-label="Navigation principale">
+        <a class="tab" href="./index.html">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9z"></path></svg>
+          <span>Accueil</span>
+        </a>
+        <a class="tab" href="./activities.html">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 12h4l3 8 3-16 3 8h4"></path></svg>
+          <span>Journal</span>
+        </a>
+        <a class="tab" href="./profile.html">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle></svg>
+          <span>Profil</span>
+        </a>
+      </nav>
+    </div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

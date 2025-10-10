@@ -253,10 +253,28 @@ function hydrateProfile(){
   }
 }
 
+function hydrateSync(){
+  const $ = (s)=>document.querySelector(s);
+  if (!$('#sync-last')) return;
+  // Démo : valeurs statiques (tu remplaceras par de vraies données plus tard)
+  $('#sync-battery-val').textContent = '87%';
+  $('#sync-last').textContent = 'Dernière synchronisation : il y a 1 minute';
+}
+
+// … en bas dans le DOMContentLoaded principal :
+document.addEventListener('DOMContentLoaded', ()=>{
+  hydrateHome();
+  hydrateActivity();
+  hydrateActivities();
+  hydrateProfile();
+  hydrateSync();   // <— ajout
+});
+
 // ---- Boot
 document.addEventListener('DOMContentLoaded', ()=>{
   hydrateHome();
   hydrateActivity();
   hydrateActivities();
   hydrateProfile();
+  hydrateSync();
 });

@@ -445,3 +445,49 @@ body{
   object-fit: cover;          /* recadre proprement */
   display:block;
 }
+
+/* ───────── Synchronisation (page) ───────── */
+.sync-card{
+  background: var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:16px;
+}
+
+/* Montre “mock” */
+.watch{ display:flex; align-items:center; justify-content:center; padding:6px 0; }
+.watch-bezel{
+  width:180px; height:180px; border-radius:50%;
+  background: radial-gradient(60% 60% at 50% 45%, #111 0%, #222 60%, #333 100%);
+  border: 6px solid #1f252b;
+  box-shadow: inset 0 0 24px rgba(0,0,0,.45), 0 8px 18px rgba(0,0,0,.12);
+  display:grid; place-items:center;
+}
+.watch-face{
+  width:142px; height:142px; border-radius:50%;
+  background: radial-gradient(70% 70% at 50% 40%, #0a0d0f, #0e1417 60%, #121a1e 100%);
+  display:grid; place-items:center; position:relative;
+}
+.watch-check{ width:64px; height:64px; color:#29b36b; filter: drop-shadow(0 2px 4px rgba(0,0,0,.4)); }
+
+.watch-body{
+  width:210px; height:14px; margin-left:-210px; border-radius:6px;
+  background: linear-gradient(180deg,#30373e,#1f252b);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* Infos et bouton */
+.sync-infos{ display:flex; align-items:center; justify-content:center; gap:14px; }
+.sync-battery{ display:inline-flex; align-items:center; gap:8px; color:var(--text); font-weight:600; }
+.sync-btn{
+  height:46px; border-radius:12px; border:1px solid var(--line);
+  background: #e9e2d5; color: var(--text); font-weight:800;
+}
+.sync-btn[disabled]{ opacity:.65; cursor:not-allowed; }
+
+/* Petite amélioration d’accessibilité : logo cliquable */
+.brand-link{ text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; }
