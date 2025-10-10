@@ -225,27 +225,31 @@ function hydrateActivities(){
 }
 
 function hydrateProfile(){
-  const guard = $('#gauge');
-  if(!guard) return;
-  try{
-    const w = state.weekly;
-    const readiness = w.readiness || 82;
-    $('#gauge').style.setProperty('--p', readiness);
-    $('#gauge-val').textContent = readiness + '%';
-    $('#p-load').textContent  = formatKm(w.load);
-    $('#p-hours').textContent = formatHoursDecimalToHM(typeof w.hours === 'number' ? w.hours : 0);
+  const $ = (s)=>document.querySelector(s);
+  const w = state.weekly;
 
-    const chips = document.getElementById('p-sports');
-    if (chips && chips.children.length === 0){
-      state.sports.forEach(sp=>{
-        const el = document.createElement('span');
-        el.className = 'chip';
-        el.innerHTML = `<span class="dot" style="background:${sp.color}"></span>${iconFor(sp.name)} ${sp.name}`;
-        chips.appendChild(el);
-      });
-    }
-  }catch(err){
-    console.error('hydrateProfile error:', err);
+  // on teste un élément qui existe toujours sur la page profil
+  if (!$('#p-load')) return;
+
+  // valeurs
+  $('#p-load').textContent  = formatKm(w.load); // ex: "73 km"
+  $('#p-hours').textContent = formatHoursDecimalToHM(
+    typeof w.hours === 'number' ? w.hours : 0
+  );
+  // Repos: si tu as une logique, remplace "OK"
+  const restEl = $('#p-rest');
+  if (restEl) restEl.textContent = 'OK';
+
+  // chips "Sports"
+  const chips = document.getElementById('p-sports');
+  if (chips) {
+    chips.innerHTML = ''; // reset si re-hydratation
+    state.sports.forEach(sp=>{
+      const el = document.createElement('span');
+      el.className = 'chip';
+      el.innerHTML = `<span class="dot" style="background:${sp.color}"></span>${iconFor(sp.name)} ${sp.name}`;
+      chips.appendChild(el);
+    });
   }
 }
 
