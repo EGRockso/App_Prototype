@@ -333,24 +333,26 @@ body{
 .evol-label{ font-size: 11px !important; }
 .evol-val{ font-size: 15px !important; }
 
-/* === PATCH — Chips plus compactes (tout tient sur une ligne) === */
-.chips{ gap:6px !important; }                    /* un peu moins d’espace entre chips */
+/* === PATCH — Chips compactes (pastilles taille d'origine) === */
+.chips{ gap:6px !important; }                  /* espace entre chips un peu réduit */
 
 .chip{
-  padding:6px 8px !important;                    /* moins haut/large */
-  gap:4px !important;                            /* espace interne réduit */
-  white-space: nowrap;                           /* force le contenu sur une seule ligne */
+  padding:6px 7px !important;                  /* moins large/haut, sans toucher le texte */
+  gap:3px !important;                          /* espace interne fortement réduit */
+  white-space: nowrap !important;              /* pas de retour à la ligne dans la chip */
+  line-height: 1.1 !important;                 /* compacter la hauteur */
 }
 
+/* pastille — taille d'origine */
 .chip .dot{
-  width:7px; height:7px;                         /* pastille un poil plus petite */
-  box-shadow: 0 0 0 3px rgba(242,231,210,.55);   /* halo plus fin */
+  width:8px; height:8px;                       /* 8px (comme avant) */
+  box-shadow: 0 0 0 4px rgba(242,231,210,.6);  /* halo d'origine */
+  margin-right: 2px;                           /* colle un peu plus l'icône */
 }
 
-/* icône sport collée au texte (et plus petite) */
+/* icône sport — taille d'origine, marges resserrées */
 .chip svg{
-  width:16px; height:16px;                       /* 18 -> 16 */
-  display:inline-block;
-  vertical-align: middle;
-  margin: 0 3px 0 2px;                           /* ↓ espace dot↔icône et icône↔texte */
+  width:18px; height:18px;                     /* 18px (comme avant) */
+  display:inline-block; vertical-align:middle;
+  margin: 0 2px;                               /* colle texte et pastille */
 }
