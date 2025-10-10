@@ -311,3 +311,24 @@ body{
   color: var(--text) !important;
   text-shadow: 0 1px 0 rgba(255,255,255,.30) !important;
 }
+
+/* === PATCH UI — quick-cards plus compactes + slogan plus bas === */
+
+/* 1) Descendre nettement "Keep moving forward" (~+20 px ≈ 4–5 mm) */
+.hero-overlay{ padding-bottom: 62px !important; }  /* avant 40px */
+
+/* 2) Cartes "quick stats" plus petites (hauteur réduite) */
+.quick-grid{ gap: 8px !important; }                       /* un poil moins d'espace */
+.quick-card{
+  padding: 8px 10px !important;                           /* moins haut */
+  border-radius: 14px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.05) !important;      /* un peu plus léger */
+}
+.qc-label{ font-size: 11px !important; }                  /* label + fin */
+.qc-value{ font-size: 16px !important; }                  /* valeur + compacte */
+
+/* Carte Évolution : encore plus compacte */
+.qc-evol{ padding-top: 6px !important; padding-bottom: 6px !important; }
+.evol-row{ margin: 4px 0 !important; }
+.evol-label{ font-size: 11px !important; }
+.evol-val{ font-size: 15px !important; }
