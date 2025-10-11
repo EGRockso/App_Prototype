@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Rockso • Training — Entraînement</title>
+  <link rel="icon" href="assets/img/rockso_logo_mark.png">
+  <meta name="theme-color" content="#F5EFE3">
+  <link rel="stylesheet" href="styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body class="theme-rockso" data-page="training">
+  <main class="viewport">
+    <div class="device">
+      <header class="app-header">
+        <a class="brand brand-link" href="./sync.html">
+          <img src="assets/img/rockso_logo_mark.png" alt="Rockso" class="brand-mark"/>
+          <span class="brand-name">Training</span>
+        </a>
+        <a class="icon-btn" href="./profile.html" aria-label="Profil">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg>
+        </a>
+      </header>
+
+      <!-- Ruban sous-onglets -->
+      <nav class="subtabs">
+        <a class="subtab active" href="./training-entrainement.html">Entraînement</a>
+        <a class="subtab" href="./training-tendance.html">Tendance</a>
+        <a class="subtab" href="./training-recuperation.html">Récupération</a>
+        <a class="subtab" href="./training-quotidien.html">Quotidien</a>
+      </nav>
+
+      <section class="content scroll">
+        <h2 class="section-title" style="margin-top:10px">Entraînement</h2>
+
+        <!-- Cartes KPI semaine -->
+        <div class="quick-grid">
+          <div class="quick-card">
+            <span class="qc-label">Durée (7j)</span>
+            <strong class="qc-value" id="trg-dur-7">6h 32</strong>
+          </div>
+          <div class="quick-card">
+            <span class="qc-label">Distance (7j)</span>
+            <strong class="qc-value" id="trg-dist-7">21,5 km</strong>
+          </div>
+          <div class="quick-card">
+            <span class="qc-label">Séances</span>
+            <strong class="qc-value" id="trg-sessions">5</strong>
+          </div>
+        </div>
+
+        <!-- Zones d’intensité (barres horizontales) -->
+        <div class="section">
+          <h2 class="section-title">Zones d’intensité</h2>
+          <div class="card">
+            <div class="list">
+              <div class="row">
+                <div class="left"><strong>Zone 5</strong></div>
+                <div class="right" style="flex:1">
+                  <div class="bar bar--z5" style="width:8%"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="left"><strong>Zone 4</strong></div>
+                <div class="right" style="flex:1">
+                  <div class="bar bar--z4" style="width:20%"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="left"><strong>Zone 3</strong></div>
+                <div class="right" style="flex:1">
+                  <div class="bar bar--z3" style="width:42%"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="left"><strong>Zone 2</strong></div>
+                <div class="right" style="flex:1">
+                  <div class="bar bar--z2" style="width:66%"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="left"><strong>Zone 1</strong></div>
+                <div class="right" style="flex:1">
+                  <div class="bar bar--z1" style="width:90%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Volume d’entraînement (bar chart simple, placeholder) -->
+        <div class="section">
+          <h2 class="section-title">Volume d’entraînement</h2>
+          <div class="card chart">
+            <svg viewBox="0 0 320 160" preserveAspectRatio="none">
+              <rect x="20"  y="120" width="28" height="30" rx="6" class="cbar z1"/>
+              <rect x="64"  y="90"  width="28" height="60" rx="6" class="cbar z2"/>
+              <rect x="108" y="70"  width="28" height="80" rx="6" class="cbar z3"/>
+              <rect x="152" y="40"  width="28" height="110" rx="6" class="cbar z4"/>
+              <rect x="196" y="90"  width="28" height="60" rx="6" class="cbar z2"/>
+              <rect x="240" y="110" width="28" height="40" rx="6" class="cbar z1"/>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tabbar (Training actif via JS) -->
+      <nav class="tabbar" role="navigation" aria-label="Navigation principale">
+        <a class="tab" href="./index.html">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9z"></path></svg>
+          <span>Accueil</span>
+        </a>
+        <a class="tab" href="./activities.html">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 12h4l3 8 3-16 3 8h4"></path></svg>
+          <span>Journal</span>
+        </a>
+        <a class="tab active" href="./training-entrainement.html" id="tab-training">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="M4 20V10a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v10H4zM10 20V6a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v14h-5zM17 20v-8a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v8h-5z" fill="currentColor"/>
+          </svg>
+          <span>Training</span>
+        </a>
+      </nav>
+    </div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

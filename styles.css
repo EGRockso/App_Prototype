@@ -539,9 +539,9 @@ body{
 
 /* animations déclenchées quand JS ajoute .animate sur #sync-pulsar */
 #sync-pulsar.animate .p-dot { animation: pulsar-dot 2.4s ease-out infinite; }
-#sync-pulsar.animate .p1    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: .30s; }
-#sync-pulsar.animate .p2    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: .90s; }
-#sync-pulsar.animate .p3    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: 1.50s; }
+#sync-pulsar.animate .p1    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: .60s; }
+#sync-pulsar.animate .p2    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: 1.20s; }
+#sync-pulsar.animate .p3    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: 1.80s; }
 
 @keyframes pulsar-dot {
   0%   { opacity: 1 }
@@ -573,4 +573,55 @@ body{
   8%   { opacity: .95; transform: scale(0.94); }
   60%  { opacity: .35; transform: scale(1.10); }
   100% { opacity: 0;   transform: scale(1.18); }
+}
+
+/* --- Ruban sous-onglets Training --- */
+.subtabs{
+  display:flex; gap:12px; padding:10px 14px; border-bottom:1px solid var(--line);
+  background: linear-gradient(180deg,#FFFDF8,#F6F0E6);
+}
+.subtab{
+  padding:8px 12px; border-radius:999px; text-decoration:none; color:var(--muted);
+  border:1px solid var(--line); background:#FFFDF8; font-weight:600;
+}
+.subtab.active{
+  color: var(--text);
+  border-color: rgba(63,140,106,.35);
+  box-shadow: 0 2px 10px rgba(63,140,106,.10);
+}
+
+/* petits graphes “barres” */
+.bar{ height:10px; border-radius:999px; background:var(--line); position:relative; overflow:hidden; }
+.bar::after{ content:""; position:absolute; inset:0; border-radius:inherit; transform-origin:left center; }
+.bar--z5::after{ background:#D32F2F; transform:scaleX(1); }
+.bar--z4::after{ background:#F57C00; transform:scaleX(1); }
+.bar--z3::after{ background:#F2C14E; transform:scaleX(1); }
+.bar--z2::after{ background:#00B37A; transform:scaleX(1); }
+.bar--z1::after{ background:#72A88A; transform:scaleX(1); }
+
+.bar--recovery::after{ background:#00B37A; }
+.bar--tsb::after{ background:#72A88A; }
+.bar--rpe::after{ background:#F2A65A; }
+
+/* bar chart couleurs */
+.cbar{ fill: #E7DECF; }
+.cbar.z1{ fill:#F2E9DA; }
+.cbar.z2{ fill:#CDE8DD; }
+.cbar.z3{ fill:#F9DEB7; }
+.cbar.z4{ fill:#B6D7C5; }
+
+/* Échelle “condition physique” */
+.bar-scale{
+  position:relative; height:14px; margin:10px 0 4px; background:var(--line); border-radius:999px;
+}
+.bar-scale .tick{ position:absolute; top:0; bottom:0; width:20%; background:linear-gradient(90deg,transparent,transparent); }
+.bar-scale .tick:nth-child(1){ left:0 }
+.bar-scale .tick:nth-child(2){ left:20% }
+.bar-scale .tick:nth-child(3){ left:40% }
+.bar-scale .tick:nth-child(4){ left:60% }
+.bar-scale .tick:nth-child(5){ left:80% }
+.bar-scale .tick--neg{ background:linear-gradient(90deg,#E57373,transparent) }
+.bar-scale .tick--pos{ background:linear-gradient(90deg,transparent,#66BB6A) }
+.bar-scale .needle{
+  position:absolute; top:-3px; width:2px; height:20px; background:#3F8C6A; border-radius:2px;
 }

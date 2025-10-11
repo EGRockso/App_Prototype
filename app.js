@@ -342,4 +342,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
   hydrateProfile();
   hydrateSync();
   setupSyncAnimation();
+  // marquer Training actif si on est sur une page Training
+  if (document.body.dataset.page === 'training') {
+    const t = document.getElementById('tab-training');
+    if (t) t.classList.add('active');
+  }
 });
