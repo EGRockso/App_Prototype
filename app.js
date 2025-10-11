@@ -1,8 +1,8 @@
 // =======================
-// Rockso prototype — app.js (clean)
+// Rockso prototype — app.js (clean, consolidated)
 // =======================
 
-// ---- Data (inchangée)
+// ---- Mock data
 const state = {
   lastActivity: {
     id: "sample",
@@ -30,14 +30,13 @@ const state = {
   },
   weekly: { load: 73, hours: 4.6, readiness: 82 },
   sports: [
-    { name: "Course",   color: "#EB6E9A" },
+    { name: "Course",   color: "#EB6E9A" }, // rose
     { name: "Cyclisme", color: "#00B37A" },
     { name: "Padel",    color: "#F2A65A" },
     { name: "Renfo",    color: "#E9DDC9" }
   ]
 };
 
-// Génère quelques activités pour le Journal
 state.activities = [
   state.lastActivity,
   { id:'a2', type:'Cyclisme', dateISO:'2025-10-04T18:20:00', distanceKm: 32.6, durationSec: 3600+18*60, paceSecPerKm: 120, hrAvg: 138, elevPos: 220, calories: 780 },
@@ -47,7 +46,7 @@ state.activities = [
   { id:'a6', type:'Cyclisme', dateISO:'2025-09-29T17:30:00', distanceKm: 25.4, durationSec: 55*60,      paceSecPerKm: 0,   hrAvg: 130, elevPos: 160, calories: 560 }
 ];
 
-// ---- Helpers DOM & format
+// ---- DOM helpers & formatters
 const $  = (sel)=>document.querySelector(sel);
 const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
 
@@ -68,8 +67,14 @@ function formatHoursDecimalToHM(hDecimal=0){
   const m = Math.round((hDecimal - h) * 60);
   return `${h}h ${String(m).padStart(2,'0')}`;
 }
+function formatKm(val){
+  if (val == null) return '—';
+  const n = Number(val);
+  if (!Number.isFinite(n)) return '—';
+  return `${n.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} km`;
+}
 
-// ---- Icônes inline
+// ---- Inline icons
 const Icons = {
   Course:   '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 12h3l3 4 3-8 3 4h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   Cyclisme: '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="17" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="17" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 17l6-8 3 4h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
@@ -78,7 +83,7 @@ const Icons = {
 };
 function iconFor(sport){ return Icons[sport] || Icons.Course; }
 
-// ---- Évolution (couleurs)
+// ---- Evolution dots
 const EVOL_THRESHOLDS = { ok: 10, warn: 20 }; // <=10% vert, <=20% jaune, >20% rouge
 function setEvolution(baseId, valuePct=0){
   const valEl = document.getElementById(baseId);
@@ -88,112 +93,92 @@ function setEvolution(baseId, valuePct=0){
   valEl.textContent = `${sign}${Math.round(valuePct)}%`;
   const a = Math.abs(valuePct);
   dotEl.classList.remove('dot--ok','dot--warn','dot--risk');
-  if (a <= EVOL_THRESHOLDS.ok)      dotEl.classList.add('dot--ok');
+  if (a <= EVOL_THRESHOLDS.ok)        dotEl.classList.add('dot--ok');
   else if (a <= EVOL_THRESHOLDS.warn) dotEl.classList.add('dot--warn');
-  else                               dotEl.classList.add('dot--risk');
+  else                                dotEl.classList.add('dot--risk');
 }
 
-function formatKm(val){
-  if (val == null) return '—';
-  const n = Number(val);
-  if (!Number.isFinite(n)) return '—';
-  return `${n.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} km`;
-}
-
-
 // =======================
-// Hydrations par page
+// Hydrations
 // =======================
-
 function hydrateHome(){
-  const homeGuard = $('#metric-load');
-  if (!homeGuard) return; // pas la page d'accueil
+  if (!$('#metric-load')) return;
 
-  try{
-    const { weekly, lastActivity, sports } = state;
+  const { weekly, lastActivity, sports } = state;
 
-    // Quick cards
-    $('#metric-load').textContent = formatKm(weekly.load);
-    $('#metric-hours').textContent = formatHoursDecimalToHM(
-      typeof weekly.hours === 'number' ? weekly.hours : 0
-    );
+  // quick cards
+  $('#metric-load').textContent = formatKm(weekly.load);
+  $('#metric-hours').textContent = formatHoursDecimalToHM(
+    typeof weekly.hours === 'number' ? weekly.hours : 0
+  );
 
-    // Évolution (démo : 6% / -12%) -> remplace par tes vrais calculs plus tard
-    const evolVolumePct    = typeof weekly.evolVolumePct === 'number' ? weekly.evolVolumePct : 6;
-    const evolIntensityPct = typeof weekly.evolIntensityPct === 'number' ? weekly.evolIntensityPct : -12;
-    setEvolution('evol-vol', evolVolumePct);
-    setEvolution('evol-int', evolIntensityPct);
+  // évolution (démo)
+  const evolVolumePct    = typeof weekly.evolVolumePct === 'number' ? weekly.evolVolumePct : 6;
+  const evolIntensityPct = typeof weekly.evolIntensityPct === 'number' ? weekly.evolIntensityPct : -12;
+  setEvolution('evol-vol', evolVolumePct);
+  setEvolution('evol-int', evolIntensityPct);
 
-    // Chips sports
-    const chips = document.getElementById('sport-chips');
-    if (chips && chips.children.length === 0){
-      sports.forEach(sp=>{
-        const el = document.createElement('button');
-        el.className = 'chip'; el.type='button';
-        el.innerHTML = `<span class="dot" style="background:${sp.color}"></span>${iconFor(sp.name)} ${sp.name}`;
-        chips.appendChild(el);
-      });
-    }
-
-    // Dernière activité
-    $('#last-type').textContent = lastActivity.type;
-    $('#last-date').textContent = fmtDate(lastActivity.dateISO);
-    $('#last-distance').textContent = lastActivity.distanceKm.toFixed(2) + ' km';
-    $('#last-duration').textContent = fmtDur(lastActivity.durationSec);
-    $('#last-pace').textContent = fmtPace(lastActivity.paceSecPerKm);
-    $('#last-activity').href = `./activity.html?id=${lastActivity.id}`;
-
-  }catch(err){
-    console.error('hydrateHome error:', err);
+  // chips
+  const chips = document.getElementById('sport-chips');
+  if (chips && chips.children.length === 0){
+    state.sports.forEach(sp=>{
+      const el = document.createElement('button');
+      el.className = 'chip'; el.type='button';
+      el.innerHTML = `<span class="dot" style="background:${sp.color}"></span>${iconFor(sp.name)} ${sp.name}`;
+      chips.appendChild(el);
+    });
   }
+
+  // last activity card
+  $('#last-type').textContent     = lastActivity.type;
+  $('#last-date').textContent     = fmtDate(lastActivity.dateISO);
+  $('#last-distance').textContent = `${lastActivity.distanceKm.toFixed(2)} km`;
+  $('#last-duration').textContent = fmtDur(lastActivity.durationSec);
+  $('#last-pace').textContent     = fmtPace(lastActivity.paceSecPerKm);
+  $('#last-activity').href        = `./activity.html?id=${lastActivity.id}`;
 }
 
 function hydrateActivity(){
   const id = new URLSearchParams(location.search).get('id') || 'sample';
   const a = state.activities.find(x=>x.id===id) || state.lastActivity;
-  const guard = $('#type');
-  if (!guard) return;
+  if (!$('#type')) return;
 
-  try{
-    $('#type').textContent = a.type;
-    $('#date').textContent = fmtDate(a.dateISO);
-    $('#distance').textContent = a.distanceKm ? a.distanceKm.toFixed(2)+' km' : '—';
-    $('#duration').textContent = fmtDur(a.durationSec);
-    $('#pace').textContent     = a.paceSecPerKm ? fmtPace(a.paceSecPerKm) : '—';
-    $('#hr').textContent       = a.hrAvg ? a.hrAvg + ' bpm' : '—';
-    $('#elev').textContent     = a.elevPos ? a.elevPos + ' m' : '—';
-    $('#cal').textContent      = a.calories ? a.calories + ' kcal' : '—';
+  $('#type').textContent   = a.type;
+  $('#date').textContent   = fmtDate(a.dateISO);
+  $('#distance').textContent = a.distanceKm ? a.distanceKm.toFixed(2)+' km' : '—';
+  $('#duration').textContent = fmtDur(a.durationSec);
+  $('#pace').textContent     = a.paceSecPerKm ? fmtPace(a.paceSecPerKm) : '—';
+  $('#hr').textContent       = a.hrAvg ? a.hrAvg + ' bpm' : '—';
+  $('#elev').textContent     = a.elevPos ? a.elevPos + ' m' : '—';
+  $('#cal').textContent      = a.calories ? a.calories + ' kcal' : '—';
 
-    // Route mini-graph
-    const w=320,h=140;
-    const points = (a.route||[]).map(([x,y])=>`${x/100*w},${y/100*h}`).join(' ');
-    const svg = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
-      <defs>
-        <linearGradient id="g" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%"   stop-color="#EB6E9A"/>
-          <stop offset="50%"  stop-color="#F2A65A"/>
-          <stop offset="100%" stop-color="#00B37A"/>
-        </linearGradient>
-      </defs>
-      <polyline points="${points}" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`;
-    $('#route').innerHTML = svg;
+  // mini route
+  const w=320,h=140;
+  const points = (a.route||[]).map(([x,y])=>`${x/100*w},${y/100*h}`).join(' ');
+  const svg = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="g" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%"   stop-color="#EB6E9A"/>
+        <stop offset="50%"  stop-color="#F2A65A"/>
+        <stop offset="100%" stop-color="#00B37A"/>
+      </linearGradient>
+    </defs>
+    <polyline points="${points}" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+  $('#route').innerHTML = svg;
 
-    // Laps
-    const laps = $('#laps'); laps.innerHTML = '';
-    (a.laps||[]).forEach(l => {
-      const row = document.createElement('div');
-      row.style.display='grid';
-      row.style.gridTemplateColumns='40px 1fr auto';
-      row.style.gap='10px';
-      row.style.padding='8px 0';
-      row.style.borderBottom='1px solid var(--line)';
-      row.innerHTML = `<span class="muted">#${l.n}</span><strong>${l.distKm.toFixed(2)} km</strong><span>${fmtDur(l.timeSec)}</span>`;
-      laps.appendChild(row);
-    });
-  }catch(err){
-    console.error('hydrateActivity error:', err);
-  }
+  // laps
+  const laps = $('#laps'); laps.innerHTML = '';
+  (a.laps||[]).forEach(l => {
+    const row = document.createElement('div');
+    row.style.display='grid';
+    row.style.gridTemplateColumns='40px 1fr auto';
+    row.style.gap='10px';
+    row.style.padding='8px 0';
+    row.style.borderBottom='1px solid var(--line)';
+    row.innerHTML = `<span class="muted">#${l.n}</span><strong>${l.distKm.toFixed(2)} km</strong><span>${fmtDur(l.timeSec)}</span>`;
+    laps.appendChild(row);
+  });
 }
 
 function activityRow(a){
@@ -213,37 +198,25 @@ function activityRow(a){
     </div>
   </a>`;
 }
-
 function hydrateActivities(){
   const list = document.getElementById('activity-list');
   if(!list) return;
-  try{
-    list.innerHTML = state.activities.map(activityRow).join('');
-  }catch(err){
-    console.error('hydrateActivities error:', err);
-  }
+  list.innerHTML = state.activities.map(activityRow).join('');
 }
 
 function hydrateProfile(){
-  const $ = (s)=>document.querySelector(s);
+  if (!$('#p-load')) return;
   const w = state.weekly;
 
-  // on teste un élément qui existe toujours sur la page profil
-  if (!$('#p-load')) return;
-
-  // valeurs
-  $('#p-load').textContent  = formatKm(w.load); // ex: "73 km"
+  $('#p-load').textContent  = formatKm(w.load);
   $('#p-hours').textContent = formatHoursDecimalToHM(
     typeof w.hours === 'number' ? w.hours : 0
   );
-  // Repos: si tu as une logique, remplace "OK"
-  const restEl = $('#p-rest');
-  if (restEl) restEl.textContent = 'OK';
+  const restEl = $('#p-rest'); if (restEl) restEl.textContent = 'OK';
 
-  // chips "Sports"
   const chips = document.getElementById('p-sports');
   if (chips) {
-    chips.innerHTML = ''; // reset si re-hydratation
+    chips.innerHTML = '';
     state.sports.forEach(sp=>{
       const el = document.createElement('span');
       el.className = 'chip';
@@ -254,42 +227,39 @@ function hydrateProfile(){
 }
 
 function hydrateSync(){
-  const $ = (s)=>document.querySelector(s);
-  if (!$('#sync-last')) return;
-  // Démo : valeurs statiques (tu remplaceras par de vraies données plus tard)
-  $('#sync-battery-val').textContent = '87%';
-  $('#sync-last').textContent = 'Dernière synchronisation : il y a 1 minute';
+  // présence d’un élément spécifique à la page Sync
+  if (!document.getElementById('btn-sync')) return;
+
+  const elBatt = document.getElementById('sync-battery-val') || document.querySelector('[data-sync-battery]');
+  const elLast = document.getElementById('sync-last')        || document.querySelector('[data-sync-last]');
+
+  if (elBatt && !elBatt.textContent.trim()) elBatt.textContent = '87%';
+  if (elLast && !elLast.textContent.trim()) elLast.textContent = '—';
 }
 
-// … en bas dans le DOMContentLoaded principal :
-document.addEventListener('DOMContentLoaded', ()=>{
-  hydrateHome();
-  hydrateActivity();
-  hydrateActivities();
-  hydrateProfile();
-  hydrateSync();   // <— ajout
-});
+// =======================
+// Sync animation (progress ring + pulsar)
+// =======================
+function setupSyncAnimation(){
+  const btn     = document.getElementById('btn-sync');
+  const bar     = document.getElementById('sync-progress-bar');
+  const gProg   = document.getElementById('sync-progress');
+  const gCheck  = document.getElementById('sync-check');
+  const status  = document.getElementById('sync-status');
+  const gPulsar = document.getElementById('sync-pulsar'); // ← nouveau groupe (pulsar)
 
-// ---- SYNC ANIMATION ----
-(function setupSyncAnimation(){
-  const btn   = document.getElementById('btn-sync');
-  const bar   = document.getElementById('sync-progress-bar');
-  const gProg = document.getElementById('sync-progress');
-  const gChk  = document.getElementById('sync-check');
-  const status= document.getElementById('sync-status');
+  if(!btn || !bar || !gProg || !gCheck) return; // pas sur la page
 
-  if(!btn || !bar || !gProg || !gChk) return; // pas sur cette page
-
-  const CIRC = 2*Math.PI*60; // r=60 -> ~377 (déjà dans stroke-dasharray)
+  const CIRC = 2*Math.PI*60; // r=60 -> ~377 (identique à stroke-dasharray)
 
   const steps = [
-    { label: "Connexion…",                          dur: 700,  start: 0,  end: 10 },
-    { label: "Préparation de la synchronisation…",  dur: 900,  start:10,  end: 22 },
-    { label: "Données d’activité",                  dur:1200,  start:22,  end: 40 },
-    { label: "Données sur le sommeil",              dur:1200,  start:40,  end: 58 },
-    { label: "Données de ressources",               dur:1200,  start:58,  end: 74 },
-    { label: "Optimisation du GPS (1/2)",           dur:1000,  start:74,  end: 88 },
-    { label: "Optimisation du GPS",                 dur:1000,  start:88,  end:100 },
+    { label: "Connexion…",                         dur: 700,  start: 0,  end: 10 },
+    { label: "Préparation de la synchronisation…", dur: 900,  start:10,  end: 22 },
+    { label: "Données d’activité",                 dur:1200,  start:22,  end: 40 },
+    { label: "Données sur le sommeil",             dur:1200,  start:40,  end: 58 },
+    { label: "Données de ressources",              dur:1200,  start:58,  end: 74 },
+    { label: "Optimisation du GPS (1/2)",          dur:1000,  start:74,  end: 88 },
+    { label: "Optimisation du GPS",                dur:1000,  start:88,  end:100 },
   ];
 
   function setProgress(pct){
@@ -298,12 +268,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
   }
 
   async function runStep(step){
-    status && (status.textContent = step.label);
+    if (status) status.textContent = step.label;
     const t0 = performance.now();
     const tEnd = t0 + step.dur;
     return new Promise(res=>{
       function tick(now){
-        const k = Math.min(1, (now - t0) / (step.dur));
+        const k = Math.min(1, (now - t0) / step.dur);
         const v = step.start + (step.end - step.start) * k;
         setProgress(v);
         if(now < tEnd) requestAnimationFrame(tick);
@@ -313,44 +283,63 @@ document.addEventListener('DOMContentLoaded', ()=>{
     });
   }
 
-  async function startSync(){
-    // UI: check -> progress
-    gChk.style.display = 'none';
-    gProg.style.display = 'block';
-    btn.disabled = true;
-
-    // reset anneau
-    setProgress(0);
-
-    // déroule la timeline
-    for(const s of steps){ /* eslint-disable no-await-in-loop */
-      await runStep(s);
+  function startSyncUI(){
+    gCheck.style.display = 'none';
+    gProg.style.display  = 'block';
+    if (gPulsar){
+      gPulsar.style.display = '';        // visible
+      gPulsar.classList.add('animate');  // démarre l’anim CSS
     }
+    btn.disabled = true;
+    setProgress(0);
+  }
 
-    // fin : check visible + date simulée
-    gProg.style.display = 'none';
-    gChk.style.display  = 'block';
-    status && (status.textContent = "Synchronisation terminée");
+  function endSyncUI(){
+    gProg.style.display  = 'none';
+    if (gPulsar){
+      gPulsar.classList.remove('animate');
+      gPulsar.style.display = 'none';
+    }
+    gCheck.style.display = 'block';
+    if (status) status.textContent = "Synchronisation terminée";
 
-    // si tu as un champ "Dernière synchronisation", mets-le à jour:
-    const last = document.querySelector('.sync-row .sync-label + .sync-val, .sync-val[data-sync-last]');
+    // met à jour "Dernière synchronisation"
+    const last = document.querySelector('[data-sync-last]') ||
+                 document.getElementById('sync-last') ||
+                 document.querySelector('.sync-row .sync-label + .sync-val');
     if(last){
       const d = new Date();
-      const txt = d.toLocaleString('fr-FR', { hour:'2-digit', minute:'2-digit' });
-      last.textContent = `aujourd’hui ${txt}`;
+      last.textContent = `aujourd’hui ${d.toLocaleString('fr-FR', { hour:'2-digit', minute:'2-digit' })}`;
     }
-
     btn.disabled = false;
   }
 
-  btn.addEventListener('click', startSync);
-})();
+  async function startSync(){
+    startSyncUI();
+    for (const s of steps) { // eslint-disable-line no-restricted-syntax
+      // eslint-disable-next-line no-await-in-loop
+      await runStep(s);
+    }
+    endSyncUI();
+  }
 
-// ---- Boot
+  // état initial : check visible, progress & pulsar cachés
+  gCheck.style.display = 'block';
+  gProg.style.display  = 'none';
+  if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display = 'none'; }
+  setProgress(0);
+
+  btn.addEventListener('click', startSync);
+}
+
+// =======================
+// Boot
+// =======================
 document.addEventListener('DOMContentLoaded', ()=>{
   hydrateHome();
   hydrateActivity();
   hydrateActivities();
   hydrateProfile();
   hydrateSync();
+  setupSyncAnimation();
 });
