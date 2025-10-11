@@ -533,14 +533,30 @@ body{
 #sync-waves .w2 { animation: wave-pop 1.2s linear infinite; animation-delay: .25s; }
 #sync-waves .w3 { animation: wave-pop 1.2s linear infinite; animation-delay: .5s; }
 
-/* --- Pulsar / radar animation --- */
-.pulsar { transform-origin: 130px 145px; }
+/* Pulsar centré (aucun déplacement, juste des ondes qui apparaissent/fadent) */
+#sync-pulsar .p-dot,
+#sync-pulsar .p-ring { opacity: 0; }
 
-/* enable animations only when .animate is present (toggled by JS) */
-.pulsar.animate .pulse-dot     { animation: dot-ping 1.8s ease-out infinite; }
-.pulsar.animate .pulse-ring.r1 { animation: ring-ping 1.8s ease-out infinite 0.20s; }
-.pulsar.animate .pulse-ring.r2 { animation: ring-ping 1.8s ease-out infinite 0.60s; }
-.pulsar.animate .pulse-ring.r3 { animation: ring-ping 1.8s ease-out infinite 1.00s; }
+/* animations déclenchées quand JS ajoute .animate sur #sync-pulsar */
+#sync-pulsar.animate .p-dot { animation: pulsar-dot 2.4s ease-out infinite; }
+#sync-pulsar.animate .p1    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: .30s; }
+#sync-pulsar.animate .p2    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: .90s; }
+#sync-pulsar.animate .p3    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: 1.50s; }
+
+@keyframes pulsar-dot {
+  0%   { opacity: 1 }
+  25%  { opacity: .75 }
+  40%  { opacity: 0 }
+  100% { opacity: 0 }
+}
+
+@keyframes pulsar-ring {
+  0%   { opacity: 0;   stroke-width: 3 }
+  10%  { opacity: 1;   stroke-width: 3 }
+  55%  { opacity: .45; stroke-width: 2.6 }
+  80%  { opacity: 0;   stroke-width: 2.3 }
+  100% { opacity: 0;   stroke-width: 2.3 }
+}
 
 /* dot: quick appear → fade as first ring starts */
 @keyframes dot-ping {
