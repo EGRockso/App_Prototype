@@ -625,3 +625,27 @@ body{
 .bar-scale .needle{
   position:absolute; top:-3px; width:2px; height:20px; background:#3F8C6A; border-radius:2px;
 }
+/* --- Training tabs: 4 sur 1 ligne --- */
+.train-tabs{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 14px 12px;
+}
+
+.train-tabs .pill{
+  /* compacter la pill */
+  padding: 8px 10px;              /* avant: plus large */
+  font-size: clamp(12px, 2.9vw, 14px);
+  line-height: 1.1;
+  text-align: center;
+  white-space: nowrap;             /* évite les retours à la ligne */
+}
+
+/* un poil plus serré sur les petits écrans */
+@media (max-width: 380px){
+  .train-tabs .pill{
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+}
