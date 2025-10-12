@@ -649,3 +649,28 @@ body{
     font-size: 12px;
   }
 }
+
+/* === TRAINING TABS — force 4 sur 1 ligne, items compressibles === */
+nav.train-tabs,
+.train-tabs{
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin: 8px 14px 12px !important;
+}
+
+.train-tabs .pill{
+  min-width: 0 !important;           /* <-- autorise la réduction dans la colonne */
+  padding: 6px 8px !important;        /* un poil plus serré */
+  font-size: 12px !important;         /* compact */
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;        /* évite le débordement */
+  text-overflow: ellipsis !important; /* coupe proprement si besoin */
+  text-align: center !important;
+  border-radius: 999px !important;
+}
+
+@media (max-width: 360px){
+  .train-tabs .pill{ font-size: 11px !important; }
+}
