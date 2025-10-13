@@ -434,3 +434,22 @@ body{ background: #0b0e12; }
 @media (max-width:380px){
   .train-tabs .pill{ font-size:11px; padding:5px 7px; }
 }
+
+/* Bouton "Journal des activités" — force le style du lien */
+.journal-btn,
+.journal-btn:link,
+.journal-btn:visited{
+  display:flex; align-items:center; justify-content:center;
+  height:44px; padding:0 14px;
+  border:1px dashed var(--line);
+  border-radius:12px;
+  background:#FFFDF8;
+  color:var(--text) !important;
+  font-weight:800;
+  text-decoration:none !important;
+}
+
+.journal-btn:hover{
+  background:#fff; border-color:#e6dccd;
+  box-shadow:0 4px 10px rgba(0,0,0,.06);
+}
