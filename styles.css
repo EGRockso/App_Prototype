@@ -674,3 +674,25 @@ nav.train-tabs,
 @media (max-width: 360px){
   .train-tabs .pill{ font-size: 11px !important; }
 }
+/* TRAINING — compacter les 4 onglets */
+.train-tabs{
+  gap: 6px !important;
+  margin: 8px 12px 10px !important;
+}
+
+.train-tabs .pill{
+  min-width: 0 !important;
+  padding: 6px 8px !important;
+  font-size: 12px !important;     /* ↓ taille du texte */
+  line-height: 1.05 !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-align: center !important;
+}
+
+/* encore un cran plus petit sur très petits écrans */
+@media (max-width: 380px){
+  .train-tabs .pill{ font-size: 11px !important; padding: 5px 7px !important; }
+}
