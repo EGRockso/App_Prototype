@@ -47,7 +47,7 @@
 
               <!-- === Calque PROGRESS (caché par défaut) === -->
               <!-- ROCKSO START: avoid duplicate id with text progress -->
-              <g id="sync-watch-layer" style="display:none">
+              <g id="sync-progress" style="display:none">
                 <!-- piste grise -->
                 <circle cx="130" cy="145" r="60"
                         fill="none" stroke="rgba(255,255,255,.18)" stroke-width="8"/>
@@ -127,16 +127,18 @@
 
           <div class="sync-actions">
             <button id="sync-btn" class="btn">Synchroniser</button>
-            <!-- ROCKSO START: this is the textual progress used by app.js -->
-            <div class="sync-actions">
-                <button id="sync-btn" class="btn">Synchroniser</button>
-                <div id="sync-progress-text"></div>   <!-- ← anciennement id="sync-progress" -->
-                <div id="gear-area" class="gear hidden"></div>
-                <div id="sync-done" class="hidden"></div>
 
-                <!-- Bouton reset démo -->
-                <button id="reset-demo" class="btn" style="margin-left:8px;">Réinitialiser</button>
-            </div>
+            <!-- zone de texte de progression (unique) -->
+            <div id="sync-progress-text" aria-live="polite"></div>
+
+            <!-- engrenage IA + message fin (uniques) -->
+            <div id="gear-area" class="gear hidden"></div>
+            <div id="sync-done" class="hidden"></div>
+
+            <!-- Bouton reset démo -->
+            <button id="reset-demo" class="btn" style="margin-left:8px;">Réinitialiser</button>
+           </div>
+
 
             <div id="gear-area" class="gear hidden"></div>
             <div id="sync-done" class="hidden"></div>
