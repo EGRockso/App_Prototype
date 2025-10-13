@@ -1,5 +1,5 @@
 // =======================
-// Rockso prototype — app.js (merged for demo sync + IA)
+// Rockso prototype — app.js (merged for demo sync + IA) — CLEAN
 // =======================
 
 // ---- Mock data (fallback si aucune synchro démo n'a été jouée)
@@ -49,11 +49,7 @@ state.activities = [
 // =======================
 // DEMO SYNC + PERSISTENCE
 // =======================
-const STORE_KEY = "rocksoState";       // localStorage
-const DEMO_WEEKS = [                   // fichiers JSON à déposer à la racine du microsite
-  "week_demo_1.json", // no injury
-  "week_demo_2.json"  // injury
-];
+const STORE_KEY = "rocksoState"; // localStorage
 
 function getStore(){
   try {
@@ -65,17 +61,30 @@ function getStore(){
 function saveStore(st){
   localStorage.setItem(STORE_KEY, JSON.stringify(st));
 }
+
+// URL robuste + fetch sans cache
+function resolveUrl(rel){
+  const base = (document.querySelector('base')?.href) ||
+               (location.origin + location.pathname.replace(/[^/]+$/, ''));
+  return new URL(rel, base).toString();
+}
 async function loadJSON(url){
-  const res = await fetch(url);
-  if(!res.ok) throw new Error("Failed to load " + url);
+  const full = resolveUrl(url);
+  const res = await fetch(full, { cache: "no-cache" });
+  if (!res.ok) {
+    console.error("[sync] fetch failed", { url: full, status: res.status, statusText: res.statusText });
+    throw new Error(`HTTP ${res.status} on ${full}`);
+  }
   return await res.json();
 }
+// Fichiers JSON démo (à la racine, à côté de sync.html)
+const DEMO_WEEKS = ["./week_demo_1.json", "./week_demo_2.json"];
+
 function calcPaceSecPerKm(distanceKm, durationMin){
   if (!distanceKm || distanceKm<=0) return 0;
   return Math.round((durationMin*60) / distanceKm);
 }
 function mapPayloadActivity(a, idx, weekIndex){
-  // mappe l’activité JSON démo -> format UI
   const typeLabel = (a.type === 'run') ? 'Course' : (a.type === 'cross' ? 'Renfo' : 'Course');
   return {
     id: `wk${weekIndex}-a${idx+1}`,
@@ -89,19 +98,13 @@ function mapPayloadActivity(a, idx, weekIndex){
   };
 }
 function getLiveState(){
-  // Priorité au store (synchros jouées), sinon fallback sur mock "state"
   const st = getStore();
   if (st.weeks && st.weeks.length){
     const lastW = st.weeks[st.weeks.length-1];
-    // Construire lastActivity dérivée si besoin
     const acts = (st.activities||[]).slice().sort((a,b)=> new Date(a.datetime_iso||a.dateISO) - new Date(b.datetime_iso||b.dateISO));
     const lastRaw = acts[acts.length-1];
-    const last = lastRaw ? mapPayloadActivity(
-      lastRaw.datetime_iso ? lastRaw : lastRaw, // same mapping
-      0, lastW.week_index || 0
-    ) : null;
+    const last = lastRaw ? mapPayloadActivity(lastRaw, 0, lastW.week_index || 0) : null;
 
-    // Quick stats depuis la dernière semaine
     const totalKm = lastW.summary?.total_km || 0;
     const hours   = (st.activities||[]).reduce((acc,a)=>acc + (a.duration_min||0), 0) / 60;
     return {
@@ -109,7 +112,7 @@ function getLiveState(){
         load: totalKm,
         hours: hours,
         evolVolumePct: Math.round(((lastW.summary?.load_spike_rel_w1_w2||1)-1)*100) || 0,
-        evolIntensityPct: Math.round((((lastW.summary?.km_z5t||0)/(lastW.summary?.total_km||1))*100) - 10) // simple proxy
+        evolIntensityPct: Math.round((((lastW.summary?.km_z5t||0)/(lastW.summary?.total_km||1))*100) - 10)
       },
       lastActivity: last || state.lastActivity,
       activities: acts.map((a,i)=> mapPayloadActivity(a, i, lastW.week_index || 0)),
@@ -117,7 +120,6 @@ function getLiveState(){
       lastWeekAnalysis: lastW.ml ? { text: lastW.analysis_text, ml: lastW.ml } : st.lastWeekAnalysis
     };
   }
-  // Fallback mock
   return {
     weekly: state.weekly,
     lastActivity: state.lastActivity,
@@ -211,7 +213,7 @@ function renderAnalysisPanelFromStore(){
 }
 
 // =======================
-// Hydrations (MAJ pour utiliser le store s'il existe)
+// Hydrations (utilisent le store s'il existe)
 // =======================
 function hydrateHome(){
   if (!$('#metric-load')) return;
@@ -219,19 +221,16 @@ function hydrateHome(){
   const live = getLiveState();
   const { weekly, lastActivity, sports } = live;
 
-  // quick cards
   $('#metric-load').textContent = formatKm(weekly.load);
   $('#metric-hours').textContent = formatHoursDecimalToHM(
     typeof weekly.hours === 'number' ? weekly.hours : 0
   );
 
-  // évolution (depuis store si possible)
   const evolVolumePct    = typeof weekly.evolVolumePct === 'number' ? weekly.evolVolumePct : 6;
   const evolIntensityPct = typeof weekly.evolIntensityPct === 'number' ? weekly.evolIntensityPct : -12;
   setEvolution('evol-vol', evolVolumePct);
   setEvolution('evol-int', evolIntensityPct);
 
-  // chips
   const chips = document.getElementById('sport-chips');
   if (chips && chips.children.length === 0){
     sports.forEach(sp=>{
@@ -242,7 +241,6 @@ function hydrateHome(){
     });
   }
 
-  // last activity card (ton composant existant)
   $('#last-type').textContent     = lastActivity.type;
   $('#last-date').textContent     = fmtDate(lastActivity.dateISO);
   $('#last-distance').textContent = `${(lastActivity.distanceKm||0).toFixed(2)} km`;
@@ -251,7 +249,6 @@ function hydrateHome(){
   $('#last-pace').textContent     = pace;
   $('#last-activity').href        = `./activity.html?id=${lastActivity.id || 'sample'}`;
 
-  // Analyse IA (si présente)
   renderAnalysisPanelFromStore();
 }
 
@@ -270,7 +267,6 @@ function hydrateActivity(){
   $('#elev').textContent     = a.elevPos ? a.elevPos + ' m' : '—';
   $('#cal').textContent      = a.calories ? a.calories + ' kcal' : '—';
 
-  // mini route (fallback mock si rien)
   const w=320,h=140;
   const points = (a.route||[]).map(([x,y])=>`${x/100*w},${y/100*h}`).join(' ');
   const svg = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
@@ -285,7 +281,6 @@ function hydrateActivity(){
   </svg>`;
   $('#route').innerHTML = svg;
 
-  // laps (si disponibles dans mock)
   const laps = $('#laps'); if (laps){ laps.innerHTML = '';
     (a.laps||[]).forEach(l => {
       const row = document.createElement('div');
@@ -321,7 +316,6 @@ function hydrateActivities(){
   const list = document.getElementById('activity-list');
   if(!list) return;
   const live = getLiveState();
-  // plus récent en premier
   const items = (live.activities||[]).slice().sort((a,b)=> new Date(b.dateISO)-new Date(a.dateISO));
   list.innerHTML = items.map(activityRow).join('');
 }
@@ -350,12 +344,9 @@ function hydrateProfile(){
 }
 
 function hydrateSync(){
-  // compat: #sync-btn (nouveau) ou #btn-sync (ancien)
   if (!document.getElementById('btn-sync') && !document.getElementById('sync-btn')) return;
-
   const elBatt = document.getElementById('sync-battery-val') || document.querySelector('[data-sync-battery]');
   const elLast = document.getElementById('sync-last')        || document.querySelector('[data-sync-last]');
-
   if (elBatt && !elBatt.textContent.trim()) elBatt.textContent = '87%';
   if (elLast && !elLast.textContent.trim()) elLast.textContent = '—';
 }
@@ -375,6 +366,24 @@ function setupSyncAnimation(){
 
   if(!btn || !bar || !gProg || !gCheck) return; // pas sur la page
 
+  // Refléter l'état persistant au chargement
+  const persisted = getStore();
+  if ((persisted.synced || 0) > 0) {
+    gCheck.style.display = 'block';
+    gProg.style.display  = 'none';
+    if (doneEl) {
+      doneEl.classList.remove('hidden');
+      doneEl.innerHTML = `✅ Rockso a déjà analysé l'entraînement. Consulte l'analyse sur <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`;
+    }
+    const last = document.querySelector('[data-sync-last]') ||
+                 document.getElementById('sync-last') ||
+                 document.querySelector('.sync-row .sync-label + .sync-val');
+    if(last){
+      const d = new Date();
+      last.textContent = `aujourd’hui ${d.toLocaleString('fr-FR', { hour:'2-digit', minute:'2-digit' })}`;
+    }
+  }
+
   const CIRC = 2*Math.PI*60; // r=60 -> ~377
   function setProgress(pct){
     const off = CIRC * (1 - pct/100);
@@ -389,12 +398,12 @@ function setupSyncAnimation(){
     if (textProgress) textProgress.textContent = '';
     if (doneEl) { doneEl.classList.add('hidden'); doneEl.innerHTML = ''; }
   }
+
   function endSyncUI(){
     gProg.style.display  = 'none';
     gCheck.style.display = 'block';
     if (status) status.textContent = "Synchronisation terminée";
 
-    // met à jour "Dernière synchronisation"
     const last = document.querySelector('[data-sync-last]') ||
                  document.getElementById('sync-last') ||
                  document.querySelector('.sync-row .sync-label + .sync-val');
@@ -408,7 +417,6 @@ function setupSyncAnimation(){
   function animTo(targetPct, dur=800){
     const t0 = performance.now();
     const start = parseFloat(bar.style.strokeDashoffset || (CIRC));
-    // Convertir offset courant en pct courant
     const currentPct = 100 - (start/CIRC*100);
     const delta = targetPct - currentPct;
     return new Promise(res=>{
@@ -426,19 +434,16 @@ function setupSyncAnimation(){
   async function runDemoUpload(payload){
     const N = (payload.activities||[]).length;
 
-    // Intro
     if (status) status.textContent = "Connexion…";
     await animTo(10, 600);
     if (status) status.textContent = "Préparation de la synchronisation…";
     await animTo(20, 700);
 
-    // Étapes 1/N
     for (let i=0;i<N;i++){
       if (textProgress) textProgress.textContent = `Synchronisation des activités ${i+1}/${N}…`;
-      await animTo(20 + ((i+1)/N)*75, 600); // pousser jusqu’à ~95%
+      await animTo(20 + ((i+1)/N)*75, 600);
       await new Promise(r=>setTimeout(r, 120));
     }
-
     await animTo(98, 500);
   }
 
@@ -446,8 +451,6 @@ function setupSyncAnimation(){
     const st = getStore();
     st.weeks = st.weeks || [];
     st.activities = st.activities || [];
-
-    // Concat activities (on garde la version "brute" JSON pour la persistance)
     st.weeks.push(payload);
     st.activities = st.activities.concat(payload.activities);
     st.lastActivity = payload.activities[payload.activities.length-1];
@@ -458,27 +461,26 @@ function setupSyncAnimation(){
 
   async function startSync(){
     startSyncUI();
-
     try {
       const st = getStore();
       const idx = st.synced || 0;
-      if (idx >= DEMO_WEEKS.length){
+
+      if (idx >= DEMO_WEEKS.length) {
         if (status) status.textContent = "Aucune nouvelle donnée démo à synchroniser.";
+        if (textProgress) textProgress.textContent = "Démo : toutes les données ont déjà été synchronisées.";
         await animTo(100, 400);
         endSyncUI();
         return;
       }
+
       const payload = await loadJSON(DEMO_WEEKS[idx]);
 
-      // Anneau + pas 1/N
       await runDemoUpload(payload);
-
-      // Merge & fin d’anneau
       mergePayloadIntoStore(payload);
+
       await animTo(100, 400);
       endSyncUI();
 
-      // 1 seconde d'IA (engrenage)
       if (gearArea) gearArea.classList.remove("hidden");
       if (status) status.textContent = "Analyse IA en cours…";
       await new Promise(r=>setTimeout(r, 1000));
@@ -488,8 +490,9 @@ function setupSyncAnimation(){
         doneEl.innerHTML = `✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`;
       }
     } catch(e){
-      if (status) status.textContent = "Erreur de synchronisation.";
       console.error(e);
+      if (status) status.textContent = "Erreur de synchronisation (vérifie que les fichiers JSON sont présents à la racine).";
+      if (textProgress) textProgress.textContent = "Astuce : place week_demo_1.json et week_demo_2.json à côté de sync.html (ou adapte DEMO_WEEKS).";
     }
   }
 
@@ -512,14 +515,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   hydrateSync();
   setupSyncAnimation();
 
-  // marquer Training actif si on est sur une page Training
   if (document.body.dataset.page === 'training') {
     const t = document.getElementById('tab-training');
     if (t) t.classList.add('active');
-    // Afficher l'analyse sur Training
     renderAnalysisPanelFromStore();
   }
-  // Afficher l'analyse également si le panneau est présent (ex: index)
   if (document.getElementById('analysis-panel')) {
     renderAnalysisPanelFromStore();
   }
