@@ -1,0 +1,60 @@
+{
+  "athlete_id": 26,
+  "week_index": 1383,
+  "summary": {
+    "total_km": 31.5,
+    "sessions": 9,
+    "rest_days": 2,
+    "km_z3z5": 16.5,
+    "km_z5t": 0.0,
+    "load_spike_rel_w1_w2": 2.97
+  },
+  "activities": [
+    {
+      "name": "Sortie moyenne",
+      "type": "run",
+      "distance_km": 10.1,
+      "duration_min": 46,
+      "avg_hr": 150,
+      "rpe": 7,
+      "notes": "",
+      "datetime_iso": "2025-06-13T18:00:00"
+    },
+    {
+      "name": "Séance rythmée",
+      "type": "run",
+      "distance_km": 7.9,
+      "duration_min": 34,
+      "avg_hr": 150,
+      "rpe": 8,
+      "notes": "",
+      "datetime_iso": "2025-06-14T18:00:00"
+    },
+    {
+      "name": "Footing court",
+      "type": "run",
+      "distance_km": 5.7,
+      "duration_min": 34,
+      "avg_hr": 135,
+      "rpe": 3,
+      "notes": "",
+      "datetime_iso": "2025-06-15T18:00:00"
+    },
+    {
+      "name": "Renforcement",
+      "type": "cross",
+      "distance_km": 0.0,
+      "duration_min": 60,
+      "avg_hr": 110,
+      "rpe": 4,
+      "notes": "",
+      "datetime_iso": "2025-06-16T18:00:00"
+    }
+  ],
+  "ml": {
+    "predicted_label": 1,
+    "predicted_probability": 0.79,
+    "model": "global_sgd_tuned.joblib (simulé)"
+  },
+  "analysis_text": "Semaine à risque: +2.97x de volume vs N-1/N-2, 0% en Z5/T1/T2. Tendon/Achilles sous contrainte probable. HRV en baisse et sommeil fragmenté rapportés les 2 derniers jours."
+}

@@ -1,0 +1,60 @@
+{
+  "athlete_id": 26,
+  "week_index": 2523,
+  "summary": {
+    "total_km": 100.3,
+    "sessions": 13,
+    "rest_days": 2,
+    "km_z3z5": 11.7,
+    "km_z5t": 10.5,
+    "load_spike_rel_w1_w2": 0.97
+  },
+  "activities": [
+    {
+      "name": "Endurance longue",
+      "type": "run",
+      "distance_km": 30.1,
+      "duration_min": 172,
+      "avg_hr": 135,
+      "rpe": 5,
+      "notes": "",
+      "datetime_iso": "2025-06-05T18:00:00"
+    },
+    {
+      "name": "Séance tempo",
+      "type": "run",
+      "distance_km": 18.1,
+      "duration_min": 83,
+      "avg_hr": 150,
+      "rpe": 7,
+      "notes": "",
+      "datetime_iso": "2025-06-06T18:00:00"
+    },
+    {
+      "name": "Fractionné court",
+      "type": "run",
+      "distance_km": 17.1,
+      "duration_min": 74,
+      "avg_hr": 150,
+      "rpe": 8,
+      "notes": "",
+      "datetime_iso": "2025-06-07T18:00:00"
+    },
+    {
+      "name": "Footing récup",
+      "type": "run",
+      "distance_km": 12.0,
+      "duration_min": 72,
+      "avg_hr": 135,
+      "rpe": 3,
+      "notes": "",
+      "datetime_iso": "2025-06-08T18:00:00"
+    }
+  ],
+  "ml": {
+    "predicted_label": 0,
+    "predicted_probability": 0.12,
+    "model": "global_sgd_tuned.joblib (simulé)"
+  },
+  "analysis_text": "Semaine maîtrisée: 100.3 km, charge bien progressée (x1.00) avec 10% d'intensité qualitative. Sommeil et HRV stables, bonne tolérance subjective."
+}

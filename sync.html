@@ -7,6 +7,9 @@
   <link rel="icon" href="assets/img/rockso_logo_mark.png">
   <meta name="theme-color" content="#F5EFE3">
   <link rel="stylesheet" href="styles.css"/>
+  <!-- ROCKSO START: add app.css for cards/badges/gear -->
+  <link rel="stylesheet" href="app.css"/>
+  <!-- ROCKSO END -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body class="theme-rockso">
@@ -31,52 +34,55 @@
 
         <!-- Bloc héros : montre + check vert dans l’écran -->
         <div class="sync-hero card">
-            <div class="watch" aria-hidden="true">
-                <svg viewBox="0 0 260 330" class="watch-svg">
-                    <!-- bracelet haut -->
-                    <rect x="100" y="0" width="60" height="60" rx="12" fill="#dcd3c5"/>
-                    <!-- boîtier -->
-                    <rect x="35" y="50" width="190" height="190" rx="32" fill="#1e2925" />
-                    <!-- bague -->
-                    <circle cx="130" cy="145" r="86" fill="#2b3a33"/>
-                    <!-- écran -->
-                    <circle cx="130" cy="145" r="76" fill="#0f1512" />
+          <div class="watch" aria-hidden="true">
+            <svg viewBox="0 0 260 330" class="watch-svg">
+              <!-- bracelet haut -->
+              <rect x="100" y="0" width="60" height="60" rx="12" fill="#dcd3c5"/>
+              <!-- boîtier -->
+              <rect x="35" y="50" width="190" height="190" rx="32" fill="#1e2925" />
+              <!-- bague -->
+              <circle cx="130" cy="145" r="86" fill="#2b3a33"/>
+              <!-- écran -->
+              <circle cx="130" cy="145" r="76" fill="#0f1512" />
 
-                    <!-- === Calque PROGRESS (caché par défaut) === -->
-                    <g id="sync-progress" style="display:none">
-                        <!-- piste grise -->
-                        <circle cx="130" cy="145" r="60"
-                                fill="none" stroke="rgba(255,255,255,.18)" stroke-width="8"/>
-                        <!-- barre verte (animée en JS via strokeDashoffset) -->
-                        <circle id="sync-progress-bar" cx="130" cy="145" r="60"
-                                fill="none" stroke="#3F8C6A" stroke-width="8"
-                                stroke-linecap="round"
-                                stroke-dasharray="377" stroke-dashoffset="377"/>
-                        <!-- Pulsar (centré au milieu de l’écran de la montre) -->
-                        <g id="sync-pulsar" style="display:none" transform="translate(130,145)">
-                            <!-- point central -->
-                            <circle class="p-dot" r="6" fill="#ffffff"></circle>
-                            <!-- trois anneaux -->
-                            <circle class="p-ring p1" r="20" fill="none" stroke="#ffffff" stroke-width="3"></circle>
-                            <circle class="p-ring p2" r="30" fill="none" stroke="#ffffff" stroke-width="3"></circle>
-                            <circle class="p-ring p3" r="40" fill="none" stroke="#ffffff" stroke-width="3"></circle>
-                        </g>
-                    </g>
+              <!-- === Calque PROGRESS (caché par défaut) === -->
+              <!-- ROCKSO START: avoid duplicate id with text progress -->
+              <g id="sync-watch-layer" style="display:none">
+                <!-- piste grise -->
+                <circle cx="130" cy="145" r="60"
+                        fill="none" stroke="rgba(255,255,255,.18)" stroke-width="8"/>
+                <!-- barre verte (animée en JS via strokeDashoffset si on le souhaite) -->
+                <circle id="sync-progress-bar" cx="130" cy="145" r="60"
+                        fill="none" stroke="#3F8C6A" stroke-width="8"
+                        stroke-linecap="round"
+                        stroke-dasharray="377" stroke-dashoffset="377"/>
+                <!-- Pulsar (centré au milieu de l’écran de la montre) -->
+                <g id="sync-pulsar" style="display:none" transform="translate(130,145)">
+                  <!-- point central -->
+                  <circle class="p-dot" r="6" fill="#ffffff"></circle>
+                  <!-- trois anneaux -->
+                  <circle class="p-ring p1" r="20" fill="none" stroke="#ffffff" stroke-width="3"></circle>
+                  <circle class="p-ring p2" r="30" fill="none" stroke="#ffffff" stroke-width="3"></circle>
+                  <circle class="p-ring p3" r="40" fill="none" stroke="#ffffff" stroke-width="3"></circle>
+                </g>
+              </g>
+              <!-- ROCKSO END -->
 
-                    <!-- === Calque CHECK (visible au repos & à la fin) === -->
-                    <path id="sync-check" d="M92 146 l25 25 46-54"
-                            fill="none" stroke="#3F8C6A" stroke-width="14"
-                            stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- === Calque CHECK (visible au repos & à la fin) === -->
+              <path id="sync-check" d="M92 146 l25 25 46-54"
+                    fill="none" stroke="#3F8C6A" stroke-width="14"
+                    stroke-linecap="round" stroke-linejoin="round"/>
 
-                    <!-- boutons latéraux -->
-                    <rect x="225" y="95"  width="12" height="26" rx="6" fill="#cdbfae"/>
-                    <rect x="225" y="130" width="12" height="26" rx="6" fill="#cdbfae"/>
-                    <rect x="225" y="165" width="12" height="26" rx="6" fill="#cdbfae"/>
-                    <!-- bracelet bas -->
-                    <rect x="100" y="240" width="60" height="60" rx="12" fill="#dcd3c5"/>
-                </svg>
-            </div>
+              <!-- boutons latéraux -->
+              <rect x="225" y="95"  width="12" height="26" rx="6" fill="#cdbfae"/>
+              <rect x="225" y="130" width="12" height="26" rx="6" fill="#cdbfae"/>
+              <rect x="225" y="165" width="12" height="26" rx="6" fill="#cdbfae"/>
+              <!-- bracelet bas -->
+              <rect x="100" y="240" width="60" height="60" rx="12" fill="#dcd3c5"/>
+            </svg>
+          </div>
         </div>
+
         <p id="sync-status" class="muted" style="margin:10px 0 0">Prêt</p>
 
         <!-- Infos (batterie + état) + bouton -->
@@ -120,7 +126,12 @@
           </div>
 
           <div class="sync-actions">
-            <button id="btn-sync" class="btn">Synchroniser</button>
+            <button id="sync-btn" class="btn">Synchroniser</button>
+            <!-- ROCKSO START: this is the textual progress used by app.js -->
+            <div id="sync-progress" aria-live="polite"></div>
+            <div id="gear-area" class="gear hidden"></div>
+            <div id="sync-done" class="hidden"></div>
+            <!-- ROCKSO END -->
           </div>
         </div>
       </section>
@@ -136,16 +147,18 @@
           <span>Journal</span>
         </a>
         <a class="tab" href="./training-entrainement.html" id="tab-training">
-            <!-- pictogramme bar chart plein -->
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <!-- pictogramme bar chart plein -->
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
             <path d="M4 20V10a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v10H4zM10 20V6a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v14h-5zM17 20v-8a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v8h-5z" fill="currentColor"/>
-            </svg>
-            <span>Training</span>
+          </svg>
+          <span>Training</span>
         </a>
       </nav>
 
     </div>
   </main>
-  <script src="app.js"></script>
+  <!-- ROCKSO START: load app.js deferred -->
+  <script src="app.js" defer></script>
+  <!-- ROCKSO END -->
 </body>
 </html>

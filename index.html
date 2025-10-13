@@ -7,6 +7,9 @@
   <link rel="icon" href="assets/img/rockso_logo_mark.png">
   <meta name="theme-color" content="#F5EFE3"><!-- thème clair -->
   <link rel="stylesheet" href="styles.css"/>
+  <!-- ROCKSO START: styles démo (cartes/badges/engrenage) -->
+  <link rel="stylesheet" href="app.css"/>
+  <!-- ROCKSO END -->
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 
@@ -76,7 +79,7 @@
           <div class="chips" id="sport-chips"></div>
         </div>
 
-        <!-- Dernière activité -->
+        <!-- Dernière activité (ton composant existant) -->
         <div class="section">
           <h2 class="section-title">Dernière activité</h2>
           <a class="activity-card" id="last-activity" href="#">
@@ -103,18 +106,9 @@
           <a class="journal-btn" href="./activities.html">Journal des activités</a>
         </div>
 
-        <!-- Placeholder démos -->
-        <div class="section future">
-          <h2 class="section-title">Aperçu des futures démos</h2>
-          <div class="card">
-            <p class="muted">Ici, on ajoutera :</p>
-            <ul class="muted">
-              <li>Un bouton <em>Importer des données</em> (CSV/FIT/JSON).</li>
-              <li>Un bouton <em>Lancer le modèle IA</em> (prédiction blessure / readiness).</li>
-              <li>Un panneau <em>Résultats</em> (score + explications).</li>
-            </ul>
-          </div>
-        </div>
+        <!-- ROCKSO START: panneau d'analyse IA -->
+        <div id="analysis-panel"></div>
+        <!-- ROCKSO END -->
       </section>
 
       <!-- Tabbar iOS-like -->
@@ -142,6 +136,8 @@
     </div>
   </main>
 
-  <script src="app.js"></script>
+  <!-- ROCKSO START: script démo -->
+  <script src="app.js" defer></script>
+  <!-- ROCKSO END -->
 </body>
 </html>

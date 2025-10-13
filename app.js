@@ -1,8 +1,8 @@
 // =======================
-// Rockso prototype — app.js (clean, consolidated)
+// Rockso prototype — app.js (merged for demo sync + IA)
 // =======================
 
-// ---- Mock data
+// ---- Mock data (fallback si aucune synchro démo n'a été jouée)
 const state = {
   lastActivity: {
     id: "sample",
@@ -30,7 +30,7 @@ const state = {
   },
   weekly: { load: 73, hours: 4.6, readiness: 82 },
   sports: [
-    { name: "Course",   color: "#EB6E9A" }, // rose
+    { name: "Course",   color: "#EB6E9A" },
     { name: "Cyclisme", color: "#00B37A" },
     { name: "Padel",    color: "#F2A65A" },
     { name: "Renfo",    color: "#E9DDC9" }
@@ -46,7 +46,90 @@ state.activities = [
   { id:'a6', type:'Cyclisme', dateISO:'2025-09-29T17:30:00', distanceKm: 25.4, durationSec: 55*60,      paceSecPerKm: 0,   hrAvg: 130, elevPos: 160, calories: 560 }
 ];
 
-// ---- DOM helpers & formatters
+// =======================
+// DEMO SYNC + PERSISTENCE
+// =======================
+const STORE_KEY = "rocksoState";       // localStorage
+const DEMO_WEEKS = [                   // fichiers JSON à déposer à la racine du microsite
+  "week_demo_1.json", // no injury
+  "week_demo_2.json"  // injury
+];
+
+function getStore(){
+  try {
+    return JSON.parse(localStorage.getItem(STORE_KEY)) || { synced:0, weeks:[], activities:[], lastWeekAnalysis:null, lastActivity:null };
+  } catch(e){
+    return { synced:0, weeks:[], activities:[], lastWeekAnalysis:null, lastActivity:null };
+  }
+}
+function saveStore(st){
+  localStorage.setItem(STORE_KEY, JSON.stringify(st));
+}
+async function loadJSON(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error("Failed to load " + url);
+  return await res.json();
+}
+function calcPaceSecPerKm(distanceKm, durationMin){
+  if (!distanceKm || distanceKm<=0) return 0;
+  return Math.round((durationMin*60) / distanceKm);
+}
+function mapPayloadActivity(a, idx, weekIndex){
+  // mappe l’activité JSON démo -> format UI
+  const typeLabel = (a.type === 'run') ? 'Course' : (a.type === 'cross' ? 'Renfo' : 'Course');
+  return {
+    id: `wk${weekIndex}-a${idx+1}`,
+    type: typeLabel,
+    dateISO: a.datetime_iso,
+    distanceKm: Number(a.distance_km || 0),
+    durationSec: Math.round((a.duration_min || 0) * 60),
+    paceSecPerKm: calcPaceSecPerKm(a.distance_km || 0, a.duration_min || 0),
+    hrAvg: a.avg_hr || null,
+    elevPos: 0, calories: 0
+  };
+}
+function getLiveState(){
+  // Priorité au store (synchros jouées), sinon fallback sur mock "state"
+  const st = getStore();
+  if (st.weeks && st.weeks.length){
+    const lastW = st.weeks[st.weeks.length-1];
+    // Construire lastActivity dérivée si besoin
+    const acts = (st.activities||[]).slice().sort((a,b)=> new Date(a.datetime_iso||a.dateISO) - new Date(b.datetime_iso||b.dateISO));
+    const lastRaw = acts[acts.length-1];
+    const last = lastRaw ? mapPayloadActivity(
+      lastRaw.datetime_iso ? lastRaw : lastRaw, // same mapping
+      0, lastW.week_index || 0
+    ) : null;
+
+    // Quick stats depuis la dernière semaine
+    const totalKm = lastW.summary?.total_km || 0;
+    const hours   = (st.activities||[]).reduce((acc,a)=>acc + (a.duration_min||0), 0) / 60;
+    return {
+      weekly: {
+        load: totalKm,
+        hours: hours,
+        evolVolumePct: Math.round(((lastW.summary?.load_spike_rel_w1_w2||1)-1)*100) || 0,
+        evolIntensityPct: Math.round((((lastW.summary?.km_z5t||0)/(lastW.summary?.total_km||1))*100) - 10) // simple proxy
+      },
+      lastActivity: last || state.lastActivity,
+      activities: acts.map((a,i)=> mapPayloadActivity(a, i, lastW.week_index || 0)),
+      sports: state.sports,
+      lastWeekAnalysis: lastW.ml ? { text: lastW.analysis_text, ml: lastW.ml } : st.lastWeekAnalysis
+    };
+  }
+  // Fallback mock
+  return {
+    weekly: state.weekly,
+    lastActivity: state.lastActivity,
+    activities: state.activities,
+    sports: state.sports,
+    lastWeekAnalysis: null
+  };
+}
+
+// =======================
+// DOM helpers & formatters
+// =======================
 const $  = (sel)=>document.querySelector(sel);
 const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
 
@@ -99,12 +182,42 @@ function setEvolution(baseId, valuePct=0){
 }
 
 // =======================
-// Hydrations
+// Analyse IA (index + training)
+// =======================
+function renderAnalysisPanelFromStore(){
+  const panel = document.getElementById("analysis-panel");
+  if (!panel) return;
+  const st = getStore();
+  if (!st.weeks || !st.weeks.length){
+    panel.innerHTML = `<div class="card"><div class="card-body"><p>Pas d'analyse disponible.</p></div></div>`;
+    return;
+  }
+  const week = st.weeks[st.weeks.length-1];
+  const badge = week.ml?.predicted_label ? `<span class="badge badge-red">Risque de blessure</span>` 
+                                         : `<span class="badge badge-green">Risque faible</span>`;
+  panel.innerHTML = `
+    <div class="card">
+      <div class="card-title">Analyse de la semaine</div>
+      <div class="card-body">
+        <p>${badge} — proba=${Math.round((week.ml?.predicted_probability||0)*100)}%</p>
+        <p><strong>Total:</strong> ${week.summary?.total_km ?? '—'} km &nbsp;|&nbsp; 
+           <strong>Intensité Z5/T1/T2:</strong> ${week.summary?.km_z5t ?? '—'} km &nbsp;|&nbsp;
+           <strong>Progression:</strong> x${week.summary?.load_spike_rel_w1_w2 ?? '—'}</p>
+        <p>${week.analysis_text || ''}</p>
+        <p class="muted">Modèle: ${week.ml?.model || "global_sgd_tuned.joblib (simulé)"}</p>
+      </div>
+    </div>
+  `;
+}
+
+// =======================
+// Hydrations (MAJ pour utiliser le store s'il existe)
 // =======================
 function hydrateHome(){
   if (!$('#metric-load')) return;
 
-  const { weekly, lastActivity, sports } = state;
+  const live = getLiveState();
+  const { weekly, lastActivity, sports } = live;
 
   // quick cards
   $('#metric-load').textContent = formatKm(weekly.load);
@@ -112,7 +225,7 @@ function hydrateHome(){
     typeof weekly.hours === 'number' ? weekly.hours : 0
   );
 
-  // évolution (démo)
+  // évolution (depuis store si possible)
   const evolVolumePct    = typeof weekly.evolVolumePct === 'number' ? weekly.evolVolumePct : 6;
   const evolIntensityPct = typeof weekly.evolIntensityPct === 'number' ? weekly.evolIntensityPct : -12;
   setEvolution('evol-vol', evolVolumePct);
@@ -121,7 +234,7 @@ function hydrateHome(){
   // chips
   const chips = document.getElementById('sport-chips');
   if (chips && chips.children.length === 0){
-    state.sports.forEach(sp=>{
+    sports.forEach(sp=>{
       const el = document.createElement('button');
       el.className = 'chip'; el.type='button';
       el.innerHTML = `<span class="dot" style="background:${sp.color}"></span>${iconFor(sp.name)} ${sp.name}`;
@@ -129,30 +242,35 @@ function hydrateHome(){
     });
   }
 
-  // last activity card
+  // last activity card (ton composant existant)
   $('#last-type').textContent     = lastActivity.type;
   $('#last-date').textContent     = fmtDate(lastActivity.dateISO);
-  $('#last-distance').textContent = `${lastActivity.distanceKm.toFixed(2)} km`;
-  $('#last-duration').textContent = fmtDur(lastActivity.durationSec);
-  $('#last-pace').textContent     = fmtPace(lastActivity.paceSecPerKm);
-  $('#last-activity').href        = `./activity.html?id=${lastActivity.id}`;
+  $('#last-distance').textContent = `${(lastActivity.distanceKm||0).toFixed(2)} km`;
+  $('#last-duration').textContent = fmtDur(lastActivity.durationSec||0);
+  const pace = lastActivity.paceSecPerKm ? fmtPace(lastActivity.paceSecPerKm) : '—';
+  $('#last-pace').textContent     = pace;
+  $('#last-activity').href        = `./activity.html?id=${lastActivity.id || 'sample'}`;
+
+  // Analyse IA (si présente)
+  renderAnalysisPanelFromStore();
 }
 
 function hydrateActivity(){
   const id = new URLSearchParams(location.search).get('id') || 'sample';
-  const a = state.activities.find(x=>x.id===id) || state.lastActivity;
+  const live = getLiveState();
+  const a = (live.activities || []).find(x=>x.id===id) || live.lastActivity;
   if (!$('#type')) return;
 
   $('#type').textContent   = a.type;
   $('#date').textContent   = fmtDate(a.dateISO);
   $('#distance').textContent = a.distanceKm ? a.distanceKm.toFixed(2)+' km' : '—';
-  $('#duration').textContent = fmtDur(a.durationSec);
+  $('#duration').textContent = fmtDur(a.durationSec||0);
   $('#pace').textContent     = a.paceSecPerKm ? fmtPace(a.paceSecPerKm) : '—';
   $('#hr').textContent       = a.hrAvg ? a.hrAvg + ' bpm' : '—';
   $('#elev').textContent     = a.elevPos ? a.elevPos + ' m' : '—';
   $('#cal').textContent      = a.calories ? a.calories + ' kcal' : '—';
 
-  // mini route
+  // mini route (fallback mock si rien)
   const w=320,h=140;
   const points = (a.route||[]).map(([x,y])=>`${x/100*w},${y/100*h}`).join(' ');
   const svg = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
@@ -167,24 +285,25 @@ function hydrateActivity(){
   </svg>`;
   $('#route').innerHTML = svg;
 
-  // laps
-  const laps = $('#laps'); laps.innerHTML = '';
-  (a.laps||[]).forEach(l => {
-    const row = document.createElement('div');
-    row.style.display='grid';
-    row.style.gridTemplateColumns='40px 1fr auto';
-    row.style.gap='10px';
-    row.style.padding='8px 0';
-    row.style.borderBottom='1px solid var(--line)';
-    row.innerHTML = `<span class="muted">#${l.n}</span><strong>${l.distKm.toFixed(2)} km</strong><span>${fmtDur(l.timeSec)}</span>`;
-    laps.appendChild(row);
-  });
+  // laps (si disponibles dans mock)
+  const laps = $('#laps'); if (laps){ laps.innerHTML = '';
+    (a.laps||[]).forEach(l => {
+      const row = document.createElement('div');
+      row.style.display='grid';
+      row.style.gridTemplateColumns='40px 1fr auto';
+      row.style.gap='10px';
+      row.style.padding='8px 0';
+      row.style.borderBottom='1px solid var(--line)';
+      row.innerHTML = `<span class="muted">#${l.n}</span><strong>${l.distKm.toFixed(2)} km</strong><span>${fmtDur(l.timeSec)}</span>`;
+      laps.appendChild(row);
+    });
+  }
 }
 
 function activityRow(a){
   const d = new Date(a.dateISO).toLocaleString('fr-FR', { weekday:'short', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
   const dist = a.distanceKm ? a.distanceKm.toFixed(1)+' km' : '';
-  const dur = fmtDur(a.durationSec);
+  const dur = fmtDur(a.durationSec||0);
   return `<a class="row" href="./activity.html?id=${a.id}">
     <div class="left">
       <span class="icon">${iconFor(a.type)}</span>
@@ -201,12 +320,16 @@ function activityRow(a){
 function hydrateActivities(){
   const list = document.getElementById('activity-list');
   if(!list) return;
-  list.innerHTML = state.activities.map(activityRow).join('');
+  const live = getLiveState();
+  // plus récent en premier
+  const items = (live.activities||[]).slice().sort((a,b)=> new Date(b.dateISO)-new Date(a.dateISO));
+  list.innerHTML = items.map(activityRow).join('');
 }
 
 function hydrateProfile(){
   if (!$('#p-load')) return;
-  const w = state.weekly;
+  const live = getLiveState();
+  const w = live.weekly;
 
   $('#p-load').textContent  = formatKm(w.load);
   $('#p-hours').textContent = formatHoursDecimalToHM(
@@ -217,7 +340,7 @@ function hydrateProfile(){
   const chips = document.getElementById('p-sports');
   if (chips) {
     chips.innerHTML = '';
-    state.sports.forEach(sp=>{
+    live.sports.forEach(sp=>{
       const el = document.createElement('span');
       el.className = 'chip';
       el.innerHTML = `<span class="dot" style="background:${sp.color}"></span>${iconFor(sp.name)} ${sp.name}`;
@@ -227,8 +350,8 @@ function hydrateProfile(){
 }
 
 function hydrateSync(){
-  // présence d’un élément spécifique à la page Sync
-  if (!document.getElementById('btn-sync')) return;
+  // compat: #sync-btn (nouveau) ou #btn-sync (ancien)
+  if (!document.getElementById('btn-sync') && !document.getElementById('sync-btn')) return;
 
   const elBatt = document.getElementById('sync-battery-val') || document.querySelector('[data-sync-battery]');
   const elLast = document.getElementById('sync-last')        || document.querySelector('[data-sync-last]');
@@ -238,68 +361,36 @@ function hydrateSync(){
 }
 
 // =======================
-// Sync animation (progress ring + pulsar)
+// Sync animation + intégration démo (anneau + pas 1/N + IA 1s)
 // =======================
 function setupSyncAnimation(){
-  const btn     = document.getElementById('btn-sync');
+  const btn     = document.getElementById('sync-btn') || document.getElementById('btn-sync');
   const bar     = document.getElementById('sync-progress-bar');
-  const gProg   = document.getElementById('sync-progress');
+  const gProg   = document.getElementById('sync-watch-layer') || document.getElementById('sync-progress'); // fallback ancien id
   const gCheck  = document.getElementById('sync-check');
   const status  = document.getElementById('sync-status');
-  const gPulsar = document.getElementById('sync-pulsar'); // ← nouveau groupe (pulsar)
+  const textProgress = document.getElementById('sync-progress'); // zone texte sous le bouton
+  const gearArea = document.getElementById('gear-area');
+  const doneEl   = document.getElementById('sync-done');
 
   if(!btn || !bar || !gProg || !gCheck) return; // pas sur la page
 
-  const CIRC = 2*Math.PI*60; // r=60 -> ~377 (identique à stroke-dasharray)
-
-  const steps = [
-    { label: "Connexion…",                         dur: 700,  start: 0,  end: 10 },
-    { label: "Préparation de la synchronisation…", dur: 900,  start:10,  end: 22 },
-    { label: "Données d’activité",                 dur:1200,  start:22,  end: 40 },
-    { label: "Données sur le sommeil",             dur:1200,  start:40,  end: 58 },
-    { label: "Données de ressources",              dur:1200,  start:58,  end: 74 },
-    { label: "Optimisation du GPS (1/2)",          dur:1000,  start:74,  end: 88 },
-    { label: "Optimisation du GPS",                dur:1000,  start:88,  end:100 },
-  ];
-
+  const CIRC = 2*Math.PI*60; // r=60 -> ~377
   function setProgress(pct){
     const off = CIRC * (1 - pct/100);
     bar.style.strokeDashoffset = off.toFixed(1);
   }
 
-  async function runStep(step){
-    if (status) status.textContent = step.label;
-    const t0 = performance.now();
-    const tEnd = t0 + step.dur;
-    return new Promise(res=>{
-      function tick(now){
-        const k = Math.min(1, (now - t0) / step.dur);
-        const v = step.start + (step.end - step.start) * k;
-        setProgress(v);
-        if(now < tEnd) requestAnimationFrame(tick);
-        else res();
-      }
-      requestAnimationFrame(tick);
-    });
-  }
-
   function startSyncUI(){
     gCheck.style.display = 'none';
     gProg.style.display  = 'block';
-    if (gPulsar){
-      gPulsar.style.display = '';        // visible
-      gPulsar.classList.add('animate');  // démarre l’anim CSS
-    }
     btn.disabled = true;
     setProgress(0);
+    if (textProgress) textProgress.textContent = '';
+    if (doneEl) { doneEl.classList.add('hidden'); doneEl.innerHTML = ''; }
   }
-
   function endSyncUI(){
     gProg.style.display  = 'none';
-    if (gPulsar){
-      gPulsar.classList.remove('animate');
-      gPulsar.style.display = 'none';
-    }
     gCheck.style.display = 'block';
     if (status) status.textContent = "Synchronisation terminée";
 
@@ -314,19 +405,97 @@ function setupSyncAnimation(){
     btn.disabled = false;
   }
 
-  async function startSync(){
-    startSyncUI();
-    for (const s of steps) { // eslint-disable-line no-restricted-syntax
-      // eslint-disable-next-line no-await-in-loop
-      await runStep(s);
-    }
-    endSyncUI();
+  function animTo(targetPct, dur=800){
+    const t0 = performance.now();
+    const start = parseFloat(bar.style.strokeDashoffset || (CIRC));
+    // Convertir offset courant en pct courant
+    const currentPct = 100 - (start/CIRC*100);
+    const delta = targetPct - currentPct;
+    return new Promise(res=>{
+      function tick(now){
+        const k = Math.min(1, (now - t0) / dur);
+        const pct = currentPct + delta * k;
+        setProgress(pct);
+        if (k<1) requestAnimationFrame(tick);
+        else res();
+      }
+      requestAnimationFrame(tick);
+    });
   }
 
-  // état initial : check visible, progress & pulsar cachés
+  async function runDemoUpload(payload){
+    const N = (payload.activities||[]).length;
+
+    // Intro
+    if (status) status.textContent = "Connexion…";
+    await animTo(10, 600);
+    if (status) status.textContent = "Préparation de la synchronisation…";
+    await animTo(20, 700);
+
+    // Étapes 1/N
+    for (let i=0;i<N;i++){
+      if (textProgress) textProgress.textContent = `Synchronisation des activités ${i+1}/${N}…`;
+      await animTo(20 + ((i+1)/N)*75, 600); // pousser jusqu’à ~95%
+      await new Promise(r=>setTimeout(r, 120));
+    }
+
+    await animTo(98, 500);
+  }
+
+  function mergePayloadIntoStore(payload){
+    const st = getStore();
+    st.weeks = st.weeks || [];
+    st.activities = st.activities || [];
+
+    // Concat activities (on garde la version "brute" JSON pour la persistance)
+    st.weeks.push(payload);
+    st.activities = st.activities.concat(payload.activities);
+    st.lastActivity = payload.activities[payload.activities.length-1];
+    st.lastWeekAnalysis = { text: payload.analysis_text, ml: payload.ml };
+    st.synced = (st.synced||0) + 1;
+    saveStore(st);
+  }
+
+  async function startSync(){
+    startSyncUI();
+
+    try {
+      const st = getStore();
+      const idx = st.synced || 0;
+      if (idx >= DEMO_WEEKS.length){
+        if (status) status.textContent = "Aucune nouvelle donnée démo à synchroniser.";
+        await animTo(100, 400);
+        endSyncUI();
+        return;
+      }
+      const payload = await loadJSON(DEMO_WEEKS[idx]);
+
+      // Anneau + pas 1/N
+      await runDemoUpload(payload);
+
+      // Merge & fin d’anneau
+      mergePayloadIntoStore(payload);
+      await animTo(100, 400);
+      endSyncUI();
+
+      // 1 seconde d'IA (engrenage)
+      if (gearArea) gearArea.classList.remove("hidden");
+      if (status) status.textContent = "Analyse IA en cours…";
+      await new Promise(r=>setTimeout(r, 1000));
+      if (gearArea) gearArea.classList.add("hidden");
+      if (doneEl) {
+        doneEl.classList.remove("hidden");
+        doneEl.innerHTML = `✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`;
+      }
+    } catch(e){
+      if (status) status.textContent = "Erreur de synchronisation.";
+      console.error(e);
+    }
+  }
+
+  // état initial : check visible, progress caché
   gCheck.style.display = 'block';
   gProg.style.display  = 'none';
-  if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display = 'none'; }
   setProgress(0);
 
   btn.addEventListener('click', startSync);
@@ -342,9 +511,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
   hydrateProfile();
   hydrateSync();
   setupSyncAnimation();
+
   // marquer Training actif si on est sur une page Training
   if (document.body.dataset.page === 'training') {
     const t = document.getElementById('tab-training');
     if (t) t.classList.add('active');
+    // Afficher l'analyse sur Training
+    renderAnalysisPanelFromStore();
+  }
+  // Afficher l'analyse également si le panneau est présent (ex: index)
+  if (document.getElementById('analysis-panel')) {
+    renderAnalysisPanelFromStore();
   }
 });

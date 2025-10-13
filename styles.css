@@ -439,7 +439,8 @@ body{ background: #0b0e12; }
 .journal-btn,
 .journal-btn:link,
 .journal-btn:visited{
-  display: inline-block;      /* garde le margin-top sans créer de boîte */
+  display: block;            /* ← was inline-block */
+  text-align: center;        /* ← centers the text */
   margin-top: 10px;
   padding: 0;
   background: transparent;
@@ -460,3 +461,33 @@ body{ background: #0b0e12; }
   outline-offset: 2px;
 }
 
+/* ===== ROCKSO DEMO MIN ADD-ONS ===== */
+
+/* Utilisé pour cacher/afficher des zones (ex: engrenage) */
+.hidden { display: none !important; }
+
+/* Badge verts/rouges pour l'analyse IA */
+.badge-green{
+  background: #E7F8EE;
+  color: #0F8A3B;
+  border: 1px solid rgba(15,138,59,.25);
+}
+.badge-red{
+  background: #FDE8E8;
+  color: #C62828;
+  border: 1px solid rgba(198,40,40,.25);
+}
+
+/* Titres/corps de carte utilisés dans #analysis-panel */
+.card-title{ font-weight:700; margin-bottom:8px; }
+.card-body{ line-height:1.5; }
+
+/* Engrenage "Analyse IA" (id=gear-area) */
+#gear-area { width: 48px; height: 48px; margin: 12px auto; position: relative; }
+#gear-area::before, #gear-area::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  border: 4px solid #999; border-top-color: transparent; border-right-color: transparent;
+  animation: rockso-spin 0.9s linear infinite;
+}
+#gear-area::after { inset: 8px; animation-duration: 1.4s; opacity: 0.6; }
+@keyframes rockso-spin { to { transform: rotate(360deg); } }
