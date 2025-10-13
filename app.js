@@ -1,5 +1,5 @@
 // =======================
-// Rockso prototype — app.js (merged for demo sync + IA) — CLEAN
+// Rockso prototype — app.js (demo sync + IA) — FIXED
 // =======================
 
 // ---- Mock data (fallback si aucune synchro démo n'a été jouée)
@@ -10,7 +10,7 @@ const state = {
     dateISO: "2025-10-05T07:42:00",
     distanceKm: 8.42,
     durationSec: 45*60 + 12,
-    paceSecPerKm: 321, // 5:21 /km
+    paceSecPerKm: 321,
     hrAvg: 152,
     elevPos: 86,
     calories: 564,
@@ -24,9 +24,7 @@ const state = {
       { n: 7, distKm: 1, timeSec: 321 },
       { n: 8, distKm: 1, timeSec: 322 },
     ],
-    route: [
-      [2,90],[8,80],[15,70],[25,62],[35,60],[45,64],[55,74],[64,88],[74,82],[84,70],[92,58]
-    ]
+    route: [[2,90],[8,80],[15,70],[25,62],[35,60],[45,64],[55,74],[64,88],[74,82],[84,70],[92,58]]
   },
   weekly: { load: 73, hours: 4.6, readiness: 82 },
   sports: [
@@ -58,27 +56,71 @@ function getStore(){
     return { synced:0, weeks:[], activities:[], lastWeekAnalysis:null, lastActivity:null };
   }
 }
-function saveStore(st){
-  localStorage.setItem(STORE_KEY, JSON.stringify(st));
-}
+function saveStore(st){ localStorage.setItem(STORE_KEY, JSON.stringify(st)); }
 
-// URL robuste + fetch sans cache
+// --- Demo inline payloads (fallback si les JSON externes ne sont pas accessibles) ---
+const DEMO_INLINE = [
+  { // week_demo_1.json (no injury)
+    week_index: 1,
+    activities: [
+      { datetime_iso:"2025-09-22T07:10:00", type:"run",  distance_km:12.6, duration_min:63, avg_hr:148 },
+      { datetime_iso:"2025-09-24T18:00:00", type:"run",  distance_km:8.0,  duration_min:42, avg_hr:151 },
+      { datetime_iso:"2025-09-26T07:20:00", type:"run",  distance_km:10.2, duration_min:54, avg_hr:146 },
+      { datetime_iso:"2025-09-28T09:00:00", type:"run",  distance_km:18.5, duration_min:95, avg_hr:152 }
+    ],
+    summary: {
+      total_km: 49.3,
+      km_z5t: 4.2,
+      load_spike_rel_w1_w2: 1.12,
+      sessions: 4, rest_days: 3
+    },
+    ml: { predicted_label: 0, predicted_probability: 0.12, model: "global_sgd_tuned.joblib (simulé)" },
+    analysis_text: "Semaine maîtrisée : volume modéré (49 km), intensité contrôlée (≈4 km en Z5/T1/T2). RPE cohérent, sommeil et ressenti quotidiens stables. Le risque de blessure est faible."
+  },
+  { // week_demo_2.json (injury)
+    week_index: 2,
+    activities: [
+      { datetime_iso:"2025-09-29T06:55:00", type:"run",  distance_km:15.0, duration_min:74, avg_hr:154 },
+      { datetime_iso:"2025-10-01T19:05:00", type:"run",  distance_km:10.2, duration_min:50, avg_hr:158 },
+      { datetime_iso:"2025-10-03T07:00:00", type:"run",  distance_km:12.0, duration_min:56, avg_hr:160 },
+      { datetime_iso:"2025-10-05T09:10:00", type:"run",  distance_km:24.0, duration_min:118, avg_hr:156 }
+    ],
+    summary: {
+      total_km: 61.2,
+      km_z5t: 10.0,
+      load_spike_rel_w1_w2: 1.42,
+      sessions: 4, rest_days: 3
+    },
+    ml: { predicted_label: 1, predicted_probability: 0.76, model: "global_sgd_tuned.joblib (simulé)" },
+    analysis_text: "Surcharge nette (+42% vs S-1) et bloc d’intensité élevé (~10 km en Z5/T1/T2). Indices de fatigue probables (HRV en baisse, sommeil moyen). Le risque de blessure est accru — allégez le volume et fractionnez la récupération."
+  }
+];
+
+// --- Charge JSON depuis plusieurs chemins candidats ; fallback DEMO_INLINE si échecs ---
 function resolveUrl(rel){
   const base = (document.querySelector('base')?.href) ||
                (location.origin + location.pathname.replace(/[^/]+$/, ''));
   return new URL(rel, base).toString();
 }
-async function loadJSON(url){
-  const full = resolveUrl(url);
-  const res = await fetch(full, { cache: "no-cache" });
-  if (!res.ok) {
-    console.error("[sync] fetch failed", { url: full, status: res.status, statusText: res.statusText });
-    throw new Error(`HTTP ${res.status} on ${full}`);
-  }
-  return await res.json();
+async function tryFetch(url){
+  const res = await fetch(url, { cache:"no-cache" });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
 }
-// Fichiers JSON démo (à la racine, à côté de sync.html)
+// chemins candidats (si tu mets tes fichiers ailleurs, adapte ici)
 const DEMO_WEEKS = ["./week_demo_1.json", "./week_demo_2.json"];
+const DEMO_ALT_PREFIXES = ["./", "./assets/", "./data/", "./assets/data/"];
+
+async function loadWeek(idx){
+  const file = DEMO_WEEKS[idx];
+  for (const prefix of DEMO_ALT_PREFIXES){
+    try { return await tryFetch(resolveUrl(prefix + file.replace("./",""))); }
+    catch(e){ /* on essaie le suivant */ }
+  }
+  // Fallback inline si tous les fetch échouent
+  console.warn(`[sync] Fallback DEMO_INLINE[${idx}] (fichier introuvable)`);
+  return DEMO_INLINE[idx];
+}
 
 function calcPaceSecPerKm(distanceKm, durationMin){
   if (!distanceKm || distanceKm<=0) return 0;
@@ -169,7 +211,7 @@ const Icons = {
 function iconFor(sport){ return Icons[sport] || Icons.Course; }
 
 // ---- Evolution dots
-const EVOL_THRESHOLDS = { ok: 10, warn: 20 }; // <=10% vert, <=20% jaune, >20% rouge
+const EVOL_THRESHOLDS = { ok: 10, warn: 20 };
 function setEvolution(baseId, valuePct=0){
   const valEl = document.getElementById(baseId);
   const dotEl = document.getElementById(`${baseId}-dot`);
@@ -206,30 +248,24 @@ function renderAnalysisPanelFromStore(){
            <strong>Intensité Z5/T1/T2:</strong> ${week.summary?.km_z5t ?? '—'} km &nbsp;|&nbsp;
            <strong>Progression:</strong> x${week.summary?.load_spike_rel_w1_w2 ?? '—'}</p>
         <p>${week.analysis_text || ''}</p>
-        <p class="muted">Modèle: ${week.ml?.model || "global_sgd_tuned.joblib (simulé)"}</p>
+        <p class="muted">Modèle: ${week.ml?.model || "global_sgd_tuned.joblib (simulé)"} </p>
       </div>
     </div>
   `;
 }
 
 // =======================
-// Hydrations (utilisent le store s'il existe)
+// Hydrations
 // =======================
 function hydrateHome(){
   if (!$('#metric-load')) return;
-
   const live = getLiveState();
   const { weekly, lastActivity, sports } = live;
 
   $('#metric-load').textContent = formatKm(weekly.load);
-  $('#metric-hours').textContent = formatHoursDecimalToHM(
-    typeof weekly.hours === 'number' ? weekly.hours : 0
-  );
-
-  const evolVolumePct    = typeof weekly.evolVolumePct === 'number' ? weekly.evolVolumePct : 6;
-  const evolIntensityPct = typeof weekly.evolIntensityPct === 'number' ? weekly.evolIntensityPct : -12;
-  setEvolution('evol-vol', evolVolumePct);
-  setEvolution('evol-int', evolIntensityPct);
+  $('#metric-hours').textContent = formatHoursDecimalToHM(typeof weekly.hours === 'number' ? weekly.hours : 0);
+  setEvolution('evol-vol', typeof weekly.evolVolumePct==='number'?weekly.evolVolumePct:6);
+  setEvolution('evol-int', typeof weekly.evolIntensityPct==='number'?weekly.evolIntensityPct:-12);
 
   const chips = document.getElementById('sport-chips');
   if (chips && chips.children.length === 0){
@@ -245,8 +281,7 @@ function hydrateHome(){
   $('#last-date').textContent     = fmtDate(lastActivity.dateISO);
   $('#last-distance').textContent = `${(lastActivity.distanceKm||0).toFixed(2)} km`;
   $('#last-duration').textContent = fmtDur(lastActivity.durationSec||0);
-  const pace = lastActivity.paceSecPerKm ? fmtPace(lastActivity.paceSecPerKm) : '—';
-  $('#last-pace').textContent     = pace;
+  $('#last-pace').textContent     = lastActivity.paceSecPerKm ? fmtPace(lastActivity.paceSecPerKm) : '—';
   $('#last-activity').href        = `./activity.html?id=${lastActivity.id || 'sample'}`;
 
   renderAnalysisPanelFromStore();
@@ -324,11 +359,8 @@ function hydrateProfile(){
   if (!$('#p-load')) return;
   const live = getLiveState();
   const w = live.weekly;
-
   $('#p-load').textContent  = formatKm(w.load);
-  $('#p-hours').textContent = formatHoursDecimalToHM(
-    typeof w.hours === 'number' ? w.hours : 0
-  );
+  $('#p-hours').textContent = formatHoursDecimalToHM(typeof w.hours === 'number' ? w.hours : 0);
   const restEl = $('#p-rest'); if (restEl) restEl.textContent = 'OK';
 
   const chips = document.getElementById('p-sports');
@@ -352,17 +384,18 @@ function hydrateSync(){
 }
 
 // =======================
-// Sync animation + intégration démo (anneau + pas 1/N + IA 1s)
+// Sync animation + intégration démo
 // =======================
 function setupSyncAnimation(){
   const btn     = document.getElementById('sync-btn') || document.getElementById('btn-sync');
   const bar     = document.getElementById('sync-progress-bar');
-  const gProg   = document.getElementById('sync-watch-layer') || document.getElementById('sync-progress'); // fallback ancien id
+  const gProg   = document.getElementById('sync-progress'); // calque SVG
   const gCheck  = document.getElementById('sync-check');
   const status  = document.getElementById('sync-status');
-  const textProgress = document.getElementById('sync-progress'); // zone texte sous le bouton
+  const textProgress = document.getElementById('sync-progress-text'); // ← ID corrigé
   const gearArea = document.getElementById('gear-area');
   const doneEl   = document.getElementById('sync-done');
+  const resetBtn = document.getElementById('reset-demo');
 
   if(!btn || !bar || !gProg || !gCheck) return; // pas sur la page
 
@@ -384,6 +417,14 @@ function setupSyncAnimation(){
     }
   }
 
+  // Reset démo
+  if (resetBtn) {
+    resetBtn.addEventListener('click', ()=>{
+      localStorage.removeItem(STORE_KEY);
+      location.reload();
+    });
+  }
+
   const CIRC = 2*Math.PI*60; // r=60 -> ~377
   function setProgress(pct){
     const off = CIRC * (1 - pct/100);
@@ -398,12 +439,10 @@ function setupSyncAnimation(){
     if (textProgress) textProgress.textContent = '';
     if (doneEl) { doneEl.classList.add('hidden'); doneEl.innerHTML = ''; }
   }
-
   function endSyncUI(){
     gProg.style.display  = 'none';
     gCheck.style.display = 'block';
     if (status) status.textContent = "Synchronisation terminée";
-
     const last = document.querySelector('[data-sync-last]') ||
                  document.getElementById('sync-last') ||
                  document.querySelector('.sync-row .sync-label + .sync-val');
@@ -433,7 +472,6 @@ function setupSyncAnimation(){
 
   async function runDemoUpload(payload){
     const N = (payload.activities||[]).length;
-
     if (status) status.textContent = "Connexion…";
     await animTo(10, 600);
     if (status) status.textContent = "Préparation de la synchronisation…";
@@ -465,7 +503,7 @@ function setupSyncAnimation(){
       const st = getStore();
       const idx = st.synced || 0;
 
-      if (idx >= DEMO_WEEKS.length) {
+      if (idx >= DEMO_INLINE.length) { // max 2 semaines en démo
         if (status) status.textContent = "Aucune nouvelle donnée démo à synchroniser.";
         if (textProgress) textProgress.textContent = "Démo : toutes les données ont déjà été synchronisées.";
         await animTo(100, 400);
@@ -473,8 +511,7 @@ function setupSyncAnimation(){
         return;
       }
 
-      const payload = await loadJSON(DEMO_WEEKS[idx]);
-
+      const payload = await loadWeek(idx);  // ← essaie fichiers, puis fallback inline
       await runDemoUpload(payload);
       mergePayloadIntoStore(payload);
 
@@ -491,8 +528,8 @@ function setupSyncAnimation(){
       }
     } catch(e){
       console.error(e);
-      if (status) status.textContent = "Erreur de synchronisation (vérifie que les fichiers JSON sont présents à la racine).";
-      if (textProgress) textProgress.textContent = "Astuce : place week_demo_1.json et week_demo_2.json à côté de sync.html (ou adapte DEMO_WEEKS).";
+      if (status) status.textContent = "Erreur de synchronisation.";
+      if (textProgress) textProgress.textContent = "La démo a un fallback intégré, recharge la page si le problème persiste.";
     }
   }
 

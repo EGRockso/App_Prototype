@@ -128,7 +128,16 @@
           <div class="sync-actions">
             <button id="sync-btn" class="btn">Synchroniser</button>
             <!-- ROCKSO START: this is the textual progress used by app.js -->
-            <div id="sync-progress" aria-live="polite"></div>
+            <div class="sync-actions">
+                <button id="sync-btn" class="btn">Synchroniser</button>
+                <div id="sync-progress-text"></div>   <!-- ← anciennement id="sync-progress" -->
+                <div id="gear-area" class="gear hidden"></div>
+                <div id="sync-done" class="hidden"></div>
+
+                <!-- Bouton reset démo -->
+                <button id="reset-demo" class="btn" style="margin-left:8px;">Réinitialiser</button>
+            </div>
+
             <div id="gear-area" class="gear hidden"></div>
             <div id="sync-done" class="hidden"></div>
             <!-- ROCKSO END -->
