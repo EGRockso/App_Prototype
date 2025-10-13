@@ -1,40 +1,53 @@
-/* ─────────────────────────────────────────────────────────────
+/* =====================================================================
    ROCKSO — Mobile prototype (light theme)
-   ─ Palette claire + motifs discrets
-   ─ Texte vert Rockso
-   ─ Tabbar iOS (frosted)
-   ─ Hero : slogan seul, lisible
-   ───────────────────────────────────────────────────────────── */
+   Version clean & rationalisée
+   ---------------------------------------------------------------------
+   • Palette + variables
+   • Gabarit device (viewport, téléphone, notch, motifs)
+   • Header, contenu défilant
+   • Hero, sections, cartes, métriques
+   • Chips (version unique)
+   • Activity card + liste Journal
+   • Gauge & Avatar
+   • Tabbar iOS (frosted)
+   • Micro-interactions
+   • Backdrop hors téléphone (thème rockso)
+   • Pages Sync (watch svg, progress, pulsar)
+   • Barres & échelles
+   • Training tabs (4 onglets sur 1 ligne)
+   • Media queries
+   ===================================================================== */
 
+/* -------------------- Variables -------------------- */
 :root{
   /* Palette Rockso */
-  --rockso-green:  #3F8C6A;   /* vert texte/bouton */
-  --rockso-beige:  #F5EFE3;   /* fond device */
-  --rockso-cream:  #FFFBF4;   /* cartes */
-  --rockso-line:   #E7DECF;   /* séparateurs */
+  --rockso-green:  #3F8C6A;     /* vert texte/bouton */
+  --rockso-beige:  #F5EFE3;     /* fond device */
+  --rockso-cream:  #FFFBF4;     /* cartes */
+  --rockso-line:   #E7DECF;     /* séparateurs */
 
-  --rockso-pink:   #EB6E9A;
+  --rockso-pink:   #EB6E9A;     /* rose thème */
   --rockso-orange: #F2A65A;
   --rockso-yellow: #F2C14E;
 
-  /* Variables UI */
-  --bg:       #F1ECE1;           /* fond page derrière le device */
+  /* Couleurs UI */
+  --bg:       #F1ECE1;          /* fond page derrière le device */
   --surface:  var(--rockso-beige);
   --surface-2:var(--rockso-cream);
-  --text:     #2E6E55;           /* texte principal (vert) */
-  --muted:    #6C8E7E;           /* texte secondaire */
+  --text:     #2E6E55;          /* texte principal */
+  --muted:    #6C8E7E;          /* texte secondaire */
   --line:     var(--rockso-line);
   --brand:    var(--rockso-green);
-  --brand-2:  #72A88A;           /* variante dégradés */
+  --brand-2:  #72A88A;
   --danger:   #C65353;
 
+  /* Rythme & effets */
   --radius:   22px;
   --shadow:   0 10px 24px rgba(160,140,120,.20);
-
-  /* Hauteur du dock iOS-like */
-  --tabbar-h: 68px;
+  --tabbar-h: 68px;             /* hauteur dock iOS-like */
 }
 
+/* -------------------- Base -------------------- */
 *{ box-sizing:border-box }
 html,body{ height:100% }
 body{
@@ -44,15 +57,13 @@ body{
   background: var(--bg);
 }
 
-/* Viewport (centrage de l’« iPhone ») */
+/* -------------------- Viewport + Device -------------------- */
 .viewport{
   min-height:100%;
-  display:grid;
-  place-items:center;
+  display:grid; place-items:center;
   padding:28px 12px;
 }
 
-/* Device (téléphone) */
 .device{
   width: 394px; max-width: 100%;
   height: 844px; max-height: calc(100vh - 24px);
@@ -85,7 +96,7 @@ body{
   z-index:5; box-shadow: 0 2px 0 rgba(255,255,255,.35) inset;
 }
 
-/* Header */
+/* -------------------- Header -------------------- */
 .app-header{
   height:64px; display:flex; align-items:center; justify-content:space-between;
   padding: 0 18px; border-bottom:1px solid var(--line);
@@ -97,21 +108,22 @@ body{
 .icon-btn{ background:none; border:none; color:var(--muted); padding:6px; border-radius:12px; }
 .icon-btn:hover{ background:rgba(255,255,255,.6); color:var(--text); }
 
-/* Contenu défilant (place pour le dock) */
+/* -------------------- Contenu défilant -------------------- */
 .content.scroll{
   flex:1; overflow:auto;
   padding: 14px 14px calc(40px + var(--tabbar-h));
 }
 
-/* Hero — image nette + voile en bas */
+/* -------------------- Hero -------------------- */
 .hero{ position:relative; overflow:hidden; border-radius: var(--radius); height:176px; }
 .hero-img{
   width:100%; height:176px; object-fit:cover; display:block;
   filter: saturate(.98) contrast(1.02) brightness(.98);
 }
 .hero-overlay{
-  position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
-  padding: 18px 16px 28px; /* texte un peu plus bas */
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding: 18px 16px 28px;
   background: linear-gradient(180deg,
     rgba(245,239,227,0) 48%,
     rgba(245,239,227,.72) 82%,
@@ -119,64 +131,80 @@ body{
 }
 .tagline{
   margin:0;
-  font-size:24px;
-  font-weight:800;
-  letter-spacing:.2px;
+  font-size:22px; font-weight:800; line-height:1.1; letter-spacing:.2px;
   color:var(--text);
   text-shadow: 0 1px 0 rgba(255,255,255,.30);
 }
 
-/* Quick stats */
-.quick-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin:12px 0 4px; }
-.quick-card{
-  background:var(--surface-2); padding:10px 12px; border-radius:16px;
-  border:1px solid var(--line); box-shadow: 0 6px 16px rgba(0,0,0,.06);
-}
-.qc-label{ color:var(--muted); font-size:12px }
-.qc-value{ font-size:18px; margin-top:2px; display:block; color:#1c3b2f }
-
-/* Quick card "Évolution" compacte */
-.qc-evol{ padding-top: 8px; padding-bottom: 8px; }
-.evol-row{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:10px; margin:6px 0;
-}
-.evol-left{ display:flex; align-items:center; gap:8px; }
-.evol-label{ color: var(--muted); font-size:12px; }
-.evol-val{ font-size:16px; }
-
-/* Pastilles statut */
-.dot{ width:8px; height:8px; border-radius:50%; display:inline-block; box-shadow:0 0 0 4px rgba(242,231,210,.6); }
-.dot--ok   { background: var(--brand); }
-.dot--warn { background: var(--rockso-yellow); }
-.dot--risk { background: var(--danger); }
-
-/* Sections & titres */
+/* -------------------- Sections & cartes génériques -------------------- */
 .section{ margin:16px 0 10px; }
 .section-title{
   font-size:14px; text-transform:uppercase; letter-spacing:.12em; color:var(--text);
   opacity:.9; margin:0 0 8px;
 }
 
-/* Chips sports */
-.chips{ display:flex; gap:8px; flex-wrap:wrap; }
-.chip{
-  padding:8px 10px; border-radius:999px; border:1px solid var(--line);
-  background:#FFFDF8; color:var(--text);
-  font-size:13px; display:inline-flex; align-items:center; gap:6px;
+.card{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:16px; padding:12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.06);
 }
-.chip .dot{
-  width:8px; height:8px; border-radius:999px; background:var(--brand);
-  box-shadow: 0 0 0 4px rgba(242,231,210,.6);
-}
+.muted{ color:var(--muted); }
 
-/* Carte dernière activité */
+/* -------------------- Quick stats -------------------- */
+.quick-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin:12px 0 4px; }
+.quick-card{
+  background:var(--surface-2); padding:8px 10px; border-radius:14px;
+  border:1px solid var(--line); box-shadow: 0 4px 12px rgba(0,0,0,.05);
+}
+.qc-label{ color:var(--muted); font-size:11px }
+.qc-value{ font-size:16px; margin-top:2px; display:block; color:#1c3b2f }
+
+/* Quick card “Évolution” */
+.qc-evol{ padding-top: 6px; padding-bottom: 6px; }
+.evol-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:4px 0; }
+.evol-left{ display:flex; align-items:center; gap:8px; }
+.evol-label{ color: var(--muted); font-size:11px; }
+.evol-val{ font-size:15px; }
+
+/* Pastilles statut */
+.dot{ width:8px; height:8px; border-radius:50%; display:inline-block; box-shadow:0 0 0 4px rgba(242,231,210,.6); }
+.dot--ok{   background: var(--brand); }
+.dot--warn{ background: var(--rockso-yellow); }
+.dot--risk{ background: var(--danger); }
+
+/* -------------------- Chips (version unique) -------------------- */
+.chips{
+  display:flex; flex-wrap:nowrap; gap:8px;
+  overflow-x:auto; overflow-y:visible;
+  padding:2px 2px 4px; white-space:nowrap;
+  scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch;
+  mask-image: linear-gradient(to right,
+      transparent 0, black 16px,
+      black calc(100% - 16px), transparent 100%);
+}
+.chips::-webkit-scrollbar{ display:none; }
+
+.chip{
+  flex:0 0 auto;
+  display:inline-flex; align-items:center; gap:4px;
+  padding:6px 8px;
+  border-radius:999px; border:1px solid var(--line);
+  background:#FFFDF8; color:var(--text);
+  font-size:13px; line-height:1.1;
+  scroll-snap-align:start;
+}
+.chip svg{ width:16px; height:16px; margin:0 1px; }
+.chip .dot{ width:10px; height:10px; box-shadow:0 0 0 4px rgba(242,231,210,.6); }
+
+/* -------------------- Activity card & métriques -------------------- */
 .activity-card{
   display:block; background: var(--surface-2);
-  border:1px solid var(--line); border-radius:16px; padding:12px; text-decoration:none; color:inherit;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  border:1px solid var(--line); border-radius:16px; padding:12px;
+  text-decoration:none; color:inherit; box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
 .activity-card:hover{ border-color:#e9decd; transform: translateY(-1px); transition: .15s ease; }
+
 .ac-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; color:var(--muted); }
 .ac-head.big{ margin-top:8px; font-size:14px; }
 .badge{
@@ -185,31 +213,46 @@ body{
   padding:6px 10px; border-radius:999px; border:1px solid rgba(63,140,106,.28);
 }
 .ac-body{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
-.metric{
-  background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:8px 10px;
-}
+
+.metric{ background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:8px 10px; }
 .metric-label{ color:var(--muted); font-size:12px; }
 .metric-value{ display:block; margin-top:2px; font-weight:700; }
 
-/* Bouton "Journal" */
-.journal-btn{
-  margin-top:10px; display:flex; align-items:center; justify-content:center; height:44px;
-  background: transparent; color: var(--text); border:1px dashed var(--line); border-radius:12px; text-decoration:none;
+/* -------------------- Journal list -------------------- */
+.list{ display:flex; flex-direction:column; gap:10px; }
+.list .row{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+  text-decoration:none; color:inherit; box-shadow: 0 6px 16px rgba(0,0,0,.06);
 }
-.journal-btn[aria-disabled="true"]{ color:var(--muted); cursor:not-allowed; }
+.row .left{ display:flex; align-items:center; gap:10px; }
+.row .icon{ width:28px; height:28px; border-radius:8px; display:grid; place-items:center; background:#FFFFFF; border:1px solid var(--line); }
+.row .meta{ color:var(--muted); font-size:12px; }
 
-/* Cartes génériques */
-.card{ background:var(--surface-2); border:1px solid var(--line); border-radius:16px; padding:12px; box-shadow: 0 6px 16px rgba(0,0,0,.06); }
-.muted{ color:var(--muted); }
+/* -------------------- Gauge & Avatar -------------------- */
+.gauge{
+  width:140px; height:140px; border-radius:999px; position:relative;
+  background:
+    conic-gradient(var(--rockso-pink) 0 calc(var(--p,75%) * .40),
+                   var(--rockso-orange) calc(var(--p,75%) * .40) calc(var(--p,75%) * .75),
+                   var(--rockso-green)  calc(var(--p,75%) * .75) var(--p,75%),
+                   #EAE3D6 var(--p,75%) 100%);
+  display:grid; place-items:center;
+}
+.gauge::after{ content:""; position:absolute; inset:8px; background:var(--surface); border-radius:999px; border:1px solid var(--line); }
+.gauge .val{ position:relative; font-size:24px; font-weight:800; color:#1c3b2f; }
 
-/* Grille de métriques */
-.metrics-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:10px; }
+.avatar{
+  width:140px; height:140px; border-radius:999px; overflow:hidden;
+  border:1px solid var(--line); background: var(--surface-2);
+  box-shadow: 0 2px 6px rgba(0,0,0,.04) inset;
+}
+.avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-/* Mini chart */
-.chart{ height:160px; display:grid; place-items:center; overflow:hidden; }
-.chart svg{ width:100%; height:100%; display:block; }
+.grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+.badge.outline{ background:transparent; color:var(--brand-2); border:1px solid rgba(63,140,106,.45); }
 
-/* ─────────────── Tabbar — iOS frosted + liens propres ─────────────── */
+/* -------------------- Tabbar iOS (frosted) -------------------- */
 .tabbar{
   position:absolute; left:0; right:0; bottom:0;
   display:flex; gap:10px;
@@ -222,35 +265,25 @@ body{
 
   border-top:1px solid rgba(231,222,207,.92);
   box-shadow: 0 -1px 0 rgba(255,255,255,.28) inset, 0 -10px 24px rgba(0,0,0,.06);
-  border-radius:0;
-  z-index:10;
-  isolation:isolate;
+  z-index:10; isolation:isolate;
 }
 .tabbar::before{
   content:""; position:absolute; inset:0; pointer-events:none;
   background: radial-gradient(150% 110% at 50% 0, rgba(255,255,255,.10), rgba(255,255,255,0) 60%);
-  mix-blend-mode: screen;
-  z-index:0;
+  mix-blend-mode: screen; z-index:0;
 }
 
-.tab,
-.tab:link,
-.tab:visited{
-  flex:1;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+.tab, .tab:link, .tab:visited{
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
   border:0; background:transparent; border-radius:12px;
-  text-decoration:none !important;
-  color:#6b7d74 !important;
-  position:relative; z-index:1;
-  -webkit-tap-highlight-color: transparent;
+  text-decoration:none; color:#6b7d74;
+  position:relative; z-index:1; -webkit-tap-highlight-color: transparent;
 }
-.tab svg{ display:block; stroke: currentColor; fill: none; } /* icônes = couleur de l'onglet */
+.tab svg{ width:22px; height:22px; display:block; fill: currentColor; } /* icônes “plein” pilotées par la couleur */
 .tab span{ font-weight:600 }
 
-.tab.active,
-.tab.active:link,
-.tab.active:visited{
-  color: var(--text) !important;
+.tab.active, .tab.active:link, .tab.active:visited{
+  color: var(--text);
   font-weight:800;
 }
 
@@ -259,37 +292,7 @@ body{
   .tabbar{ background: rgba(255,255,255,.85); }
 }
 
-/* Blocs "future" */
-.future .card{ outline:1px dashed var(--line); background:#FFFFFF; }
-
-/* Journal (liste) */
-.list{ display:flex; flex-direction:column; gap:10px; }
-.list .row{
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-  background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:10px 12px;
-  text-decoration:none; color:inherit; box-shadow: 0 6px 16px rgba(0,0,0,.06);
-}
-.row .left{ display:flex; align-items:center; gap:10px; }
-.row .icon{ width:28px; height:28px; border-radius:8px; display:grid; place-items:center; background:#FFFFFF; border:1px solid var(--line); }
-.row .meta{ color:var(--muted); font-size:12px; }
-
-/* Jauge readiness (clair) */
-.gauge{
-  width:140px; height:140px; border-radius:999px; position:relative;
-  background:
-    conic-gradient(var(--rockso-pink) 0 calc(var(--p,75%) * .40),
-                   var(--rockso-orange) calc(var(--p,75%) * .40) calc(var(--p,75%) * .75),
-                   var(--rockso-green) calc(var(--p,75%) * .75) var(--p,75%),
-                   #EAE3D6 var(--p,75%) 100%);
-  display:grid; place-items:center;
-}
-.gauge::after{ content:""; position:absolute; inset:8px; background:var(--surface); border-radius:999px; border:1px solid var(--line); }
-.gauge .val{ position:relative; font-size:24px; font-weight:800; color:#1c3b2f; }
-
-.grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-.badge.outline{ background:transparent; color:var(--brand-2); border:1px solid rgba(63,140,106,.45); }
-
-/* Micro-interactions sobres */
+/* -------------------- Micro-interactions -------------------- */
 * { transition: color .15s ease, background-color .15s ease, border-color .15s ease; }
 .btn, .tab, .chip, .activity-card, .metric, .quick-card {
   transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
@@ -298,73 +301,10 @@ body{
 .btn:active, .activity-card:active, .chip:active, .metric:active, .quick-card:active { transform: translateY(0); }
 .tab:hover { opacity:.95; }
 .tab:active { transform: translateY(1px); }
-@media (prefers-reduced-motion: reduce) { *{ transition:none !important; } }
 
-/* === Force hero tagline (taille + position) === */
-.hero-overlay{ padding-bottom: 40px !important; }
-.hero .tagline{
-  margin: 0 !important;
-  font-size: 22px !important;
-  font-weight: 800 !important;
-  line-height: 1.1 !important;
-  letter-spacing: .2px !important;
-  color: var(--text) !important;
-  text-shadow: 0 1px 0 rgba(255,255,255,.30) !important;
-}
-
-/* === PATCH UI — quick-cards plus compactes + slogan plus bas === */
-
-/* 1) Descendre nettement "Keep moving forward" (~+20 px ≈ 4–5 mm) */
-.hero-overlay{ padding-bottom: 5px !important; }  /* avant 40px */
-
-/* 2) Cartes "quick stats" plus petites (hauteur réduite) */
-.quick-grid{ gap: 8px !important; }                       /* un poil moins d'espace */
-.quick-card{
-  padding: 8px 10px !important;                           /* moins haut */
-  border-radius: 14px !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,.05) !important;      /* un peu plus léger */
-}
-.qc-label{ font-size: 11px !important; }                  /* label + fin */
-.qc-value{ font-size: 16px !important; }                  /* valeur + compacte */
-
-/* Carte Évolution : encore plus compacte */
-.qc-evol{ padding-top: 6px !important; padding-bottom: 6px !important; }
-.evol-row{ margin: 4px 0 !important; }
-.evol-label{ font-size: 11px !important; }
-.evol-val{ font-size: 15px !important; }
-
-/* === PATCH — Chips compactes (pastilles taille d'origine) === */
-.chips{ gap:6px !important; }                  /* espace entre chips un peu réduit */
-
-.chip{
-  padding:6px 7px !important;                  /* moins large/haut, sans toucher le texte */
-  gap:3px !important;                          /* espace interne fortement réduit */
-  white-space: nowrap !important;              /* pas de retour à la ligne dans la chip */
-  line-height: 1.1 !important;                 /* compacter la hauteur */
-}
-
-/* pastille — taille d'origine */
-.chip .dot{
-  width:8px; height:8px;                       /* 8px (comme avant) */
-  box-shadow: 0 0 0 4px rgba(242,231,210,.6);  /* halo d'origine */
-  margin-right: 2px;                           /* colle un peu plus l'icône */
-}
-
-/* icône sport — taille d'origine, marges resserrées */
-.chip svg{
-  width:18px; height:18px;                     /* 18px (comme avant) */
-  display:inline-block; vertical-align:middle;
-  margin: 0 2px;                               /* colle texte et pastille */
-}
-
-/* === BACKDROP HORS TÉLÉPHONE — sombre + nuances Rockso === */
-.viewport{ position: relative; } /* pour le ::after */
-body{
-  /* fond global très sombre */
-  background: #0b0e12 !important;
-}
-
-/* dégradés colorés autour du device (pas dans le device) */
+/* -------------------- Backdrop hors téléphone (mode sombre + nuances) -------------------- */
+.viewport{ position: relative; }
+body{ background: #0b0e12; }
 .theme-rockso .viewport{
   background:
     radial-gradient(900px 520px at 0% 0%,    rgba(235,110,154,.18), transparent 60%),
@@ -372,127 +312,14 @@ body{
     radial-gradient(1100px 700px at 50% 120%,rgba(0,179,122,.20),   transparent 60%),
     linear-gradient(180deg,#11151a,#0b0e12);
 }
-
-/* léger halo sous le téléphone pour le contraste (optionnel) */
 .theme-rockso .viewport::after{
   content:""; pointer-events:none; position:absolute; inset:0;
   background:
     radial-gradient(60% 25% at 50% 95%, rgba(0,0,0,.35), transparent 60%),
     radial-gradient(50% 18% at 50% 98%, rgba(0,179,122,.14), transparent 65%);
-  mix-blend-mode: normal;
 }
 
-/* Icônes tabbar en style "plein" piloté par la couleur de l'onglet */
-.tab svg{ width:22px; height:22px; display:block; fill: currentColor; }
-.tab svg path{ stroke: none; }
-
-/* === Catégories en 1 seule ligne (scroll horizontal doux) === */
-.chips{
-  display:flex;
-  flex-wrap: nowrap;              /* une seule ligne */
-  gap:8px;
-  overflow-x:auto;                /* scroll horizontal si ça dépasse */
-  overflow-y:visible;
-  padding-bottom:2px;
-  white-space: nowrap;
-  scroll-snap-type: x proximity;  /* feeling iOS */
-  -webkit-overflow-scrolling: touch;
-  mask-image: linear-gradient(to right,
-    transparent 0, black 16px, black calc(100% - 16px), transparent 100%); /* fondu bords */
-}
-.chips::-webkit-scrollbar{ display:none; } /* cache la barre de scroll */
-
-/* === Catégories : 1 ligne, scroll horizontal doux === */
-.chips{
-  display:flex;
-  flex-wrap:nowrap;             /* une seule ligne */
-  gap:8px;
-  overflow-x:auto;              /* défilement latéral si ça dépasse */
-  overflow-y:visible;
-  padding: 2px 2px 4px;         /* un poil d’air sous la rangée */
-  white-space:nowrap;
-  scroll-snap-type:x proximity; /* feeling iOS */
-  -webkit-overflow-scrolling:touch;
-  /* fondu aux bords pour indiquer qu’on peut glisser */
-  mask-image: linear-gradient(to right,
-      transparent 0, black 16px,
-      black calc(100% - 16px), transparent 100%);
-}
-.chips::-webkit-scrollbar{ display:none; } /* pas de barre grise */
-
-/* chaque chip reste compacte et ne s’étire pas */
-.chip{
-  flex:0 0 auto;
-  scroll-snap-align:start;
-}
-
-/* resserrage léger interne pour tenir sur 1 ligne sans rapetisser les pastilles */
-.chip{ padding:6px 8px; gap:4px; }
-.chip svg{ width:16px; height:16px; margin:0 1px; }
-.chip .dot{ width:10px; height:10px; box-shadow:0 0 0 4px rgba(242,231,210,.6); }
-
-/* Avatar rond à la place de la jauge */
-.avatar{
-  width:140px; height:140px;
-  border-radius:999px;
-  overflow:hidden;
-  border:1px solid var(--line);
-  background: var(--surface-2);
-  box-shadow: 0 2px 6px rgba(0,0,0,.04) inset;
-}
-.avatar img{
-  width:100%; height:100%;
-  object-fit: cover;          /* recadre proprement */
-  display:block;
-}
-
-/* ───────── Synchronisation (page) ───────── */
-.sync-card{
-  background: var(--surface-2);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
-  display:grid;
-  grid-template-columns: 1fr;
-  gap:16px;
-}
-
-/* Montre “mock” */
-.watch{ display:flex; align-items:center; justify-content:center; padding:6px 0; }
-.watch-bezel{
-  width:180px; height:180px; border-radius:50%;
-  background: radial-gradient(60% 60% at 50% 45%, #111 0%, #222 60%, #333 100%);
-  border: 6px solid #1f252b;
-  box-shadow: inset 0 0 24px rgba(0,0,0,.45), 0 8px 18px rgba(0,0,0,.12);
-  display:grid; place-items:center;
-}
-.watch-face{
-  width:142px; height:142px; border-radius:50%;
-  background: radial-gradient(70% 70% at 50% 40%, #0a0d0f, #0e1417 60%, #121a1e 100%);
-  display:grid; place-items:center; position:relative;
-}
-.watch-check{ width:64px; height:64px; color:#29b36b; filter: drop-shadow(0 2px 4px rgba(0,0,0,.4)); }
-
-.watch-body{
-  width:210px; height:14px; margin-left:-210px; border-radius:6px;
-  background: linear-gradient(180deg,#30373e,#1f252b);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-}
-
-/* Infos et bouton */
-.sync-infos{ display:flex; align-items:center; justify-content:center; gap:14px; }
-.sync-battery{ display:inline-flex; align-items:center; gap:8px; color:var(--text); font-weight:600; }
-.sync-btn{
-  height:46px; border-radius:12px; border:1px solid var(--line);
-  background: #e9e2d5; color: var(--text); font-weight:800;
-}
-.sync-btn[disabled]{ opacity:.65; cursor:not-allowed; }
-
-/* Petite amélioration d’accessibilité : logo cliquable */
-.brand-link{ text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px; }
-
-/* === SYNC PAGE === */
+/* ==================== PAGES — SYNC ==================== */
 .sync-hero{
   display:grid; place-items:center;
   padding: 12px;
@@ -503,9 +330,8 @@ body{
   width: 240px; height:auto;
   filter: drop-shadow(0 10px 24px rgba(0,0,0,.12));
 }
-/* Sync progress ring color */
-.watch-svg #sync-progress-bar { stroke: var(--rockso-pink); }
-
+/* Annneau de progression dans le rose du thème */
+.watch-svg #sync-progress-bar{ stroke: var(--rockso-pink); }
 
 .sync-panel{ margin-top:12px; }
 .sync-rows{ display:flex; flex-direction:column; gap:8px; }
@@ -517,104 +343,61 @@ body{
 .sync-ico{ color: var(--muted); display:grid; place-items:center; }
 .sync-label{ color: var(--muted); font-size:14px; }
 .sync-val{ font-weight:800; color: var(--text); }
-
 .sync-actions{ display:flex; justify-content:flex-start; margin-top:10px; }
 .sync-actions .btn[disabled]{ filter:saturate(.85) opacity(.7); cursor:not-allowed; }
 
-/* Ondes dans l'écran de la montre (sync) */
+/* Ondes dans l’écran (ancienne animation) */
 @keyframes wave-pop {
-  0%   { opacity: 0; transform: scale(0.9); }
-  10%  { opacity: 1; transform: scale(1); }
-  60%  { opacity: 1; }
-  100% { opacity: 0; transform: scale(1.05); }
+  0% { opacity:0; transform:scale(0.9) }
+  10%{ opacity:1; transform:scale(1) }
+  60%{ opacity:1 }
+  100%{ opacity:0; transform:scale(1.05) }
 }
 #sync-waves .wave { opacity: 0; }
 #sync-waves .w1 { animation: wave-pop 1.2s linear infinite; animation-delay: 0s; }
 #sync-waves .w2 { animation: wave-pop 1.2s linear infinite; animation-delay: .25s; }
 #sync-waves .w3 { animation: wave-pop 1.2s linear infinite; animation-delay: .5s; }
 
-/* Pulsar centré (aucun déplacement, juste des ondes qui apparaissent/fadent) */
-#sync-pulsar .p-dot,
-#sync-pulsar .p-ring { opacity: 0; }
+/* Pulsar centré (point + 3 ondes concentriques) — déclenché quand JS ajoute .animate */
+#sync-pulsar .p-dot, #sync-pulsar .p-ring{ opacity:0; }
+#sync-pulsar.animate .p-dot{ animation: pulsar-dot 2.4s ease-out infinite; }
+#sync-pulsar.animate .p1{    animation: pulsar-ring 2.4s ease-out infinite .60s; }
+#sync-pulsar.animate .p2{    animation: pulsar-ring 2.4s ease-out infinite 1.20s; }
+#sync-pulsar.animate .p3{    animation: pulsar-ring 2.4s ease-out infinite 1.80s; }
 
-/* animations déclenchées quand JS ajoute .animate sur #sync-pulsar */
-#sync-pulsar.animate .p-dot { animation: pulsar-dot 2.4s ease-out infinite; }
-#sync-pulsar.animate .p1    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: .60s; }
-#sync-pulsar.animate .p2    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: 1.20s; }
-#sync-pulsar.animate .p3    { animation: pulsar-ring 2.4s ease-out infinite; animation-delay: 1.80s; }
-
-@keyframes pulsar-dot {
-  0%   { opacity: 1 }
-  25%  { opacity: .75 }
-  40%  { opacity: 0 }
-  100% { opacity: 0 }
+@keyframes pulsar-dot{
+  0%{ opacity:1 } 25%{ opacity:.75 } 40%{ opacity:0 } 100%{ opacity:0 }
+}
+@keyframes pulsar-ring{
+  0%{ opacity:0; stroke-width:3 }
+  10%{ opacity:1; stroke-width:3 }
+  55%{ opacity:.45; stroke-width:2.6 }
+  80%{ opacity:0;   stroke-width:2.3 }
+  100%{opacity:0;   stroke-width:2.3 }
 }
 
-@keyframes pulsar-ring {
-  0%   { opacity: 0;   stroke-width: 3 }
-  10%  { opacity: 1;   stroke-width: 3 }
-  55%  { opacity: .45; stroke-width: 2.6 }
-  80%  { opacity: 0;   stroke-width: 2.3 }
-  100% { opacity: 0;   stroke-width: 2.3 }
-}
-
-/* dot: quick appear → fade as first ring starts */
-@keyframes dot-ping {
-  0%   { opacity: 0;   transform: scale(0.85); }
-  10%  { opacity: 1;   transform: scale(1.00); }
-  35%  { opacity: .55; transform: scale(1.06); }
-  60%  { opacity: .15; transform: scale(1.10); }
-  100% { opacity: 0;   transform: scale(1.12); }
-}
-
-/* rings: appear, expand, fade out (like ripples on water) */
-@keyframes ring-ping {
-  0%   { opacity: 0;   transform: scale(0.88); }
-  8%   { opacity: .95; transform: scale(0.94); }
-  60%  { opacity: .35; transform: scale(1.10); }
-  100% { opacity: 0;   transform: scale(1.18); }
-}
-
-/* --- Ruban sous-onglets Training --- */
-.subtabs{
-  display:flex; gap:12px; padding:10px 14px; border-bottom:1px solid var(--line);
-  background: linear-gradient(180deg,#FFFDF8,#F6F0E6);
-}
-.subtab{
-  padding:8px 12px; border-radius:999px; text-decoration:none; color:var(--muted);
-  border:1px solid var(--line); background:#FFFDF8; font-weight:600;
-}
-.subtab.active{
-  color: var(--text);
-  border-color: rgba(63,140,106,.35);
-  box-shadow: 0 2px 10px rgba(63,140,106,.10);
-}
-
-/* petits graphes “barres” */
+/* ==================== Barres & échelles ==================== */
 .bar{ height:10px; border-radius:999px; background:var(--line); position:relative; overflow:hidden; }
 .bar::after{ content:""; position:absolute; inset:0; border-radius:inherit; transform-origin:left center; }
-.bar--z5::after{ background:#D32F2F; transform:scaleX(1); }
-.bar--z4::after{ background:#F57C00; transform:scaleX(1); }
-.bar--z3::after{ background:#F2C14E; transform:scaleX(1); }
-.bar--z2::after{ background:#00B37A; transform:scaleX(1); }
-.bar--z1::after{ background:#72A88A; transform:scaleX(1); }
-
+.bar--z5::after{ background:#D32F2F; }
+.bar--z4::after{ background:#F57C00; }
+.bar--z3::after{ background:#F2C14E; }
+.bar--z2::after{ background:#00B37A; }
+.bar--z1::after{ background:#72A88A; }
 .bar--recovery::after{ background:#00B37A; }
 .bar--tsb::after{ background:#72A88A; }
 .bar--rpe::after{ background:#F2A65A; }
 
-/* bar chart couleurs */
-.cbar{ fill: #E7DECF; }
+.cbar{ fill:#E7DECF; }
 .cbar.z1{ fill:#F2E9DA; }
 .cbar.z2{ fill:#CDE8DD; }
 .cbar.z3{ fill:#F9DEB7; }
 .cbar.z4{ fill:#B6D7C5; }
 
-/* Échelle “condition physique” */
 .bar-scale{
   position:relative; height:14px; margin:10px 0 4px; background:var(--line); border-radius:999px;
 }
-.bar-scale .tick{ position:absolute; top:0; bottom:0; width:20%; background:linear-gradient(90deg,transparent,transparent); }
+.bar-scale .tick{ position:absolute; top:0; bottom:0; width:20%; }
 .bar-scale .tick:nth-child(1){ left:0 }
 .bar-scale .tick:nth-child(2){ left:20% }
 .bar-scale .tick:nth-child(3){ left:40% }
@@ -625,74 +408,29 @@ body{
 .bar-scale .needle{
   position:absolute; top:-3px; width:2px; height:20px; background:#3F8C6A; border-radius:2px;
 }
-/* --- Training tabs: 4 sur 1 ligne --- */
+
+/* ==================== Training — 4 onglets ==================== */
 .train-tabs{
-  display: grid;
+  display:grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  margin: 8px 14px 12px;
+  gap:6px;
+  margin:8px 12px 10px;
 }
-
 .train-tabs .pill{
-  /* compacter la pill */
-  padding: 8px 10px;              /* avant: plus large */
-  font-size: clamp(12px, 2.9vw, 14px);
-  line-height: 1.1;
-  text-align: center;
-  white-space: nowrap;             /* évite les retours à la ligne */
+  min-width:0; padding:6px 8px;
+  border-radius:999px; border:1px solid var(--line);
+  background:#FFFDF8; color:var(--muted);
+  text-decoration:none; text-align:center;
+  font-weight:700; font-size:12px; line-height:1.05;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.train-tabs .pill.active{
+  color:var(--text);
+  border-color:rgba(63,140,106,.35);
+  box-shadow:0 2px 10px rgba(63,140,106,.10);
 }
 
-/* un poil plus serré sur les petits écrans */
-@media (max-width: 380px){
-  .train-tabs .pill{
-    padding: 7px 8px;
-    font-size: 12px;
-  }
-}
-
-/* === TRAINING TABS — force 4 sur 1 ligne, items compressibles === */
-nav.train-tabs,
-.train-tabs{
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: 8px !important;
-  margin: 8px 14px 12px !important;
-}
-
-.train-tabs .pill{
-  min-width: 0 !important;           /* <-- autorise la réduction dans la colonne */
-  padding: 6px 8px !important;        /* un poil plus serré */
-  font-size: 12px !important;         /* compact */
-  line-height: 1.1 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;        /* évite le débordement */
-  text-overflow: ellipsis !important; /* coupe proprement si besoin */
-  text-align: center !important;
-  border-radius: 999px !important;
-}
-
-@media (max-width: 360px){
-  .train-tabs .pill{ font-size: 11px !important; }
-}
-/* TRAINING — compacter les 4 onglets */
-.train-tabs{
-  gap: 6px !important;
-  margin: 8px 12px 10px !important;
-}
-
-.train-tabs .pill{
-  min-width: 0 !important;
-  padding: 6px 8px !important;
-  font-size: 12px !important;     /* ↓ taille du texte */
-  line-height: 1.05 !important;
-  letter-spacing: 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  text-align: center !important;
-}
-
-/* encore un cran plus petit sur très petits écrans */
-@media (max-width: 380px){
-  .train-tabs .pill{ font-size: 11px !important; padding: 5px 7px !important; }
+/* -------------------- Media queries -------------------- */
+@media (max-width:380px){
+  .train-tabs .pill{ font-size:11px; padding:5px 7px; }
 }
