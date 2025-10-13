@@ -435,21 +435,28 @@ body{ background: #0b0e12; }
   .train-tabs .pill{ font-size:11px; padding:5px 7px; }
 }
 
-/* Bouton "Journal des activités" — force le style du lien */
+/* Journal des activités — version texte seul (pas de boîte) */
 .journal-btn,
 .journal-btn:link,
 .journal-btn:visited{
-  display:flex; align-items:center; justify-content:center;
-  height:44px; padding:0 14px;
-  border:1px dashed var(--line);
-  border-radius:12px;
-  background:#FFFDF8;
-  color:var(--text) !important;
-  font-weight:800;
-  text-decoration:none !important;
+  display: inline-block;      /* garde le margin-top sans créer de boîte */
+  margin-top: 10px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--text) !important;   /* vert Rockso */
+  font-weight: 800;
+  text-decoration: none !important;
 }
 
 .journal-btn:hover{
-  background:#fff; border-color:#e6dccd;
-  box-shadow:0 4px 10px rgba(0,0,0,.06);
+  text-decoration: underline;  /* petit feedback au survol */
+  opacity: .95;
 }
+
+.journal-btn:focus-visible{
+  outline: 2px solid rgba(63,140,106,.35);
+  outline-offset: 2px;
+}
+
