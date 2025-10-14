@@ -33,36 +33,37 @@
       <section class="content scroll">
         <h2 class="section-title" style="margin-top:10px">Santé du quotidien</h2>
 
-        <!-- === Tes cartes existantes (statique / démo) === -->
+        <!-- Santé du quotidien -->
         <div class="metrics-grid">
-          <div class="quick-card">
-            <span class="qc-label">Pas</span>
-            <strong class="qc-value">10 842</strong>
-          </div>
-          <div class="quick-card">
-            <span class="qc-label">Calories actives</span>
-            <strong class="qc-value">723 kcal</strong>
-          </div>
-          <div class="quick-card">
-            <span class="qc-label">FC moyenne</span>
-            <strong class="qc-value">64 bpm</strong>
-          </div>
+            <div class="quick-card">
+                <span class="qc-label">Pas</span>
+                <strong class="qc-value" id="dq-steps">—</strong>
+            </div>
+            <div class="quick-card">
+                <span class="qc-label">Calories actives</span>
+                <strong class="qc-value" id="dq-active-cal">—</strong>
+            </div>
+            <div class="quick-card">
+                <span class="qc-label">FC moyenne</span>
+                <strong class="qc-value" id="dq-rhr">—</strong>
+            </div>
         </div>
 
         <div class="metrics-grid">
-          <div class="quick-card">
-            <span class="qc-label">Respiration</span>
-            <strong class="qc-value">14 rpm</strong>
-          </div>
-          <div class="quick-card">
-            <span class="qc-label">SpO₂</span>
-            <strong class="qc-value">97%</strong>
-          </div>
-          <div class="quick-card">
-            <span class="qc-label">Minutes actives</span>
-            <strong class="qc-value">46 min</strong>
-          </div>
+            <div class="quick-card">
+                <span class="qc-label">Respiration</span>
+                <strong class="qc-value" id="dq-resp">—</strong>
+            </div>
+            <div class="quick-card">
+                <span class="qc-label">SpO₂</span>
+                <strong class="qc-value" id="dq-spo2">—</strong>
+            </div>
+            <div class="quick-card">
+                <span class="qc-label">Minutes actives</span>
+                <strong class="qc-value" id="dq-act-min">—</strong>
+            </div>
         </div>
+
 
         <div class="section">
           <h2 class="section-title">Activité (7 derniers jours)</h2>
@@ -77,6 +78,47 @@
             </svg>
           </div>
         </div>
+
+        <!-- Récap récupération (semaine en cours) -->
+        <section class="section">
+            <h2 class="section-title">Récap récupération (semaine en cours)</h2>
+
+            <div class="metrics-grid">
+                <div class="quick-card">
+                    <span class="qc-label">Sommeil (dernière nuit)</span>
+                    <strong class="qc-value" id="dq-sleep-last">—</strong>
+                </div>
+                <div class="quick-card">
+                    <span class="qc-label">Sommeil (moy. 7j)</span>
+                    <strong class="qc-value" id="dq-sleep-avg">—</strong>
+                </div>
+                <div class="quick-card">
+                    <span class="qc-label">HRV (moy. 7j)</span>
+                    <strong class="qc-value" id="dq-hrv-avg">—</strong>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="quick-card">
+                    <span class="qc-label">RPE (moy. 7j)</span>
+                    <strong class="qc-value" id="dq-rpe-avg">—</strong>
+                </div>
+                    <div class="quick-card">
+                    <span class="qc-label">FC repos (moy. 7j)</span>
+                <strong class="qc-value" id="dq-rhr-avg">—</strong>
+                </div>
+                <div class="quick-card" style="visibility:hidden;"></div>
+            </div>
+        </section>
+
+        <!-- Journal quotidien (7 jours) -->
+        <section class="section">
+            <h2 class="section-title">Journal quotidien (7 jours)</h2>
+            <div class="card" id="daily-list">
+                <p class="muted">Aucune donnée quotidienne disponible. Lance une synchronisation.</p>
+            </div>
+        </section>
+
 
         <!-- === NOUVEAU : Récap semaine (moyennes sommeil/HRV/RPE) === -->
         <div class="section">

@@ -1,618 +1,417 @@
 // =======================
-// Rockso prototype — app.js (demo sync + IA) — DAILY READY
+// Rockso prototype — app.js (cohérence globale S0→S1→S2)
 // =======================
 
-// ---- Mock data (fallback si aucune synchro démo n'a été jouée)
-const state = {
-  lastActivity: {
-    id: "sample",
-    type: "Course",
-    dateISO: "2025-10-05T07:42:00",
-    distanceKm: 8.42,
-    durationSec: 45*60 + 12,
-    paceSecPerKm: 321,
-    hrAvg: 152,
-    elevPos: 86,
-    calories: 564,
-    laps: [
-      { n: 1, distKm: 1, timeSec: 323 },
-      { n: 2, distKm: 1, timeSec: 325 },
-      { n: 3, distKm: 1, timeSec: 319 },
-      { n: 4, distKm: 1, timeSec: 320 },
-      { n: 5, distKm: 1, timeSec: 318 },
-      { n: 6, distKm: 1, timeSec: 324 },
-      { n: 7, distKm: 1, timeSec: 321 },
-      { n: 8, distKm: 1, timeSec: 322 },
-    ],
-    route: [[2,90],[8,80],[15,70],[25,62],[35,60],[45,64],[55,74],[64,88],[74,82],[84,70],[92,58]]
-  },
-  weekly: { load: 73, hours: 4.6, readiness: 82 },
-  sports: [
-    { name: "Course",   color: "#EB6E9A" },
-    { name: "Cyclisme", color: "#00B37A" },
-    { name: "Padel",    color: "#F2A65A" },
-    { name: "Renfo",    color: "#E9DDC9" }
-  ]
-};
+// ---------- Helpers ----------
+const $  = (s)=>document.querySelector(s);
+const $$ = (s)=>Array.from(document.querySelectorAll(s));
 
-state.activities = [
-  state.lastActivity,
-  { id:'a2', type:'Cyclisme', dateISO:'2025-10-04T18:20:00', distanceKm: 32.6, durationSec: 3600+18*60, paceSecPerKm: 120, hrAvg: 138, elevPos: 220, calories: 780 },
-  { id:'a3', type:'Course',   dateISO:'2025-10-03T07:15:00', distanceKm: 6.2,  durationSec: 34*60+10,   paceSecPerKm: 330, hrAvg: 149, elevPos: 65,  calories: 410 },
-  { id:'a4', type:'Padel',    dateISO:'2025-10-01T20:05:00', distanceKm: 3.1,  durationSec: 70*60,      paceSecPerKm: 0,   hrAvg: 156, elevPos: 10,  calories: 620 },
-  { id:'a5', type:'Renfo',    dateISO:'2025-09-30T19:00:00', distanceKm: 0,    durationSec: 40*60,      paceSecPerKm: 0,   hrAvg: 120, elevPos: 0,   calories: 220 },
-  { id:'a6', type:'Cyclisme', dateISO:'2025-09-29T17:30:00', distanceKm: 25.4, durationSec: 55*60,      paceSecPerKm: 0,   hrAvg: 130, elevPos: 160, calories: 560 }
-];
+function fmtPace(secPerKm){ const m=Math.floor(secPerKm/60), s=String(Math.round(secPerKm%60)).padStart(2,"0"); return `${m}:${s}/km`; }
+function fmtDur(sec){ const h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=Math.round(sec%60); return (h? h+":" : "")+String(m).padStart(2,'0')+":"+String(s).padStart(2,'0'); }
+function fmtHMfromMin(min){ const h=Math.floor(min/60), m=Math.round(min%60); return `${h}h ${String(m).padStart(2,'0')}`; }
+function fmtDate(iso){ const d=new Date(iso); return d.toLocaleString('fr-FR',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
+function formatKm(n){ if(n==null||!isFinite(n))return '—'; return `${Number(n).toLocaleString('fr-FR',{maximumFractionDigits:1})} km`; }
+function avg(a){ return a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+function round1(n){ return Math.round(n*10)/10; }
 
-// =======================
-// DEMO SYNC + PERSISTENCE
-// =======================
-const STORE_KEY = "rocksoState"; // localStorage
-
-function getStore(){
-  try {
-    return JSON.parse(localStorage.getItem(STORE_KEY)) || { synced:0, weeks:[], activities:[], lastWeekAnalysis:null, lastActivity:null, daily:null };
-  } catch(e){
-    return { synced:0, weeks:[], activities:[], lastWeekAnalysis:null, lastActivity:null, daily:null };
-  }
-}
-function saveStore(st){ localStorage.setItem(STORE_KEY, JSON.stringify(st)); }
-
-// --- Demo inline payloads (fallback si les JSON externes ne sont pas accessibles) ---
-const DEMO_INLINE = [
-  { // Semaine 1 — risque faible
-    week_index: 1,
-    activities: [
-      { datetime_iso:"2025-09-22T07:10:00", type:"run",  distance_km:12.6, duration_min:63, avg_hr:148 },
-      { datetime_iso:"2025-09-24T18:00:00", type:"run",  distance_km:8.0,  duration_min:42, avg_hr:151 },
-      { datetime_iso:"2025-09-26T07:20:00", type:"run",  distance_km:10.2, duration_min:54, avg_hr:146 },
-      { datetime_iso:"2025-09-28T09:00:00", type:"run",  distance_km:18.5, duration_min:95, avg_hr:152 }
-    ],
-    summary: { total_km: 49.3, km_z5t: 4.2, load_spike_rel_w1_w2: 1.12, sessions: 4, rest_days: 3 },
-    ml: { predicted_label: 0, predicted_probability: 0.12, model: "global_sgd_tuned.joblib (simulé)" },
-    analysis_text: "Semaine maîtrisée : volume modéré (49 km), intensité contrôlée (≈4 km en Z5/T1/T2). Quotidien stable (≈8 h de sommeil, HRV ≈73 ms, RPE ≈4). Le risque de blessure est faible.",
-    daily: [
-      { date:"2025-09-22", sleep_hours:8.2, sleep_quality:4, hrv_rmssd_ms:76, rpe:3, soreness:2 },
-      { date:"2025-09-23", sleep_hours:8.0, sleep_quality:4, hrv_rmssd_ms:74, rpe:4, soreness:2 },
-      { date:"2025-09-24", sleep_hours:8.4, sleep_quality:4, hrv_rmssd_ms:75, rpe:4, soreness:3 },
-      { date:"2025-09-25", sleep_hours:7.8, sleep_quality:4, hrv_rmssd_ms:72, rpe:3, soreness:2 },
-      { date:"2025-09-26", sleep_hours:8.1, sleep_quality:4, hrv_rmssd_ms:73, rpe:4, soreness:3 },
-      { date:"2025-09-27", sleep_hours:8.6, sleep_quality:5, hrv_rmssd_ms:78, rpe:3, soreness:2 },
-      { date:"2025-09-28", sleep_hours:7.9, sleep_quality:4, hrv_rmssd_ms:70, rpe:5, soreness:4 }
-    ]
-  },
-  { // Semaine 2 — risque accru (cohérent : +24% vs S-1)
-    week_index: 2,
-    activities: [
-      { datetime_iso:"2025-09-29T06:55:00", type:"run",  distance_km:15.0, duration_min:74, avg_hr:154 },
-      { datetime_iso:"2025-10-01T19:05:00", type:"run",  distance_km:10.2, duration_min:50, avg_hr:158 },
-      { datetime_iso:"2025-10-03T07:00:00", type:"run",  distance_km:12.0, duration_min:56, avg_hr:160 },
-      { datetime_iso:"2025-10-05T09:10:00", type:"run",  distance_km:24.0, duration_min:118, avg_hr:156 }
-    ],
-    // 61.2 / 49.3 ≈ 1.24
-    summary: { total_km: 61.2, km_z5t: 10.0, load_spike_rel_w1_w2: 1.24, sessions: 4, rest_days: 3 },
-    ml: { predicted_label: 1, predicted_probability: 0.76, model: "global_sgd_tuned.joblib (simulé)" },
-    analysis_text: "Surcharge nette (+24% vs S-1) et intensité élevée (~10 km en Z5/T1/T2). Quotidien dégradé (sommeil ≈6 h 30, HRV ≈61 ms, RPE 7→8). Le risque de blessure est accru — allégez le volume (~30%) et fractionnez la récupération.",
-    daily: [
-      { date:"2025-09-29", sleep_hours:7.1, sleep_quality:3, hrv_rmssd_ms:66, rpe:6, soreness:4 },
-      { date:"2025-09-30", sleep_hours:6.8, sleep_quality:3, hrv_rmssd_ms:64, rpe:6, soreness:5 },
-      { date:"2025-10-01", sleep_hours:6.5, sleep_quality:3, hrv_rmssd_ms:62, rpe:7, soreness:6 },
-      { date:"2025-10-02", sleep_hours:6.4, sleep_quality:2, hrv_rmssd_ms:61, rpe:7, soreness:6 },
-      { date:"2025-10-03", sleep_hours:6.3, sleep_quality:2, hrv_rmssd_ms:60, rpe:8, soreness:7 },
-      { date:"2025-10-04", sleep_hours:6.6, sleep_quality:3, hrv_rmssd_ms:59, rpe:7, soreness:6 },
-      { date:"2025-10-05", sleep_hours:6.2, sleep_quality:2, hrv_rmssd_ms:58, rpe:8, soreness:7 }
-    ]
-  }
-];
-
-// --- Charge JSON depuis plusieurs chemins candidats ; fallback DEMO_INLINE si échecs ---
-function resolveUrl(rel){
-  const base = (document.querySelector('base')?.href) ||
-               (location.origin + location.pathname.replace(/[^/]+$/, ''));
-  return new URL(rel, base).toString();
-}
-async function tryFetch(url){
-  const res = await fetch(url, { cache:"no-cache" });
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-// chemins candidats (si tu mets tes fichiers ailleurs, adapte ici)
-const DEMO_WEEKS = ["week_demo_1.json", "week_demo_2.json"];
-const DEMO_ALT_PREFIXES = ["./", "./assets/", "./data/", "./assets/data/"];
-
-async function loadWeek(idx){
-  const file = DEMO_WEEKS[idx];
-  for (const prefix of DEMO_ALT_PREFIXES){
-    try { return await tryFetch(resolveUrl(prefix + file)); }
-    catch(e){ /* on essaie le suivant */ }
-  }
-  console.warn(`[sync] Fallback DEMO_INLINE[${idx}] (fichier introuvable)`);
-  return DEMO_INLINE[idx];
-}
-
-function calcPaceSecPerKm(distanceKm, durationMin){
-  if (!distanceKm || distanceKm<=0) return 0;
-  return Math.round((durationMin*60) / distanceKm);
-}
-function mapPayloadActivity(a, idx, weekIndex){
-  const typeLabel = (a.type === 'run') ? 'Course' : (a.type === 'cross' ? 'Renfo' : 'Course');
-  return {
-    id: `wk${weekIndex}-a${idx+1}`,
-    type: typeLabel,
-    dateISO: a.datetime_iso,
-    distanceKm: Number(a.distance_km || 0),
-    durationSec: Math.round((a.duration_min || 0) * 60),
-    paceSecPerKm: calcPaceSecPerKm(a.distance_km || 0, a.duration_min || 0),
-    hrAvg: a.avg_hr || null,
-    elevPos: 0, calories: 0
-  };
-}
-function getLiveState(){
-  const st = getStore();
-  if (st.weeks && st.weeks.length){
-    const lastW = st.weeks[st.weeks.length-1];
-    const acts = (st.activities||[]).slice().sort((a,b)=> new Date(a.datetime_iso||a.dateISO) - new Date(b.datetime_iso||b.dateISO));
-    const lastRaw = acts[acts.length-1];
-    const last = lastRaw ? mapPayloadActivity(lastRaw, 0, lastW.week_index || 0) : null;
-
-    const totalKm = lastW.summary?.total_km || 0;
-    const hours   = (st.activities||[]).reduce((acc,a)=>acc + (a.duration_min||0), 0) / 60;
-    return {
-      weekly: {
-        load: totalKm,
-        hours: hours,
-        evolVolumePct: Math.round(((lastW.summary?.load_spike_rel_w1_w2||1)-1)*100) || 0,
-        evolIntensityPct: Math.round((((lastW.summary?.km_z5t||0)/(lastW.summary?.total_km||1))*100) - 10)
-      },
-      lastActivity: last || state.lastActivity,
-      activities: acts.map((a,i)=> mapPayloadActivity(a, i, lastW.week_index || 0)),
-      sports: state.sports,
-      lastWeekAnalysis: lastW.ml ? { text: lastW.analysis_text, ml: lastW.ml } : st.lastWeekAnalysis,
-      daily: st.daily || lastW.daily || null // ✅ expose aussi le quotidien
-    };
-  }
-  return {
-    weekly: state.weekly,
-    lastActivity: state.lastActivity,
-    activities: state.activities,
-    sports: state.sports,
-    lastWeekAnalysis: null,
-    daily: null // ✅ fallback
-  };
-}
-
-// =======================
-// DOM helpers & formatters
-// =======================
-const $  = (sel)=>document.querySelector(sel);
-const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
-
-function fmtPace(secPerKm){
-  const m = Math.floor(secPerKm/60), s = String(Math.round(secPerKm%60)).padStart(2,"0");
-  return `${m}:${s}/km`;
-}
-function fmtDur(sec){
-  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = Math.round(sec%60);
-  return (h? h+":" : "") + String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
-}
-function fmtDate(iso){
-  const d = new Date(iso);
-  return d.toLocaleString('fr-FR', { weekday:'short', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-}
-function fmtDayYMD(ymd){
-  const [y,m,d] = ymd.split('-').map(Number);
-  const dd = new Date(y, m-1, d);
-  return dd.toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'short' });
-}
-function formatHoursDecimalToHM(hDecimal=0){
-  const h = Math.floor(hDecimal);
-  const m = Math.round((hDecimal - h) * 60);
-  return `${h}h ${String(m).padStart(2,'0')}`;
-}
-function formatKm(val){
-  if (val == null) return '—';
-  const n = Number(val);
-  if (!Number.isFinite(n)) return '—';
-  return `${n.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} km`;
-}
-
-// ---- Inline icons
-const Icons = {
-  Course:   '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 12h3l3 4 3-8 3 4h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  Cyclisme: '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="17" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="17" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 17l6-8 3 4h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
-  Padel:    '<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="9" cy="9" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12.5 12.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
-  Renfo:    '<svg viewBox="0 0 24 24" width="18" height="18"><rect x="4" y="10" width="16" height="4" rx="1" fill="currentColor"/></svg>'
+// ---------- Icônes ----------
+const Icons={
+  Course:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 12h3l3 4 3-8 3 4h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  Cyclisme:'<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="17" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="17" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 17l6-8 3 4h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  Padel:'<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="9" cy="9" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12.5 12.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  Renfo:'<svg viewBox="0 0 24 24" width="18" height="18"><rect x="4" y="10" width="16" height="4" rx="1" fill="currentColor"/></svg>'
 };
 function iconFor(sport){ return Icons[sport] || Icons.Course; }
 
-// ---- Evolution dots
-const EVOL_THRESHOLDS = { ok: 10, warn: 20 };
-function setEvolution(baseId, valuePct=0){
-  const valEl = document.getElementById(baseId);
-  const dotEl = document.getElementById(`${baseId}-dot`);
-  if (!valEl || !dotEl) return;
-  const sign = valuePct > 0 ? '+' : '';
-  valEl.textContent = `${sign}${Math.round(valuePct)}%`;
-  const a = Math.abs(valuePct);
-  dotEl.classList.remove('dot--ok','dot--warn','dot--risk');
-  if (a <= EVOL_THRESHOLDS.ok)        dotEl.classList.add('dot--ok');
-  else if (a <= EVOL_THRESHOLDS.warn) dotEl.classList.add('dot--warn');
-  else                                dotEl.classList.add('dot--risk');
+// ---------- Données baseline (Semaine 0) ----------
+const STORE_KEY="rocksoState";
+
+const baselineActivities = [
+  // Course (compte dans km hebdo)
+  { id:'s0a1', type:'Course', dateISO:'2025-09-16T07:10:00', distanceKm:8.2,  durationSec:44*60,     paceSecPerKm:322, hrAvg:148, elevPos:60,  calories:520 },
+  { id:'s0a2', type:'Course', dateISO:'2025-09-18T18:10:00', distanceKm:9.6,  durationSec:51*60,     paceSecPerKm:318, hrAvg:149, elevPos:70,  calories:600 },
+  { id:'s0a3', type:'Course', dateISO:'2025-09-20T08:05:00', distanceKm:10.4, durationSec:55*60,     paceSecPerKm:317, hrAvg:150, elevPos:80,  calories:690 },
+  { id:'s0a4', type:'Course', dateISO:'2025-09-21T09:00:00', distanceKm:16.0, durationSec:85*60+20,  paceSecPerKm:320, hrAvg:152, elevPos:120, calories:980 },
+  // Cross (ne compte pas dans km hebdo, mais compte dans durée et séances)
+  { id:'s0b1', type:'Renfo',   dateISO:'2025-09-17T19:00:00', distanceKm:0,    durationSec:40*60,     paceSecPerKm:0,   hrAvg:120, elevPos:0,   calories:260 },
+  { id:'s0b2', type:'Cyclisme',dateISO:'2025-09-19T18:00:00', distanceKm:26.0, durationSec:58*60,     paceSecPerKm:0,   hrAvg:130, elevPos:160, calories:540 },
+];
+
+const baselineDaily = [
+  { date:'2025-09-15', sleep_min:440, hrv_ms:78, rhr_bpm:53, rpe:2, steps:8200,  act_min:32 },
+  { date:'2025-09-16', sleep_min:465, hrv_ms:77, rhr_bpm:54, rpe:3, steps:10800, act_min:46 },
+  { date:'2025-09-17', sleep_min:430, hrv_ms:76, rhr_bpm:54, rpe:2, steps:9000,  act_min:38 },
+  { date:'2025-09-18', sleep_min:455, hrv_ms:75, rhr_bpm:54, rpe:3, steps:11200, act_min:52 },
+  { date:'2025-09-19', sleep_min:445, hrv_ms:77, rhr_bpm:53, rpe:2, steps:9600,  act_min:41 },
+  { date:'2025-09-20', sleep_min:470, hrv_ms:76, rhr_bpm:54, rpe:3, steps:12400, act_min:64 },
+  { date:'2025-09-21', sleep_min:468, hrv_ms:78, rhr_bpm:53, rpe:4, steps:13200, act_min:68 },
+];
+
+const initialWeek = {
+  week_index: 0,
+  summary: { total_km: 44.2, km_z5t: 3.5, load_spike_rel_w1_w2: 1.00, sessions: 6, rest_days: 1 },
+  ml: { predicted_label: 0, predicted_probability: 0.10, model:"global_sgd_tuned.joblib (simulé)" },
+  analysis_text: "Semaine de base stable (~44 km), intensité maîtrisée (~3–4 km en Z5/T1/T2), biomarqueurs OK (HRV ~76 ms, FC repos ~54 bpm, sommeil ~7h25). Risque faible."
+};
+
+// ---------- Semaine 1 & 2 (synchro démo) ----------
+const DEMO_WEEKS = ["week_demo_1.json","week_demo_2.json"];
+const DEMO_ALT_PREFIXES=["./","./assets/","./data/","./assets/data/"];
+
+const DEMO_INLINE = [
+  { // S-1 : 22→28 sept (+12% vs S-0)
+    week_index: 1,
+    activities: [
+      { datetime_iso:"2025-09-22T07:10:00", type:"run", distance_km:12.6, duration_min:63, avg_hr:148 },
+      { datetime_iso:"2025-09-24T18:00:00", type:"run", distance_km: 8.0, duration_min:42, avg_hr:151 },
+      { datetime_iso:"2025-09-26T07:20:00", type:"run", distance_km:10.2, duration_min:54, avg_hr:146 },
+      { datetime_iso:"2025-09-28T09:00:00", type:"run", distance_km:18.5, duration_min:95, avg_hr:152 },
+    ],
+    daily: [
+      { date:"2025-09-22", sleep_min:450, hrv_ms:75, rhr_bpm:54, rpe:3 },
+      { date:"2025-09-23", sleep_min:470, hrv_ms:77, rhr_bpm:53, rpe:2 },
+      { date:"2025-09-24", sleep_min:455, hrv_ms:76, rhr_bpm:54, rpe:3 },
+      { date:"2025-09-25", sleep_min:440, hrv_ms:74, rhr_bpm:54, rpe:2 },
+      { date:"2025-09-26", sleep_min:465, hrv_ms:75, rhr_bpm:54, rpe:3 },
+      { date:"2025-09-27", sleep_min:455, hrv_ms:75, rhr_bpm:54, rpe:3 },
+      { date:"2025-09-28", sleep_min:470, hrv_ms:76, rhr_bpm:53, rpe:4 },
+    ],
+    summary: { total_km: 49.3, km_z5t: 4.2, load_spike_rel_w1_w2: 1.12, sessions: 4, rest_days: 3 },
+    ml: { predicted_label: 0, predicted_probability: 0.12, model:"global_sgd_tuned.joblib (simulé)" },
+    analysis_text: "Progression modérée (+12 % vs S-0) et intensité contenue (~4 km rapides). HRV/sommeil stables. Risque faible — on continue."
+  },
+  { // S : 29 sept → 05 oct (+24% vs S-1, intensité ↑)
+    week_index: 2,
+    activities: [
+      { datetime_iso:"2025-09-29T06:55:00", type:"run", distance_km:15.0, duration_min:74, avg_hr:154 },
+      { datetime_iso:"2025-10-01T19:05:00", type:"run", distance_km:10.2, duration_min:50, avg_hr:158 },
+      { datetime_iso:"2025-10-03T07:00:00", type:"run", distance_km:12.0, duration_min:56, avg_hr:160 },
+      { datetime_iso:"2025-10-05T09:10:00", type:"run", distance_km:24.0, duration_min:118,avg_hr:156 },
+    ],
+    daily: [
+      { date:"2025-09-29", sleep_min:405, hrv_ms:72, rhr_bpm:56, rpe:4 },
+      { date:"2025-09-30", sleep_min:420, hrv_ms:71, rhr_bpm:57, rpe:4 },
+      { date:"2025-10-01", sleep_min:395, hrv_ms:70, rhr_bpm:57, rpe:5 },
+      { date:"2025-10-02", sleep_min:410, hrv_ms:69, rhr_bpm:58, rpe:4 },
+      { date:"2025-10-03", sleep_min:400, hrv_ms:70, rhr_bpm:58, rpe:5 },
+      { date:"2025-10-04", sleep_min:390, hrv_ms:68, rhr_bpm:58, rpe:5 },
+      { date:"2025-10-05", sleep_min:380, hrv_ms:69, rhr_bpm:57, rpe:6 },
+    ],
+    summary: { total_km: 61.2, km_z5t: 10.0, load_spike_rel_w1_w2: 1.24, sessions: 4, rest_days: 3 },
+    ml: { predicted_label: 1, predicted_probability: 0.76, model:"global_sgd_tuned.joblib (simulé)" },
+    analysis_text: "Surcharge (+24 % vs S-1) et hausse d’intensité (~10 km rapides). Signes de fatigue (HRV ↓, FC repos ↑, sommeil < 7 h). Risque accru — alléger le volume et fractionner la récup."
+  }
+];
+
+// ---------- Store ----------
+function saveStore(st){ localStorage.setItem(STORE_KEY, JSON.stringify(st)); }
+function getStore(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || null; }
+  catch(e){ return null; }
+}
+function seedStoreIfEmpty(){
+  let st=getStore();
+  if(st) return;
+  st = {
+    synced: 0,
+    weeks: [ initialWeek ],
+    // On stocke baseline en “forme UI” ; la suite pourra mixer JSON/UI sans pb
+    activities: baselineActivities.slice(),
+    daily: baselineDaily.slice(),
+    lastWeekAnalysis: initialWeek,
+    lastActivity: baselineActivities.slice().sort((a,b)=>new Date(b.dateISO)-new Date(a.dateISO))[0]
+  };
+  saveStore(st);
 }
 
-// =======================
-// Analyse IA (index + training)
-// =======================
-function renderAnalysisPanelFromStore(){
-  const panel = document.getElementById("analysis-panel");
-  if (!panel) return;
-  const st = getStore();
-  if (!st.weeks || !st.weeks.length){
-    panel.innerHTML = `<div class="card"><div class="card-body"><p>Pas d'analyse disponible.</p></div></div>`;
-    return;
+// ---------- Fetch JSON (synchro) ----------
+function resolveUrl(rel){ const base=(document.querySelector('base')?.href)||(location.origin+location.pathname.replace(/[^/]+$/,'')); return new URL(rel,base).toString(); }
+async function tryFetch(url){ const res=await fetch(url,{cache:"no-cache"}); if(!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); }
+async function loadWeek(idx){ const file=DEMO_WEEKS[idx]; for(const p of DEMO_ALT_PREFIXES){ try{ return await tryFetch(resolveUrl(p+file)); }catch(e){} } console.warn(`[sync] fallback inline week ${idx}`); return DEMO_INLINE[idx]; }
+
+// ---------- Agrégations ----------
+function weeklyFromActivities(acts){
+  const isRun = a => (a.type==='Course'||a.type==='run');
+  const km = acts.reduce((s,a)=>{
+    const d = a.distanceKm ?? a.distance_km ?? 0;
+    const t = (a.type==='Course'||a.type==='run') ? d : 0;
+    return s + t;
+  },0);
+  const durMin = acts.reduce((s,a)=> s + ((a.durationSec ?? ((a.duration_min||0)*60))/60), 0);
+  const sessions = acts.length;
+  return { km, durMin, sessions };
+}
+
+// ---------- Live state ----------
+function normalizeActivity(a){
+  if(a.datetime_iso){
+    return {
+      id: a.id || `wk${Math.random().toString(36).slice(2)}`,
+      type: (a.type==='run'?'Course':(a.type==='cross'?'Renfo':'Course')),
+      dateISO: a.datetime_iso,
+      distanceKm: a.distance_km||0,
+      durationSec: Math.round((a.duration_min||0)*60),
+      paceSecPerKm: a.distance_km ? Math.round((a.duration_min*60)/a.distance_km) : 0,
+      hrAvg: a.avg_hr||null, elevPos:0, calories:0
+    };
   }
-  const week = st.weeks[st.weeks.length-1];
-  const badge = week.ml?.predicted_label ? `<span class="badge badge-red">Risque de blessure</span>` 
-                                         : `<span class="badge badge-green">Risque faible</span>`;
+  return a; // déjà au format UI
+}
+
+function getLiveState(){
+  seedStoreIfEmpty();
+  const st = getStore();
+
+  // map + tri
+  const acts = (st.activities||[]).map(normalizeActivity).sort((a,b)=> new Date(b.dateISO)-new Date(a.dateISO));
+  const wk = weeklyFromActivities(acts);
+  const lastWeek = st.weeks[st.weeks.length-1] || initialWeek;
+
+  return {
+    weekly: {
+      load: round1(wk.km),
+      hours: wk.durMin/60,
+      evolVolumePct: Math.round(((lastWeek.summary?.load_spike_rel_w1_w2||1)-1)*100) || 0,
+      evolIntensityPct: Math.round((((lastWeek.summary?.km_z5t||0)/(lastWeek.summary?.total_km||1))*100) - 8)
+    },
+    activities: acts,
+    lastActivity: acts[0] || null,
+    daily: st.daily||[],
+    sports: [
+      { name:"Course",   color:"#EB6E9A" },
+      { name:"Cyclisme", color:"#00B37A" },
+      { name:"Padel",    color:"#F2A65A" },
+      { name:"Renfo",    color:"#E9DDC9" }
+    ],
+    lastWeekAnalysis: lastWeek
+  };
+}
+
+// ---------- Dots évolution ----------
+const EVOL_THRESHOLDS={ ok:10, warn:20 };
+function setEvolution(baseId, valuePct=0){
+  const valEl=$(`#${baseId}`), dotEl=$(`#${baseId}-dot`);
+  if(!valEl||!dotEl) return;
+  const sign=valuePct>0?'+':'';
+  valEl.textContent=`${sign}${Math.round(valuePct)}%`;
+  const a=Math.abs(valuePct);
+  dotEl.classList.remove('dot--ok','dot--warn','dot--risk');
+  if(a<=EVOL_THRESHOLDS.ok) dotEl.classList.add('dot--ok');
+  else if(a<=EVOL_THRESHOLDS.warn) dotEl.classList.add('dot--warn');
+  else dotEl.classList.add('dot--risk');
+}
+
+// ---------- Analyse IA (Index/Training) ----------
+function renderAnalysisPanelFromStore(){
+  const panel = $("#analysis-panel"); if(!panel) return;
+  const st = getStore(); const week = st?.weeks?.[st.weeks.length-1] || initialWeek;
+  const badge = week.ml?.predicted_label ? `<span class="badge badge-red">Risque de blessure</span>` : `<span class="badge badge-green">Risque faible</span>`;
   panel.innerHTML = `
     <div class="card">
       <div class="card-title">Analyse de la semaine</div>
       <div class="card-body">
         <p>${badge} — proba=${Math.round((week.ml?.predicted_probability||0)*100)}%</p>
-        <p><strong>Total:</strong> ${week.summary?.total_km ?? '—'} km &nbsp;|&nbsp; 
+        <p><strong>Total:</strong> ${week.summary?.total_km ?? '—'} km &nbsp;|&nbsp;
            <strong>Intensité Z5/T1/T2:</strong> ${week.summary?.km_z5t ?? '—'} km &nbsp;|&nbsp;
            <strong>Progression:</strong> x${week.summary?.load_spike_rel_w1_w2 ?? '—'}</p>
-        <p>${week.analysis_text || ''}</p>
-        <p class="muted">Modèle: ${week.ml?.model || "global_sgd_tuned.joblib (simulé)"} </p>
+        <p>${week.analysis_text||''}</p>
+        <p class="muted">Modèle: ${week.ml?.model || "global_sgd_tuned.joblib (simulé)"}</p>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
-// =======================
-// Hydrations
-// =======================
+// ---------- Hydratations pages ----------
 function hydrateHome(){
-  if (!$('#metric-load')) return;
-  const live = getLiveState();
-  const { weekly, lastActivity, sports } = live;
+  const ml = $("#metric-load"); if(!ml) return;
+  const live=getLiveState(), {weekly,lastActivity,sports}=live;
+  ml.textContent = formatKm(weekly.load);
+  $("#metric-hours").textContent = fmtHMfromMin((weekly.hours||0)*60);
+  setEvolution('evol-vol', weekly.evolVolumePct||0);
+  setEvolution('evol-int', weekly.evolIntensityPct||0);
 
-  $('#metric-load').textContent = formatKm(weekly.load);
-  $('#metric-hours').textContent = formatHoursDecimalToHM(typeof weekly.hours === 'number' ? weekly.hours : 0);
-  setEvolution('evol-vol', typeof weekly.evolVolumePct==='number'?weekly.evolVolumePct:6);
-  setEvolution('evol-int', typeof weekly.evolIntensityPct==='number'?weekly.evolIntensityPct:-12);
-
-  const chips = document.getElementById('sport-chips');
-  if (chips && chips.children.length === 0){
+  const chips=$("#sport-chips");
+  if(chips && chips.children.length===0){
     sports.forEach(sp=>{
-      const el = document.createElement('button');
-      el.className = 'chip'; el.type='button';
-      el.innerHTML = `<span class="dot" style="background:${sp.color}"></span>${iconFor(sp.name)} ${sp.name}`;
+      const el=document.createElement('button');
+      el.className='chip'; el.type='button';
+      el.innerHTML=`<span class="dot" style="background:${sp.color}"></span>${iconFor(sp.name)} ${sp.name}`;
       chips.appendChild(el);
     });
   }
-
-  $('#last-type').textContent     = lastActivity.type;
-  $('#last-date').textContent     = fmtDate(lastActivity.dateISO);
-  $('#last-distance').textContent = `${(lastActivity.distanceKm||0).toFixed(2)} km`;
-  $('#last-duration').textContent = fmtDur(lastActivity.durationSec||0);
-  $('#last-pace').textContent     = lastActivity.paceSecPerKm ? fmtPace(lastActivity.paceSecPerKm) : '—';
-  $('#last-activity').href        = `./activity.html?id=${lastActivity.id || 'sample'}`;
+  $("#last-type").textContent=lastActivity.type;
+  $("#last-date").textContent=fmtDate(lastActivity.dateISO);
+  $("#last-distance").textContent=`${(lastActivity.distanceKm||0).toFixed(2)} km`;
+  $("#last-duration").textContent=fmtDur(lastActivity.durationSec||0);
+  $("#last-pace").textContent= lastActivity.paceSecPerKm ? fmtPace(lastActivity.paceSecPerKm) : '—';
+  $("#last-activity").href=`./activity.html?id=${lastActivity.id||'sample'}`;
 
   renderAnalysisPanelFromStore();
 }
 
-function hydrateActivity(){
-  const id = new URLSearchParams(location.search).get('id') || 'sample';
-  const live = getLiveState();
-  const a = (live.activities || []).find(x=>x.id===id) || live.lastActivity;
-  if (!$('#type')) return;
+function hydrateTrainingSummary(){
+  const dEl=$("#trg-dur-7"), kEl=$("#trg-dist-7"), sEl=$("#trg-sessions");
+  if(!dEl && !kEl && !sEl) return;
+  const live=getLiveState();
+  const w = weeklyFromActivities(live.activities||[]);
+  if(kEl) kEl.textContent = formatKm(round1(w.km));
+  if(dEl) dEl.textContent = fmtHMfromMin(w.durMin);
+  if(sEl) sEl.textContent = String(w.sessions);
+}
 
-  $('#type').textContent   = a.type;
-  $('#date').textContent   = fmtDate(a.dateISO);
-  $('#distance').textContent = a.distanceKm ? a.distanceKm.toFixed(2)+' km' : '—';
-  $('#duration').textContent = fmtDur(a.durationSec||0);
-  $('#pace').textContent     = a.paceSecPerKm ? fmtPace(a.paceSecPerKm) : '—';
-  $('#hr').textContent       = a.hrAvg ? a.hrAvg + ' bpm' : '—';
-  $('#elev').textContent     = a.elevPos ? a.elevPos + ' m' : '—';
-  $('#cal').textContent      = a.calories ? a.calories + ' kcal' : '—';
+function hydrateTrainingQuotidien(){
+  const live=getLiveState(), days=live.daily||[]; if(!days.length) return;
 
-  const w=320,h=140;
-  const points = (a.route||[]).map(([x,y])=>`${x/100*w},${y/100*h}`).join(' ');
-  const svg = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
-    <defs>
-      <linearGradient id="g" x1="0" x2="1" y1="0" y2="0">
-        <stop offset="0%"   stop-color="#EB6E9A"/>
-        <stop offset="50%"  stop-color="#F2A65A"/>
-        <stop offset="100%" stop-color="#00B37A"/>
-      </linearGradient>
-    </defs>
-    <polyline points="${points}" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>`;
-  $('#route').innerHTML = svg;
+  // Dernier jour (proxy pour “aujourd’hui”)
+  const last = days[days.length-1];
 
-  const laps = $('#laps'); if (laps){ laps.innerHTML = '';
-    (a.laps||[]).forEach(l => {
-      const row = document.createElement('div');
-      row.style.display='grid';
-      row.style.gridTemplateColumns='40px 1fr auto';
-      row.style.gap='10px';
-      row.style.padding='8px 0';
-      row.style.borderBottom='1px solid var(--line)';
-      row.innerHTML = `<span class="muted">#${l.n}</span><strong>${l.distKm.toFixed(2)} km</strong><span>${fmtDur(l.timeSec)}</span>`;
-      laps.appendChild(row);
-    });
+  const set = (id, val)=>{ const el=$(id); if(el) el.textContent = val; };
+
+  // Bloc “Santé du quotidien”
+  set("#dq-steps",      last.steps ? last.steps.toLocaleString('fr-FR') : "—");
+  set("#dq-active-cal", last.steps ? Math.round(last.steps*0.04)+" kcal" : "—");  // approx démo
+  set("#dq-rhr",        last.rhr_bpm ? `${last.rhr_bpm} bpm` : "—");
+  set("#dq-resp",       "14 rpm");     // démo fixe
+  set("#dq-spo2",       "97%");
+  set("#dq-act-min",    last.act_min ? `${last.act_min} min` : "—");
+
+  // Récap récupération (moyennes 7j)
+  const sleepLast = last.sleep_min || null;
+  const sleepAvg  = round1(avg(days.map(d=>d.sleep_min))/60);
+  const hrvAvg    = Math.round(avg(days.map(d=>d.hrv_ms)));
+  const rpeAvg    = round1(avg(days.map(d=>d.rpe)));
+  const rhrAvg    = Math.round(avg(days.map(d=>d.rhr_bpm)));
+
+  set("#dq-sleep-last", sleepLast ? fmtHMfromMin(sleepLast) : "—");
+  set("#dq-sleep-avg",  sleepAvg  ? `${sleepAvg} h` : "—");
+  set("#dq-hrv-avg",    hrvAvg    ? `${hrvAvg} ms` : "—");
+  set("#dq-rpe-avg",    rpeAvg    ? `${rpeAvg}`    : "—");
+  set("#dq-rhr-avg",    rhrAvg    ? `${rhrAvg} bpm`: "—");
+
+  // Journal (J-6 → J)
+  const list = $("#daily-list");
+  if(list){
+    list.innerHTML = days.map(d=>{
+      const dt = new Date(d.date+'T12:00:00');
+      const lab = dt.toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'short'});
+      return `<div class="row" style="display:grid;grid-template-columns:1.2fr 1fr 1fr 0.6fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)">
+        <div><span class="muted">${lab}</span></div>
+        <div><strong>${fmtHMfromMin(d.sleep_min)}</strong><div class="meta">Sommeil</div></div>
+        <div><strong>${d.hrv_ms} ms</strong><div class="meta">HRV</div></div>
+        <div><strong>${d.rpe}</strong><div class="meta">RPE</div></div>
+      </div>`;
+    }).join('');
   }
+}
+
+function hydrateActivity(){
+  const id=new URLSearchParams(location.search).get('id') || (getLiveState().lastActivity?.id || 'sample');
+  const live=getLiveState();
+  const a=(live.activities||[]).find(x=>x.id===id) || live.lastActivity;
+  if(!$("#type")||!a) return;
+  $("#type").textContent=a.type;
+  $("#date").textContent=fmtDate(a.dateISO);
+  $("#distance").textContent=a.distanceKm ? a.distanceKm.toFixed(2)+' km' : '—';
+  $("#duration").textContent=fmtDur(a.durationSec||0);
+  $("#pace").textContent=a.paceSecPerKm ? fmtPace(a.paceSecPerKm) : '—';
+  $("#hr").textContent=a.hrAvg? a.hrAvg+' bpm':'—';
+  $("#elev").textContent=a.elevPos? a.elevPos+' m':'—';
+  $("#cal").textContent=a.calories? a.calories+' kcal':'—';
 }
 
 function activityRow(a){
-  const d = new Date(a.dateISO).toLocaleString('fr-FR', { weekday:'short', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-  const dist = a.distanceKm ? a.distanceKm.toFixed(1)+' km' : '';
-  const dur = fmtDur(a.durationSec||0);
+  const d=new Date(a.dateISO).toLocaleString('fr-FR',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  const dist=a.distanceKm? a.distanceKm.toFixed(1)+' km':'';
+  const dur=fmtDur(a.durationSec||0);
   return `<a class="row" href="./activity.html?id=${a.id}">
-    <div class="left">
-      <span class="icon">${iconFor(a.type)}</span>
-      <div>
-        <div><strong>${a.type}</strong></div>
-        <div class="meta">${d}</div>
-      </div>
-    </div>
-    <div class="right">
-      <div style="text-align:right"><strong>${dist}</strong><div class="meta">${dur}</div></div>
-    </div>
+    <div class="left"><span class="icon">${iconFor(a.type)}</span>
+      <div><div><strong>${a.type}</strong></div><div class="meta">${d}</div></div></div>
+    <div class="right"><div style="text-align:right"><strong>${dist}</strong><div class="meta">${dur}</div></div></div>
   </a>`;
 }
 function hydrateActivities(){
-  const list = document.getElementById('activity-list');
-  if(!list) return;
-  const live = getLiveState();
-  const items = (live.activities||[]).slice().sort((a,b)=> new Date(b.dateISO)-new Date(a.dateISO));
-  list.innerHTML = items.map(activityRow).join('');
+  const list=$("#activity-list"); if(!list) return;
+  const items=(getLiveState().activities||[]).slice().sort((a,b)=> new Date(b.dateISO)-new Date(a.dateISO));
+  list.innerHTML=items.map(activityRow).join('');
 }
 
 function hydrateProfile(){
-  if (!$('#p-load')) return;
-  const live = getLiveState();
-  const w = live.weekly;
-  $('#p-load').textContent  = formatKm(w.load);
-  $('#p-hours').textContent = formatHoursDecimalToHM(typeof w.hours === 'number' ? w.hours : 0);
-  const restEl = $('#p-rest'); if (restEl) restEl.textContent = 'OK';
-
-  const chips = document.getElementById('p-sports');
-  if (chips) {
-    chips.innerHTML = '';
-    live.sports.forEach(sp=>{
-      const el = document.createElement('span');
-      el.className = 'chip';
-      el.innerHTML = `<span class="dot" style="background:${sp.color}"></span>${iconFor(sp.name)} ${sp.name}`;
-      chips.appendChild(el);
-    });
-  }
+  const loadEl=$("#p-load"); if(!loadEl) return;
+  const live=getLiveState(); const w=weeklyFromActivities(live.activities||[]);
+  loadEl.textContent  = formatKm(round1(w.km));
+  $("#p-hours").textContent = fmtHMfromMin(w.durMin);
+  const restEl=$("#p-rest"); if(restEl) restEl.textContent='OK';
+  const chips=$("#p-sports"); if(chips){ chips.innerHTML=''; (live.sports||[]).forEach(sp=>{ const el=document.createElement('span'); el.className='chip'; el.innerHTML=`<span class="dot" style="background:${sp.color}"></span>${iconFor(sp.name)} ${sp.name}`; chips.appendChild(el); }); }
 }
 
 function hydrateSync(){
-  if (!document.getElementById('btn-sync') && !document.getElementById('sync-btn')) return;
-  const elBatt = document.getElementById('sync-battery-val') || document.querySelector('[data-sync-battery]');
-  const elLast = document.getElementById('sync-last')        || document.querySelector('[data-sync-last]');
-  if (elBatt && !elBatt.textContent.trim()) elBatt.textContent = '87%';
-  if (elLast && !elLast.textContent.trim()) elLast.textContent = '—';
+  if (!$("#sync-btn") && !$("#btn-sync")) return;
+  const elBatt=$("#sync-battery-val")||document.querySelector('[data-sync-battery]');
+  const elLast=$("#sync-last")||document.querySelector('[data-sync-last]');
+  if(elBatt && !elBatt.textContent.trim()) elBatt.textContent='87%';
+  if(elLast && !elLast.textContent.trim()) elLast.textContent='—';
 }
 
-// =======================
-// Quotidien — hydratations
-// =======================
-function hydrateDaily(){
-  const wrap = document.getElementById('daily-list');
-  if (!wrap) return; // pas sur la page Quotidien
-
-  const live = getLiveState();
-  const daily = live.daily || [];
-
-  if (!daily.length){
-    wrap.innerHTML = `<div class="card"><div class="card-body">Aucune donnée quotidienne disponible. Lance une synchronisation.</div></div>`;
-    return;
-  }
-
-  wrap.innerHTML = daily.map(d => {
-    const status = (d.hrv_rmssd_ms >= 70 && d.sleep_hours >= 8 && d.rpe <= 6) ? 'ok'
-                 : (d.hrv_rmssd_ms >= 64 && d.sleep_hours >= 7 && d.rpe <= 7) ? 'warn'
-                 : 'risk';
-    const dot = status === 'ok' ? 'dot--ok' : (status === 'warn' ? 'dot--warn' : 'dot--risk');
-
-    return `
-      <div class="row">
-        <div class="left">
-          <span class="dot ${dot}" aria-hidden="true"></span>
-          <div>
-            <div><strong>${fmtDayYMD(d.date)}</strong></div>
-            <div class="meta">Sommeil ${d.sleep_hours.toFixed(1)} h · HRV ${d.hrv_rmssd_ms} ms · RPE ${d.rpe}</div>
-          </div>
-        </div>
-        <div class="right">
-          <div class="meta">Qualité ${d.sleep_quality}/5 · Courbatures ${d.soreness}/10</div>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-function hydrateDailySummary(){
-  const elSleep = document.getElementById('sum-sleep');
-  const elHrv   = document.getElementById('sum-hrv');
-  const elRpe   = document.getElementById('sum-rpe');
-  const dot     = document.getElementById('sum-status-dot');
-  const txt     = document.getElementById('sum-status-text');
-  const note    = document.getElementById('sum-note');
-
-  if (!elSleep || !elHrv || !elRpe || !dot || !txt) return; // pas sur la page
-
-  const live = getLiveState();
-  const daily = live.daily || [];
-  if (!daily.length){
-    elSleep.textContent = elHrv.textContent = elRpe.textContent = '—';
-    dot.className = 'dot';
-    txt.textContent = '—';
-    if (note) note.textContent = '';
-    return;
-  }
-
-  const avg = (arr, k) => arr.reduce((s,x)=> s + Number(x[k]||0), 0) / arr.length;
-  const meanSleep = avg(daily, 'sleep_hours');
-  const meanHRV   = avg(daily, 'hrv_rmssd_ms');
-  const meanRPE   = avg(daily, 'rpe');
-
-  elSleep.textContent = `${meanSleep.toFixed(1)} h`;
-  elHrv.textContent   = `${Math.round(meanHRV)} ms`;
-  elRpe.textContent   = `${meanRPE.toFixed(1)}`;
-
-  let status = 'ok', label = 'OK';
-  if (!(meanHRV >= 70 && meanSleep >= 8 && meanRPE <= 6)){
-    status = (meanHRV >= 64 && meanSleep >= 7 && meanRPE <= 7) ? 'warn' : 'risk';
-    label  = status === 'warn' ? 'Attention' : 'Risque';
-  }
-
-  dot.className = `dot ${status==='ok'?'dot--ok':status==='warn'?'dot--warn':'dot--risk'}`;
-  txt.textContent = label;
-
-  if (note){
-    if (status==='ok'){
-      note.textContent = "OK : Sommeil correct, HRV stable et RPE maîtrisé — poursuis le plan.";
-    } else if (status==='warn'){
-      note.textContent = "Attention : légère fatigue détectée — privilégie l’endurance fondamentale, +1 nuit ≥8 h.";
-    } else {
-      note.textContent = "Risque : surcharge probable — réduire volume ~30%, 1 jour off, renfo léger & mobilité.";
-    }
-  }
-}
-
-// =======================
-// Sync animation + intégration démo
-// =======================
+// ---------- Sync UI + intégration ----------
 function setupSyncAnimation(){
-  const btn     = document.getElementById('sync-btn') || document.getElementById('btn-sync');
-  const bar     = document.getElementById('sync-progress-bar');
-  const gProg   = document.getElementById('sync-progress') || document.getElementById('sync-watch-layer');
-  const gCheck  = document.getElementById('sync-check');
-  const status  = document.getElementById('sync-status');
-  const textProgress = document.getElementById('sync-progress-text');
-  const iaGear  = document.getElementById('ia-gear') || document.getElementById('gear-area');
-  const doneEl  = document.getElementById('sync-done');
-  const resetBtn= document.getElementById('reset-demo');
-  const gPulsar = document.getElementById('sync-pulsar');
+  const btn=$("#sync-btn")||$("#btn-sync");
+  const bar=$("#sync-progress-bar");
+  const gProg=$("#sync-progress")||$("#sync-watch-layer");
+  const gCheck=$("#sync-check");
+  const status=$("#sync-status");
+  const textProgress=$("#sync-progress-text");
+  const iaGear=$("#ia-gear")||$("#gear-area");
+  const doneEl=$("#sync-done");
+  const resetBtn=$("#reset-demo");
+  const gPulsar=$("#sync-pulsar");
 
-  if(!btn || !bar || !gProg || !gCheck) return; // pas sur la page
+  if(!btn||!bar||!gProg||!gCheck) return;
 
-  // État persistant au chargement
-  const persisted = getStore();
-  if ((persisted.synced || 0) > 0) {
-    gCheck.style.display = 'block';
-    gProg.style.display  = 'none';
-    if (doneEl) {
-      doneEl.classList.remove('hidden');
-      doneEl.innerHTML = `✅ Rockso a déjà analysé l'entraînement. Consulte l'analyse sur <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`;
-    }
-    const last = document.querySelector('[data-sync-last]') ||
-                 document.getElementById('sync-last') ||
-                 document.querySelector('.sync-row .sync-label + .sync-val');
-    if(last){
-      const d = new Date();
-      last.textContent = `aujourd’hui ${d.toLocaleString('fr-FR', { hour:'2-digit', minute:'2-digit' })}`;
-    }
+  const persisted=getStore();
+  if((persisted?.synced||0)>0){
+    gCheck.style.display='block'; gProg.style.display='none';
+    if(doneEl){ doneEl.classList.remove('hidden'); doneEl.innerHTML=`✅ Rockso a déjà analysé l'entraînement. Consulte l'analyse sur <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`; }
+    const last=document.querySelector('[data-sync-last]')||$("#sync-last")||document.querySelector('.sync-row .sync-label + .sync-val');
+    if(last){ const d=new Date(); last.textContent=`aujourd’hui ${d.toLocaleString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`; }
   }
+  if(resetBtn){ resetBtn.addEventListener('click',()=>{ localStorage.removeItem(STORE_KEY); location.reload(); }); }
 
-  // Reset démo
-  if (resetBtn) {
-    resetBtn.addEventListener('click', ()=>{
-      localStorage.removeItem(STORE_KEY);
-      location.reload();
-    });
-  }
+  const CIRC=2*Math.PI*60;
+  function setProgress(pct){ const off=CIRC*(1-pct/100); bar.style.strokeDashoffset=off.toFixed(1); }
 
-  const CIRC = 2*Math.PI*60; // r=60 -> ~377
-  function setProgress(pct){
-    const off = CIRC * (1 - pct/100);
-    bar.style.strokeDashoffset = off.toFixed(1);
-  }
+  function startSyncUI(){ gCheck.style.display='none'; gProg.style.display='block'; btn.disabled=true; setProgress(0); if(textProgress) textProgress.textContent=''; if(doneEl){doneEl.classList.add('hidden'); doneEl.innerHTML='';} if(iaGear) iaGear.classList.add('hidden'); if(gPulsar){ gPulsar.style.display=''; gPulsar.classList.add('animate'); } }
+  function endSyncUI(){ gProg.style.display='none'; gCheck.style.display='block'; if(status) status.textContent='Synchronisation terminée'; if(gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display='none'; } const last=document.querySelector('[data-sync-last]')||$("#sync-last")||document.querySelector('.sync-row .sync-label + .sync-val'); if(last){ const d=new Date(); last.textContent=`aujourd’hui ${d.toLocaleString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`; } btn.disabled=false; }
 
-  function startSyncUI(){
-    gCheck.style.display = 'none';
-    gProg.style.display  = 'block';
-    btn.disabled = true;
-    setProgress(0);
-    if (textProgress) textProgress.textContent = '';
-    if (doneEl) { doneEl.classList.add('hidden'); doneEl.innerHTML = ''; }
-    if (iaGear) iaGear.classList.add('hidden');
-
-    // PULSAR ON
-    if (gPulsar){ gPulsar.style.display = ''; gPulsar.classList.add('animate'); }
-  }
-  function endSyncUI(){
-    gProg.style.display  = 'none';
-    gCheck.style.display = 'block';
-    if (status) status.textContent = "Synchronisation terminée";
-
-    // PULSAR OFF
-    if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display = 'none'; }
-
-    const last = document.querySelector('[data-sync-last]') ||
-                 document.getElementById('sync-last') ||
-                 document.querySelector('.sync-row .sync-label + .sync-val');
-    if(last){
-      const d = new Date();
-      last.textContent = `aujourd’hui ${d.toLocaleString('fr-FR', { hour:'2-digit', minute:'2-digit' })}`;
-    }
-    btn.disabled = false;
-  }
-
-  function animTo(targetPct, dur=800){
-    const t0 = performance.now();
-    const start = parseFloat(bar.style.strokeDashoffset || (CIRC));
-    const currentPct = 100 - (start/CIRC*100);
-    const delta = targetPct - currentPct;
-    return new Promise(res=>{
-      function tick(now){
-        const k = Math.min(1, (now - t0) / dur);
-        const pct = currentPct + delta * k;
-        setProgress(pct);
-        if (k<1) requestAnimationFrame(tick);
-        else res();
-      }
-      requestAnimationFrame(tick);
-    });
+  function animTo(targetPct,dur=800){
+    const t0=performance.now(); const start=parseFloat(bar.style.strokeDashoffset||(CIRC)); const currentPct=100-(start/CIRC*100); const delta=targetPct-currentPct;
+    return new Promise(res=>{ function tick(now){ const k=Math.min(1,(now-t0)/dur); const pct=currentPct+delta*k; setProgress(pct); if(k<1) requestAnimationFrame(tick); else res(); } requestAnimationFrame(tick); });
   }
 
   async function runDemoUpload(payload){
-    const N = (payload.activities||[]).length;
-    if (status) status.textContent = "Connexion…";
-    await animTo(10, 600);
-    if (status) status.textContent = "Préparation de la synchronisation…";
-    await animTo(20, 700);
-
-    for (let i=0;i<N;i++){
-      if (textProgress) textProgress.textContent = `Synchronisation des activités ${i+1}/${N}…`;
-      await animTo(20 + ((i+1)/N)*75, 600);
-      await new Promise(r=>setTimeout(r, 120));
-    }
-    await animTo(98, 500);
+    const N=(payload.activities||[]).length;
+    if(status) status.textContent="Connexion…"; await animTo(10,600);
+    if(status) status.textContent="Préparation de la synchronisation…"; await animTo(20,700);
+    for(let i=0;i<N;i++){ if(textProgress) textProgress.textContent=`Synchronisation des activités ${i+1}/${N}…`; await animTo(20+((i+1)/N)*75,600); await new Promise(r=>setTimeout(r,120)); }
+    await animTo(98,500);
   }
 
   function mergePayloadIntoStore(payload){
-    const st = getStore();
+    const st=getStore();
     st.weeks = st.weeks || [];
     st.activities = st.activities || [];
+    st.daily = st.daily || [];
+
     st.weeks.push(payload);
-    st.activities = st.activities.concat(payload.activities);
+    st.activities = st.activities.concat(payload.activities);     // on garde le format JSON brut
+    if(payload.daily?.length) st.daily = st.daily.concat(payload.daily);
+
     st.lastActivity = payload.activities[payload.activities.length-1];
     st.lastWeekAnalysis = { text: payload.analysis_text, ml: payload.ml };
-    st.daily = payload.daily || null; // ✅ on retient aussi le quotidien
     st.synced = (st.synced||0) + 1;
     saveStore(st);
   }
 
-  // Injecte le markup des 3 engrenages si absent (sécurité)
   function ensureGearMarkup(){
-    const iaGear = document.getElementById('ia-gear') || document.getElementById('gear-area');
-    if (!iaGear) return;
-    if (iaGear.children.length) return;
+    if(!iaGear || iaGear.children.length) return;
     iaGear.innerHTML = `
       <svg class="gear g-lg" width="34" height="34" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"/>
@@ -626,86 +425,64 @@ function setupSyncAnimation(){
         <path d="M12 10.2a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z"/>
         <path d="M12 4v1M12 19v1M6.5 6.5l.8.8M16.7 16.7l.8.8M4 12h1M19 12h1M6.5 17.5l.8-.8M16.7 7.3l.8-.8" fill="none" stroke="currentColor" stroke-width="1.5"/>
       </svg>
-      <span class="muted">Analyse IA en cours…</span>
-    `;
+      <span class="muted">Analyse IA en cours…</span>`;
   }
 
   async function startSync(){
     startSyncUI();
-    try {
-      const st = getStore();
-      const idx = st.synced || 0;
-
-      if (idx >= DEMO_INLINE.length) { // max 2 semaines en démo
-        if (status) status.textContent = "Aucune nouvelle donnée démo à synchroniser.";
-        if (textProgress) textProgress.textContent = "Démo : toutes les données ont déjà été synchronisées.";
-        await animTo(100, 400);
-        endSyncUI();
-        return;
+    try{
+      const st=getStore(); const idx=st.synced||0;
+      if(idx >= DEMO_INLINE.length){
+        if(status) status.textContent="Aucune nouvelle donnée démo à synchroniser.";
+        if(textProgress) textProgress.textContent="Démo : toutes les données ont déjà été synchronisées.";
+        await animTo(100,400); endSyncUI(); return;
       }
-
-      const payload = await loadWeek(idx);  // essaie fichiers, puis fallback inline
+      const payload=await loadWeek(idx);
       await runDemoUpload(payload);
       mergePayloadIntoStore(payload);
+      await animTo(100,400); endSyncUI();
 
-      await animTo(100, 400);
-      endSyncUI();
-
-      // Animation IA visible 2s
       ensureGearMarkup();
-      const iaGear = document.getElementById('ia-gear') || document.getElementById('gear-area');
-      if (iaGear) iaGear.classList.remove("hidden");
-      if (status) status.textContent = "Analyse IA en cours…";
-      await new Promise(r=>setTimeout(r, 2000));
-      if (iaGear) iaGear.classList.add("hidden");
-      if (doneEl) {
-        doneEl.classList.remove("hidden");
-        doneEl.innerHTML = `✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`;
-      }
-
-      // Rafraîchir les pages si ouvertes (ex. Quotidien)
-      hydrateDailySummary();
-      hydrateDaily();
-
-    } catch(e){
+      if(iaGear) iaGear.classList.remove('hidden');
+      if(status) status.textContent="Analyse IA en cours…";
+      await new Promise(r=>setTimeout(r,2000));
+      if(iaGear) iaGear.classList.add('hidden');
+      if(doneEl){ doneEl.classList.remove('hidden'); doneEl.innerHTML=`✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`; }
+    }catch(e){
       console.error(e);
-      if (status) status.textContent = "Erreur de synchronisation.";
-      if (textProgress) textProgress.textContent = "La démo a un fallback intégré, recharge la page si le problème persiste.";
-      if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display = 'none'; }
-      btn.disabled = false;
+      if(status) status.textContent="Erreur de synchronisation.";
+      if(textProgress) textProgress.textContent="La démo a un fallback intégré, recharge la page si le problème persiste.";
+      if(gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display='none'; }
+      btn.disabled=false;
     }
   }
 
-  // état initial : check visible, progress caché, pulsar off
-  gCheck.style.display = 'block';
-  gProg.style.display  = 'none';
-  setProgress(0);
-  if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display = 'none'; }
+  // état initial UI
+  const CIRC=2*Math.PI*60;
+  if(bar){ bar.style.strokeDasharray='377'; bar.style.strokeDashoffset='377'; }
+  gCheck.style.display='block'; gProg.style.display='none';
+  if(gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display='none'; }
 
+  function startSyncUI(){ /* défini plus haut via closures */ }
   btn.addEventListener('click', startSync);
 }
 
-// =======================
-// Boot
-// =======================
+// ---------- Boot ----------
 document.addEventListener('DOMContentLoaded', ()=>{
+  seedStoreIfEmpty();
+
   hydrateHome();
+  hydrateTrainingSummary();
+  hydrateTrainingQuotidien();
   hydrateActivity();
   hydrateActivities();
   hydrateProfile();
   hydrateSync();
   setupSyncAnimation();
 
-  // Quotidien
-  hydrateDailySummary();
-  hydrateDaily();
-
   if (document.body.dataset.page === 'training') {
-    const t = document.getElementById('tab-training');
-    if (t) t.classList.add('active');
+    const t = $("#tab-training"); if(t) t.classList.add('active');
     renderAnalysisPanelFromStore();
   }
-  if (document.getElementById('analysis-panel')) {
-    renderAnalysisPanelFromStore();
-  }
+  if ($("#analysis-panel")) renderAnalysisPanelFromStore();
 });

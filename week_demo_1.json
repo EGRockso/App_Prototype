@@ -1,28 +1,21 @@
 {
   "week_index": 1,
   "activities": [
-    { "datetime_iso": "2025-09-22T07:10:00", "type": "run",  "distance_km": 12.6, "duration_min": 63, "avg_hr": 148 },
-    { "datetime_iso": "2025-09-24T18:00:00", "type": "run",  "distance_km": 8.0,  "duration_min": 42, "avg_hr": 151 },
-    { "datetime_iso": "2025-09-25T19:00:00", "type": "cross","distance_km": 0.0,  "duration_min": 30, "avg_hr": 120 },
-    { "datetime_iso": "2025-09-26T07:20:00", "type": "run",  "distance_km": 10.2, "duration_min": 54, "avg_hr": 146 },
-    { "datetime_iso": "2025-09-28T09:00:00", "type": "run",  "distance_km": 18.5, "duration_min": 95, "avg_hr": 152 }
+    { "datetime_iso":"2025-09-22T07:10:00", "type":"run", "distance_km":12.6, "duration_min":63, "avg_hr":148 },
+    { "datetime_iso":"2025-09-24T18:00:00", "type":"run", "distance_km":8.0,  "duration_min":42, "avg_hr":151 },
+    { "datetime_iso":"2025-09-26T07:20:00", "type":"run", "distance_km":10.2, "duration_min":54, "avg_hr":146 },
+    { "datetime_iso":"2025-09-28T09:00:00", "type":"run", "distance_km":18.5, "duration_min":95, "avg_hr":152 }
   ],
-  "summary": {
-    "total_km": 49.3,
-    "km_z5t": 4.2,
-    "load_spike_rel_w1_w2": 1.12,
-    "sessions": 5,
-    "rest_days": 2
-  },
-  "ml": { "predicted_label": 0, "predicted_probability": 0.12, "model": "global_sgd_tuned.joblib (simulé)" },
-  "analysis_text": "Semaine maîtrisée : ~49 km, progression douce (~+12% vs S-1), 1 séance qualité et 2 jours de repos. Sommeil ~8 h, HRV stable — charge tolérée. Risque de blessure faible.",
   "daily": [
-    { "date": "2025-09-22", "sleep_hours": 8.2, "sleep_quality": 4, "hrv_rmssd_ms": 72, "rpe": 6, "soreness": 3 },
-    { "date": "2025-09-23", "sleep_hours": 8.1, "sleep_quality": 4, "hrv_rmssd_ms": 74, "rpe": 2, "soreness": 2 },
-    { "date": "2025-09-24", "sleep_hours": 8.0, "sleep_quality": 4, "hrv_rmssd_ms": 73, "rpe": 5, "soreness": 3 },
-    { "date": "2025-09-25", "sleep_hours": 8.3, "sleep_quality": 5, "hrv_rmssd_ms": 75, "rpe": 3, "soreness": 2 },
-    { "date": "2025-09-26", "sleep_hours": 7.9, "sleep_quality": 4, "hrv_rmssd_ms": 71, "rpe": 6, "soreness": 3 },
-    { "date": "2025-09-27", "sleep_hours": 8.4, "sleep_quality": 5, "hrv_rmssd_ms": 76, "rpe": 2, "soreness": 2 },
-    { "date": "2025-09-28", "sleep_hours": 8.1, "sleep_quality": 4, "hrv_rmssd_ms": 73, "rpe": 6, "soreness": 3 }
-  ]
+    { "date":"2025-09-22", "sleep_min":450, "hrv_ms":75, "rhr_bpm":54, "rpe":3 },
+    { "date":"2025-09-23", "sleep_min":470, "hrv_ms":77, "rhr_bpm":53, "rpe":2 },
+    { "date":"2025-09-24", "sleep_min":455, "hrv_ms":76, "rhr_bpm":54, "rpe":3 },
+    { "date":"2025-09-25", "sleep_min":440, "hrv_ms":74, "rhr_bpm":54, "rpe":2 },
+    { "date":"2025-09-26", "sleep_min":465, "hrv_ms":75, "rhr_bpm":54, "rpe":3 },
+    { "date":"2025-09-27", "sleep_min":455, "hrv_ms":75, "rhr_bpm":54, "rpe":3 },
+    { "date":"2025-09-28", "sleep_min":470, "hrv_ms":76, "rhr_bpm":53, "rpe":4 }
+  ],
+  "summary": { "total_km":49.3, "km_z5t":4.2, "load_spike_rel_w1_w2":1.12, "sessions":4, "rest_days":3 },
+  "ml": { "predicted_label":0, "predicted_probability":0.12, "model":"global_sgd_tuned.joblib (simulé)" },
+  "analysis_text":"Progression modérée (+12 % vs S-0) et intensité contenue (~4 km rapides). HRV/sommeil stables. Risque faible — on continue."
 }

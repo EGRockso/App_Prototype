@@ -1,29 +1,21 @@
 {
   "week_index": 2,
   "activities": [
-    { "datetime_iso": "2025-09-29T06:55:00", "type": "run",  "distance_km": 15.0, "duration_min": 74, "avg_hr": 154 },
-    { "datetime_iso": "2025-09-30T18:30:00", "type": "run",  "distance_km": 7.0,  "duration_min": 38, "avg_hr": 147 },
-    { "datetime_iso": "2025-10-01T19:05:00", "type": "run",  "distance_km": 10.2, "duration_min": 50, "avg_hr": 158 },
-    { "datetime_iso": "2025-10-03T07:00:00", "type": "run",  "distance_km": 12.0, "duration_min": 56, "avg_hr": 160 },
-    { "datetime_iso": "2025-10-04T09:20:00", "type": "run",  "distance_km": 4.0,  "duration_min": 22, "avg_hr": 140 },
-    { "datetime_iso": "2025-10-05T09:10:00", "type": "run",  "distance_km": 24.0, "duration_min": 118, "avg_hr": 156 }
+    { "datetime_iso":"2025-09-29T06:55:00", "type":"run", "distance_km":15.0, "duration_min":74, "avg_hr":154 },
+    { "datetime_iso":"2025-10-01T19:05:00", "type":"run", "distance_km":10.2, "duration_min":50, "avg_hr":158 },
+    { "datetime_iso":"2025-10-03T07:00:00", "type":"run", "distance_km":12.0, "duration_min":56, "avg_hr":160 },
+    { "datetime_iso":"2025-10-05T09:10:00", "type":"run", "distance_km":24.0, "duration_min":118, "avg_hr":156 }
   ],
-  "summary": {
-    "total_km": 72.2,
-    "km_z5t": 10.0,
-    "load_spike_rel_w1_w2": 1.44,
-    "sessions": 6,
-    "rest_days": 1
-  },
-  "ml": { "predicted_label": 1, "predicted_probability": 0.76, "model": "global_sgd_tuned.joblib (simulé)" },
-  "analysis_text": "Semaine en surcharge : ~72 km (~+44% vs S1), 2 séances intenses, 1 seul jour de repos. Sommeil ~7 h, HRV en baisse, RPE élevé en fin de semaine. Risque de blessure accru — alléger +30%, réduire l’intensité, ajouter repos/cross-training.",
   "daily": [
-    { "date": "2025-09-29", "sleep_hours": 7.4, "sleep_quality": 3, "hrv_rmssd_ms": 70, "rpe": 7, "soreness": 4 },
-    { "date": "2025-09-30", "sleep_hours": 7.2, "sleep_quality": 3, "hrv_rmssd_ms": 68, "rpe": 6, "soreness": 4 },
-    { "date": "2025-10-01", "sleep_hours": 7.0, "sleep_quality": 3, "hrv_rmssd_ms": 66, "rpe": 8, "soreness": 5 },
-    { "date": "2025-10-02", "sleep_hours": 7.1, "sleep_quality": 3, "hrv_rmssd_ms": 64, "rpe": 4, "soreness": 4 },
-    { "date": "2025-10-03", "sleep_hours": 6.8, "sleep_quality": 2, "hrv_rmssd_ms": 62, "rpe": 8, "soreness": 6 },
-    { "date": "2025-10-04", "sleep_hours": 7.0, "sleep_quality": 3, "hrv_rmssd_ms": 61, "rpe": 5, "soreness": 5 },
-    { "date": "2025-10-05", "sleep_hours": 6.9, "sleep_quality": 2, "hrv_rmssd_ms": 60, "rpe": 9, "soreness": 7 }
-  ]
+    { "date":"2025-09-29", "sleep_min":405, "hrv_ms":72, "rhr_bpm":56, "rpe":4 },
+    { "date":"2025-09-30", "sleep_min":420, "hrv_ms":71, "rhr_bpm":57, "rpe":4 },
+    { "date":"2025-10-01", "sleep_min":395, "hrv_ms":70, "rhr_bpm":57, "rpe":5 },
+    { "date":"2025-10-02", "sleep_min":410, "hrv_ms":69, "rhr_bpm":58, "rpe":4 },
+    { "date":"2025-10-03", "sleep_min":400, "hrv_ms":70, "rhr_bpm":58, "rpe":5 },
+    { "date":"2025-10-04", "sleep_min":390, "hrv_ms":68, "rhr_bpm":58, "rpe":5 },
+    { "date":"2025-10-05", "sleep_min":380, "hrv_ms":69, "rhr_bpm":57, "rpe":6 }
+  ],
+  "summary": { "total_km":61.2, "km_z5t":10.0, "load_spike_rel_w1_w2":1.24, "sessions":4, "rest_days":3 },
+  "ml": { "predicted_label":1, "predicted_probability":0.76, "model":"global_sgd_tuned.joblib (simulé)" },
+  "analysis_text":"Surcharge (+24 % vs S-1) et hausse d’intensité (~10 km rapides). Signes de fatigue (HRV ↓, FC repos ↑, sommeil < 7 h). Risque accru — alléger le volume et fractionner la récup."
 }
