@@ -378,11 +378,11 @@ function hydrateSync(){
 function setupSyncAnimation(){
   const btn     = document.getElementById('sync-btn') || document.getElementById('btn-sync');
   const bar     = document.getElementById('sync-progress-bar');
-  const gProg   = document.getElementById('sync-progress'); // calque SVG (anneau)
+  const gProg   = document.getElementById('sync-progress') || document.getElementById('sync-watch-layer');
   const gCheck  = document.getElementById('sync-check');
   const status  = document.getElementById('sync-status');
   const textProgress = document.getElementById('sync-progress-text');
-  const iaGear  = document.getElementById('ia-gear');
+  const iaGear  = document.getElementById('ia-gear') || document.getElementById('gear-area');
   const doneEl  = document.getElementById('sync-done');
   const resetBtn= document.getElementById('reset-demo');
   const gPulsar = document.getElementById('sync-pulsar');
