@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Rockso • Training — Entraînement</title>
+  <title>Rockso • Training — Quotidien</title>
   <link rel="icon" href="assets/img/rockso_logo_mark.png">
   <meta name="theme-color" content="#F5EFE3">
   <link rel="stylesheet" href="styles.css"/>
@@ -22,62 +22,97 @@
         </a>
       </header>
 
-      <!-- ... même <head> et header ... -->
-        <nav class="subtabs train-tabs">
+      <!-- sous-onglets -->
+      <nav class="subtabs train-tabs">
         <a class="subtab pill" href="./training-entrainement.html">Entraînement</a>
         <a class="subtab pill" href="./training-tendance.html">Tendance</a>
         <a class="subtab pill" href="./training-recuperation.html">Récupération</a>
         <a class="subtab pill active" href="./training-quotidien.html">Quotidien</a>
-        </nav>
+      </nav>
 
-      <!-- header + subtabs (Quotidien actif) -->
-        <section class="content scroll">
-            <h2 class="section-title" style="margin-top:10px">Santé du quotidien</h2>
+      <section class="content scroll">
+        <h2 class="section-title" style="margin-top:10px">Santé du quotidien</h2>
 
-            <div class="metrics-grid">
-                <div class="quick-card">
-                <span class="qc-label">Pas</span>
-                <strong class="qc-value">10 842</strong>
-                </div>
-                <div class="quick-card">
-                <span class="qc-label">Calories actives</span>
-                <strong class="qc-value">723 kcal</strong>
-                </div>
-                <div class="quick-card">
-                <span class="qc-label">FC moyenne</span>
-                <strong class="qc-value">64 bpm</strong>
-                </div>
+        <!-- === Tes cartes existantes (statique / démo) === -->
+        <div class="metrics-grid">
+          <div class="quick-card">
+            <span class="qc-label">Pas</span>
+            <strong class="qc-value">10 842</strong>
+          </div>
+          <div class="quick-card">
+            <span class="qc-label">Calories actives</span>
+            <strong class="qc-value">723 kcal</strong>
+          </div>
+          <div class="quick-card">
+            <span class="qc-label">FC moyenne</span>
+            <strong class="qc-value">64 bpm</strong>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="quick-card">
+            <span class="qc-label">Respiration</span>
+            <strong class="qc-value">14 rpm</strong>
+          </div>
+          <div class="quick-card">
+            <span class="qc-label">SpO₂</span>
+            <strong class="qc-value">97%</strong>
+          </div>
+          <div class="quick-card">
+            <span class="qc-label">Minutes actives</span>
+            <strong class="qc-value">46 min</strong>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2 class="section-title">Activité (7 derniers jours)</h2>
+          <div class="card chart">
+            <svg viewBox="0 0 320 160" preserveAspectRatio="none">
+              <rect x="20"  y="110" width="28" height="30" rx="6" class="cbar z1"/>
+              <rect x="64"  y="70"  width="28" height="70" rx="6" class="cbar z2"/>
+              <rect x="108" y="92"  width="28" height="48" rx="6" class="cbar z3"/>
+              <rect x="152" y="40"  width="28" height="100" rx="6" class="cbar z4"/>
+              <rect x="196" y="84"  width="28" height="56" rx="6" class="cbar z2"/>
+              <rect x="240" y="120" width="28" height="20" rx="6" class="cbar z1"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- === NOUVEAU : Récap semaine (moyennes sommeil/HRV/RPE) === -->
+        <div class="section">
+          <h2 class="section-title">Récap récupération (semaine en cours)</h2>
+          <div class="card">
+            <div class="ac-body" style="grid-template-columns: repeat(4,1fr);">
+              <div class="metric">
+                <div class="metric-label">Sommeil (moy.)</div>
+                <strong class="metric-value" id="sum-sleep">—</strong>
+              </div>
+              <div class="metric">
+                <div class="metric-label">HRV (moy.)</div>
+                <strong class="metric-value" id="sum-hrv">—</strong>
+              </div>
+              <div class="metric">
+                <div class="metric-label">RPE (moy.)</div>
+                <strong class="metric-value" id="sum-rpe">—</strong>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Statut</div>
+                <strong class="metric-value">
+                  <span class="dot" id="sum-status-dot"></span>
+                  <span id="sum-status-text" style="margin-left:6px">—</span>
+                </strong>
+              </div>
             </div>
+            <div class="card-body muted" id="sum-note" style="margin-top:8px"></div>
+          </div>
+        </div>
 
-            <div class="metrics-grid">
-                <div class="quick-card">
-                <span class="qc-label">Respiration</span>
-                <strong class="qc-value">14 rpm</strong>
-                </div>
-                <div class="quick-card">
-                <span class="qc-label">SpO₂</span>
-                <strong class="qc-value">97%</strong>
-                </div>
-                <div class="quick-card">
-                <span class="qc-label">Minutes actives</span>
-                <strong class="qc-value">46 min</strong>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2 class="section-title">Activité (7 derniers jours)</h2>
-                <div class="card chart">
-                <svg viewBox="0 0 320 160" preserveAspectRatio="none">
-                    <rect x="20"  y="110" width="28" height="30" rx="6" class="cbar z1"/>
-                    <rect x="64"  y="70"  width="28" height="70" rx="6" class="cbar z2"/>
-                    <rect x="108" y="92"  width="28" height="48" rx="6" class="cbar z3"/>
-                    <rect x="152" y="40"  width="28" height="100" rx="6" class="cbar z4"/>
-                    <rect x="196" y="84"  width="28" height="56" rx="6" class="cbar z2"/>
-                    <rect x="240" y="120" width="28" height="20" rx="6" class="cbar z1"/>
-                </svg>
-                </div>
-            </div>
-        </section>
+        <!-- === NOUVEAU : Journal quotidien === -->
+        <div class="section">
+          <h2 class="section-title">Journal quotidien (7 jours)</h2>
+          <div class="list" id="daily-list"></div>
+        </div>
+      </section>
 
       <!-- Tabbar (Training actif via JS) -->
       <nav class="tabbar" role="navigation" aria-label="Navigation principale">

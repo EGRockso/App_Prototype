@@ -1,5 +1,5 @@
 // =======================
-// Rockso prototype — app.js (demo sync + IA) — CLEAN
+// Rockso prototype — app.js (demo sync + IA) — DAILY READY
 // =======================
 
 // ---- Mock data (fallback si aucune synchro démo n'a été jouée)
@@ -51,16 +51,16 @@ const STORE_KEY = "rocksoState"; // localStorage
 
 function getStore(){
   try {
-    return JSON.parse(localStorage.getItem(STORE_KEY)) || { synced:0, weeks:[], activities:[], lastWeekAnalysis:null, lastActivity:null };
+    return JSON.parse(localStorage.getItem(STORE_KEY)) || { synced:0, weeks:[], activities:[], lastWeekAnalysis:null, lastActivity:null, daily:null };
   } catch(e){
-    return { synced:0, weeks:[], activities:[], lastWeekAnalysis:null, lastActivity:null };
+    return { synced:0, weeks:[], activities:[], lastWeekAnalysis:null, lastActivity:null, daily:null };
   }
 }
 function saveStore(st){ localStorage.setItem(STORE_KEY, JSON.stringify(st)); }
 
 // --- Demo inline payloads (fallback si les JSON externes ne sont pas accessibles) ---
 const DEMO_INLINE = [
-  { // week_demo_1.json (no injury)
+  { // Semaine 1 — risque faible
     week_index: 1,
     activities: [
       { datetime_iso:"2025-09-22T07:10:00", type:"run",  distance_km:12.6, duration_min:63, avg_hr:148 },
@@ -70,9 +70,18 @@ const DEMO_INLINE = [
     ],
     summary: { total_km: 49.3, km_z5t: 4.2, load_spike_rel_w1_w2: 1.12, sessions: 4, rest_days: 3 },
     ml: { predicted_label: 0, predicted_probability: 0.12, model: "global_sgd_tuned.joblib (simulé)" },
-    analysis_text: "Semaine maîtrisée : volume modéré (49 km), intensité contrôlée (≈4 km en Z5/T1/T2). RPE cohérent, sommeil et ressenti quotidiens stables. Le risque de blessure est faible."
+    analysis_text: "Semaine maîtrisée : volume modéré (49 km), intensité contrôlée (≈4 km en Z5/T1/T2). Quotidien stable (≈8 h de sommeil, HRV ≈73 ms, RPE ≈4). Le risque de blessure est faible.",
+    daily: [
+      { date:"2025-09-22", sleep_hours:8.2, sleep_quality:4, hrv_rmssd_ms:76, rpe:3, soreness:2 },
+      { date:"2025-09-23", sleep_hours:8.0, sleep_quality:4, hrv_rmssd_ms:74, rpe:4, soreness:2 },
+      { date:"2025-09-24", sleep_hours:8.4, sleep_quality:4, hrv_rmssd_ms:75, rpe:4, soreness:3 },
+      { date:"2025-09-25", sleep_hours:7.8, sleep_quality:4, hrv_rmssd_ms:72, rpe:3, soreness:2 },
+      { date:"2025-09-26", sleep_hours:8.1, sleep_quality:4, hrv_rmssd_ms:73, rpe:4, soreness:3 },
+      { date:"2025-09-27", sleep_hours:8.6, sleep_quality:5, hrv_rmssd_ms:78, rpe:3, soreness:2 },
+      { date:"2025-09-28", sleep_hours:7.9, sleep_quality:4, hrv_rmssd_ms:70, rpe:5, soreness:4 }
+    ]
   },
-  { // week_demo_2.json (injury)
+  { // Semaine 2 — risque accru (cohérent : +24% vs S-1)
     week_index: 2,
     activities: [
       { datetime_iso:"2025-09-29T06:55:00", type:"run",  distance_km:15.0, duration_min:74, avg_hr:154 },
@@ -80,9 +89,19 @@ const DEMO_INLINE = [
       { datetime_iso:"2025-10-03T07:00:00", type:"run",  distance_km:12.0, duration_min:56, avg_hr:160 },
       { datetime_iso:"2025-10-05T09:10:00", type:"run",  distance_km:24.0, duration_min:118, avg_hr:156 }
     ],
-    summary: { total_km: 61.2, km_z5t: 10.0, load_spike_rel_w1_w2: 1.42, sessions: 4, rest_days: 3 },
+    // 61.2 / 49.3 ≈ 1.24
+    summary: { total_km: 61.2, km_z5t: 10.0, load_spike_rel_w1_w2: 1.24, sessions: 4, rest_days: 3 },
     ml: { predicted_label: 1, predicted_probability: 0.76, model: "global_sgd_tuned.joblib (simulé)" },
-    analysis_text: "Surcharge nette (+42% vs S-1) et bloc d’intensité élevé (~10 km en Z5/T1/T2). Indices de fatigue probables (HRV en baisse, sommeil moyen). Le risque de blessure est accru — allégez le volume et fractionnez la récupération."
+    analysis_text: "Surcharge nette (+24% vs S-1) et intensité élevée (~10 km en Z5/T1/T2). Quotidien dégradé (sommeil ≈6 h 30, HRV ≈61 ms, RPE 7→8). Le risque de blessure est accru — allégez le volume (~30%) et fractionnez la récupération.",
+    daily: [
+      { date:"2025-09-29", sleep_hours:7.1, sleep_quality:3, hrv_rmssd_ms:66, rpe:6, soreness:4 },
+      { date:"2025-09-30", sleep_hours:6.8, sleep_quality:3, hrv_rmssd_ms:64, rpe:6, soreness:5 },
+      { date:"2025-10-01", sleep_hours:6.5, sleep_quality:3, hrv_rmssd_ms:62, rpe:7, soreness:6 },
+      { date:"2025-10-02", sleep_hours:6.4, sleep_quality:2, hrv_rmssd_ms:61, rpe:7, soreness:6 },
+      { date:"2025-10-03", sleep_hours:6.3, sleep_quality:2, hrv_rmssd_ms:60, rpe:8, soreness:7 },
+      { date:"2025-10-04", sleep_hours:6.6, sleep_quality:3, hrv_rmssd_ms:59, rpe:7, soreness:6 },
+      { date:"2025-10-05", sleep_hours:6.2, sleep_quality:2, hrv_rmssd_ms:58, rpe:8, soreness:7 }
+    ]
   }
 ];
 
@@ -148,7 +167,8 @@ function getLiveState(){
       lastActivity: last || state.lastActivity,
       activities: acts.map((a,i)=> mapPayloadActivity(a, i, lastW.week_index || 0)),
       sports: state.sports,
-      lastWeekAnalysis: lastW.ml ? { text: lastW.analysis_text, ml: lastW.ml } : st.lastWeekAnalysis
+      lastWeekAnalysis: lastW.ml ? { text: lastW.analysis_text, ml: lastW.ml } : st.lastWeekAnalysis,
+      daily: st.daily || lastW.daily || null // ✅ expose aussi le quotidien
     };
   }
   return {
@@ -156,7 +176,8 @@ function getLiveState(){
     lastActivity: state.lastActivity,
     activities: state.activities,
     sports: state.sports,
-    lastWeekAnalysis: null
+    lastWeekAnalysis: null,
+    daily: null // ✅ fallback
   };
 }
 
@@ -177,6 +198,11 @@ function fmtDur(sec){
 function fmtDate(iso){
   const d = new Date(iso);
   return d.toLocaleString('fr-FR', { weekday:'short', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+function fmtDayYMD(ymd){
+  const [y,m,d] = ymd.split('-').map(Number);
+  const dd = new Date(y, m-1, d);
+  return dd.toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'short' });
 }
 function formatHoursDecimalToHM(hDecimal=0){
   const h = Math.floor(hDecimal);
@@ -373,6 +399,92 @@ function hydrateSync(){
 }
 
 // =======================
+// Quotidien — hydratations
+// =======================
+function hydrateDaily(){
+  const wrap = document.getElementById('daily-list');
+  if (!wrap) return; // pas sur la page Quotidien
+
+  const live = getLiveState();
+  const daily = live.daily || [];
+
+  if (!daily.length){
+    wrap.innerHTML = `<div class="card"><div class="card-body">Aucune donnée quotidienne disponible. Lance une synchronisation.</div></div>`;
+    return;
+  }
+
+  wrap.innerHTML = daily.map(d => {
+    const status = (d.hrv_rmssd_ms >= 70 && d.sleep_hours >= 8 && d.rpe <= 6) ? 'ok'
+                 : (d.hrv_rmssd_ms >= 64 && d.sleep_hours >= 7 && d.rpe <= 7) ? 'warn'
+                 : 'risk';
+    const dot = status === 'ok' ? 'dot--ok' : (status === 'warn' ? 'dot--warn' : 'dot--risk');
+
+    return `
+      <div class="row">
+        <div class="left">
+          <span class="dot ${dot}" aria-hidden="true"></span>
+          <div>
+            <div><strong>${fmtDayYMD(d.date)}</strong></div>
+            <div class="meta">Sommeil ${d.sleep_hours.toFixed(1)} h · HRV ${d.hrv_rmssd_ms} ms · RPE ${d.rpe}</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="meta">Qualité ${d.sleep_quality}/5 · Courbatures ${d.soreness}/10</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function hydrateDailySummary(){
+  const elSleep = document.getElementById('sum-sleep');
+  const elHrv   = document.getElementById('sum-hrv');
+  const elRpe   = document.getElementById('sum-rpe');
+  const dot     = document.getElementById('sum-status-dot');
+  const txt     = document.getElementById('sum-status-text');
+  const note    = document.getElementById('sum-note');
+
+  if (!elSleep || !elHrv || !elRpe || !dot || !txt) return; // pas sur la page
+
+  const live = getLiveState();
+  const daily = live.daily || [];
+  if (!daily.length){
+    elSleep.textContent = elHrv.textContent = elRpe.textContent = '—';
+    dot.className = 'dot';
+    txt.textContent = '—';
+    if (note) note.textContent = '';
+    return;
+  }
+
+  const avg = (arr, k) => arr.reduce((s,x)=> s + Number(x[k]||0), 0) / arr.length;
+  const meanSleep = avg(daily, 'sleep_hours');
+  const meanHRV   = avg(daily, 'hrv_rmssd_ms');
+  const meanRPE   = avg(daily, 'rpe');
+
+  elSleep.textContent = `${meanSleep.toFixed(1)} h`;
+  elHrv.textContent   = `${Math.round(meanHRV)} ms`;
+  elRpe.textContent   = `${meanRPE.toFixed(1)}`;
+
+  let status = 'ok', label = 'OK';
+  if (!(meanHRV >= 70 && meanSleep >= 8 && meanRPE <= 6)){
+    status = (meanHRV >= 64 && meanSleep >= 7 && meanRPE <= 7) ? 'warn' : 'risk';
+    label  = status === 'warn' ? 'Attention' : 'Risque';
+  }
+
+  dot.className = `dot ${status==='ok'?'dot--ok':status==='warn'?'dot--warn':'dot--risk'}`;
+  txt.textContent = label;
+
+  if (note){
+    if (status==='ok'){
+      note.textContent = "OK : Sommeil correct, HRV stable et RPE maîtrisé — poursuis le plan.";
+    } else if (status==='warn'){
+      note.textContent = "Attention : légère fatigue détectée — privilégie l’endurance fondamentale, +1 nuit ≥8 h.";
+    } else {
+      note.textContent = "Risque : surcharge probable — réduire volume ~30%, 1 jour off, renfo léger & mobilité.";
+    }
+  }
+}
+
+// =======================
 // Sync animation + intégration démo
 // =======================
 function setupSyncAnimation(){
@@ -491,12 +603,14 @@ function setupSyncAnimation(){
     st.activities = st.activities.concat(payload.activities);
     st.lastActivity = payload.activities[payload.activities.length-1];
     st.lastWeekAnalysis = { text: payload.analysis_text, ml: payload.ml };
+    st.daily = payload.daily || null; // ✅ on retient aussi le quotidien
     st.synced = (st.synced||0) + 1;
     saveStore(st);
   }
 
   // Injecte le markup des 3 engrenages si absent (sécurité)
   function ensureGearMarkup(){
+    const iaGear = document.getElementById('ia-gear') || document.getElementById('gear-area');
     if (!iaGear) return;
     if (iaGear.children.length) return;
     iaGear.innerHTML = `
@@ -539,6 +653,7 @@ function setupSyncAnimation(){
 
       // Animation IA visible 2s
       ensureGearMarkup();
+      const iaGear = document.getElementById('ia-gear') || document.getElementById('gear-area');
       if (iaGear) iaGear.classList.remove("hidden");
       if (status) status.textContent = "Analyse IA en cours…";
       await new Promise(r=>setTimeout(r, 2000));
@@ -547,11 +662,15 @@ function setupSyncAnimation(){
         doneEl.classList.remove("hidden");
         doneEl.innerHTML = `✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`;
       }
+
+      // Rafraîchir les pages si ouvertes (ex. Quotidien)
+      hydrateDailySummary();
+      hydrateDaily();
+
     } catch(e){
       console.error(e);
       if (status) status.textContent = "Erreur de synchronisation.";
       if (textProgress) textProgress.textContent = "La démo a un fallback intégré, recharge la page si le problème persiste.";
-      // Éteindre le pulsar en cas d'erreur
       if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display = 'none'; }
       btn.disabled = false;
     }
@@ -576,6 +695,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
   hydrateProfile();
   hydrateSync();
   setupSyncAnimation();
+
+  // Quotidien
+  hydrateDailySummary();
+  hydrateDaily();
 
   if (document.body.dataset.page === 'training') {
     const t = document.getElementById('tab-training');

@@ -1,60 +1,28 @@
 {
-  "athlete_id": 26,
-  "week_index": 2523,
-  "summary": {
-    "total_km": 100.3,
-    "sessions": 13,
-    "rest_days": 2,
-    "km_z3z5": 11.7,
-    "km_z5t": 10.5,
-    "load_spike_rel_w1_w2": 0.97
-  },
+  "week_index": 1,
   "activities": [
-    {
-      "name": "Endurance longue",
-      "type": "run",
-      "distance_km": 30.1,
-      "duration_min": 172,
-      "avg_hr": 135,
-      "rpe": 5,
-      "notes": "",
-      "datetime_iso": "2025-06-05T18:00:00"
-    },
-    {
-      "name": "Séance tempo",
-      "type": "run",
-      "distance_km": 18.1,
-      "duration_min": 83,
-      "avg_hr": 150,
-      "rpe": 7,
-      "notes": "",
-      "datetime_iso": "2025-06-06T18:00:00"
-    },
-    {
-      "name": "Fractionné court",
-      "type": "run",
-      "distance_km": 17.1,
-      "duration_min": 74,
-      "avg_hr": 150,
-      "rpe": 8,
-      "notes": "",
-      "datetime_iso": "2025-06-07T18:00:00"
-    },
-    {
-      "name": "Footing récup",
-      "type": "run",
-      "distance_km": 12.0,
-      "duration_min": 72,
-      "avg_hr": 135,
-      "rpe": 3,
-      "notes": "",
-      "datetime_iso": "2025-06-08T18:00:00"
-    }
+    { "datetime_iso": "2025-09-22T07:10:00", "type": "run",  "distance_km": 12.6, "duration_min": 63, "avg_hr": 148 },
+    { "datetime_iso": "2025-09-24T18:00:00", "type": "run",  "distance_km": 8.0,  "duration_min": 42, "avg_hr": 151 },
+    { "datetime_iso": "2025-09-25T19:00:00", "type": "cross","distance_km": 0.0,  "duration_min": 30, "avg_hr": 120 },
+    { "datetime_iso": "2025-09-26T07:20:00", "type": "run",  "distance_km": 10.2, "duration_min": 54, "avg_hr": 146 },
+    { "datetime_iso": "2025-09-28T09:00:00", "type": "run",  "distance_km": 18.5, "duration_min": 95, "avg_hr": 152 }
   ],
-  "ml": {
-    "predicted_label": 0,
-    "predicted_probability": 0.12,
-    "model": "global_sgd_tuned.joblib (simulé)"
+  "summary": {
+    "total_km": 49.3,
+    "km_z5t": 4.2,
+    "load_spike_rel_w1_w2": 1.12,
+    "sessions": 5,
+    "rest_days": 2
   },
-  "analysis_text": "Semaine maîtrisée: 100.3 km, charge bien progressée (x1.00) avec 10% d'intensité qualitative. Sommeil et HRV stables, bonne tolérance subjective."
+  "ml": { "predicted_label": 0, "predicted_probability": 0.12, "model": "global_sgd_tuned.joblib (simulé)" },
+  "analysis_text": "Semaine maîtrisée : ~49 km, progression douce (~+12% vs S-1), 1 séance qualité et 2 jours de repos. Sommeil ~8 h, HRV stable — charge tolérée. Risque de blessure faible.",
+  "daily": [
+    { "date": "2025-09-22", "sleep_hours": 8.2, "sleep_quality": 4, "hrv_rmssd_ms": 72, "rpe": 6, "soreness": 3 },
+    { "date": "2025-09-23", "sleep_hours": 8.1, "sleep_quality": 4, "hrv_rmssd_ms": 74, "rpe": 2, "soreness": 2 },
+    { "date": "2025-09-24", "sleep_hours": 8.0, "sleep_quality": 4, "hrv_rmssd_ms": 73, "rpe": 5, "soreness": 3 },
+    { "date": "2025-09-25", "sleep_hours": 8.3, "sleep_quality": 5, "hrv_rmssd_ms": 75, "rpe": 3, "soreness": 2 },
+    { "date": "2025-09-26", "sleep_hours": 7.9, "sleep_quality": 4, "hrv_rmssd_ms": 71, "rpe": 6, "soreness": 3 },
+    { "date": "2025-09-27", "sleep_hours": 8.4, "sleep_quality": 5, "hrv_rmssd_ms": 76, "rpe": 2, "soreness": 2 },
+    { "date": "2025-09-28", "sleep_hours": 8.1, "sleep_quality": 4, "hrv_rmssd_ms": 73, "rpe": 6, "soreness": 3 }
+  ]
 }
