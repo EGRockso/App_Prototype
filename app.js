@@ -1,5 +1,5 @@
 // =======================
-// Rockso prototype — app.js (demo sync + IA) — FIXED
+// Rockso prototype — app.js (demo sync + IA) — CLEAN
 // =======================
 
 // ---- Mock data (fallback si aucune synchro démo n'a été jouée)
@@ -68,12 +68,7 @@ const DEMO_INLINE = [
       { datetime_iso:"2025-09-26T07:20:00", type:"run",  distance_km:10.2, duration_min:54, avg_hr:146 },
       { datetime_iso:"2025-09-28T09:00:00", type:"run",  distance_km:18.5, duration_min:95, avg_hr:152 }
     ],
-    summary: {
-      total_km: 49.3,
-      km_z5t: 4.2,
-      load_spike_rel_w1_w2: 1.12,
-      sessions: 4, rest_days: 3
-    },
+    summary: { total_km: 49.3, km_z5t: 4.2, load_spike_rel_w1_w2: 1.12, sessions: 4, rest_days: 3 },
     ml: { predicted_label: 0, predicted_probability: 0.12, model: "global_sgd_tuned.joblib (simulé)" },
     analysis_text: "Semaine maîtrisée : volume modéré (49 km), intensité contrôlée (≈4 km en Z5/T1/T2). RPE cohérent, sommeil et ressenti quotidiens stables. Le risque de blessure est faible."
   },
@@ -85,12 +80,7 @@ const DEMO_INLINE = [
       { datetime_iso:"2025-10-03T07:00:00", type:"run",  distance_km:12.0, duration_min:56, avg_hr:160 },
       { datetime_iso:"2025-10-05T09:10:00", type:"run",  distance_km:24.0, duration_min:118, avg_hr:156 }
     ],
-    summary: {
-      total_km: 61.2,
-      km_z5t: 10.0,
-      load_spike_rel_w1_w2: 1.42,
-      sessions: 4, rest_days: 3
-    },
+    summary: { total_km: 61.2, km_z5t: 10.0, load_spike_rel_w1_w2: 1.42, sessions: 4, rest_days: 3 },
     ml: { predicted_label: 1, predicted_probability: 0.76, model: "global_sgd_tuned.joblib (simulé)" },
     analysis_text: "Surcharge nette (+42% vs S-1) et bloc d’intensité élevé (~10 km en Z5/T1/T2). Indices de fatigue probables (HRV en baisse, sommeil moyen). Le risque de blessure est accru — allégez le volume et fractionnez la récupération."
   }
@@ -108,16 +98,15 @@ async function tryFetch(url){
   return res.json();
 }
 // chemins candidats (si tu mets tes fichiers ailleurs, adapte ici)
-const DEMO_WEEKS = ["./week_demo_1.json", "./week_demo_2.json"];
+const DEMO_WEEKS = ["week_demo_1.json", "week_demo_2.json"];
 const DEMO_ALT_PREFIXES = ["./", "./assets/", "./data/", "./assets/data/"];
 
 async function loadWeek(idx){
   const file = DEMO_WEEKS[idx];
   for (const prefix of DEMO_ALT_PREFIXES){
-    try { return await tryFetch(resolveUrl(prefix + file.replace("./",""))); }
+    try { return await tryFetch(resolveUrl(prefix + file)); }
     catch(e){ /* on essaie le suivant */ }
   }
-  // Fallback inline si tous les fetch échouent
   console.warn(`[sync] Fallback DEMO_INLINE[${idx}] (fichier introuvable)`);
   return DEMO_INLINE[idx];
 }
@@ -389,19 +378,18 @@ function hydrateSync(){
 function setupSyncAnimation(){
   const btn     = document.getElementById('sync-btn') || document.getElementById('btn-sync');
   const bar     = document.getElementById('sync-progress-bar');
-  const gProg   = document.getElementById('sync-progress'); // calque SVG
+  const gProg   = document.getElementById('sync-progress'); // calque SVG (anneau)
   const gCheck  = document.getElementById('sync-check');
   const status  = document.getElementById('sync-status');
-  const textProgress = document.getElementById('sync-progress-text'); // ← ID corrigé
-  const gearArea = document.getElementById('gear-area');
-  const doneEl   = document.getElementById('sync-done');
-  const resetBtn = document.getElementById('reset-demo');
+  const textProgress = document.getElementById('sync-progress-text');
+  const iaGear  = document.getElementById('ia-gear');
+  const doneEl  = document.getElementById('sync-done');
+  const resetBtn= document.getElementById('reset-demo');
   const gPulsar = document.getElementById('sync-pulsar');
-
 
   if(!btn || !bar || !gProg || !gCheck) return; // pas sur la page
 
-  // Refléter l'état persistant au chargement
+  // État persistant au chargement
   const persisted = getStore();
   if ((persisted.synced || 0) > 0) {
     gCheck.style.display = 'block';
@@ -440,27 +428,22 @@ function setupSyncAnimation(){
     setProgress(0);
     if (textProgress) textProgress.textContent = '';
     if (doneEl) { doneEl.classList.add('hidden'); doneEl.innerHTML = ''; }
-    
-    // >> PULSAR ON <<
-    if (gPulsar){
-      gPulsar.style.display = '';
-      gPulsar.classList.add('animate');
-    }
+    if (iaGear) iaGear.classList.add('hidden');
+
+    // PULSAR ON
+    if (gPulsar){ gPulsar.style.display = ''; gPulsar.classList.add('animate'); }
   }
   function endSyncUI(){
     gProg.style.display  = 'none';
     gCheck.style.display = 'block';
     if (status) status.textContent = "Synchronisation terminée";
+
+    // PULSAR OFF
+    if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display = 'none'; }
+
     const last = document.querySelector('[data-sync-last]') ||
                  document.getElementById('sync-last') ||
                  document.querySelector('.sync-row .sync-label + .sync-val');
-
-    // >> PULSAR OFF <<
-    if (gPulsar){
-      gPulsar.classList.remove('animate');
-      gPulsar.style.display = 'none';
-    }
-    
     if(last){
       const d = new Date();
       last.textContent = `aujourd’hui ${d.toLocaleString('fr-FR', { hour:'2-digit', minute:'2-digit' })}`;
@@ -512,6 +495,27 @@ function setupSyncAnimation(){
     saveStore(st);
   }
 
+  // Injecte le markup des 3 engrenages si absent (sécurité)
+  function ensureGearMarkup(){
+    if (!iaGear) return;
+    if (iaGear.children.length) return;
+    iaGear.innerHTML = `
+      <svg class="gear g-lg" width="34" height="34" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <svg class="gear g-md" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 9.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"/>
+        <path d="M12 3v1.6M12 18.4V20M5.76 5.76l1.13 1.13M17.1 17.1l1.13 1.13M3 12h1.6M18.4 12H20M5.76 18.24l1.13-1.13M17.1 6.9l1.13-1.13" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <svg class="gear g-sm" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 10.2a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z"/>
+        <path d="M12 4v1M12 19v1M6.5 6.5l.8.8M16.7 16.7l.8.8M4 12h1M19 12h1M6.5 17.5l.8-.8M16.7 7.3l.8-.8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <span class="muted">Analyse IA en cours…</span>
+    `;
+  }
+
   async function startSync(){
     startSyncUI();
     try {
@@ -526,17 +530,19 @@ function setupSyncAnimation(){
         return;
       }
 
-      const payload = await loadWeek(idx);  // ← essaie fichiers, puis fallback inline
+      const payload = await loadWeek(idx);  // essaie fichiers, puis fallback inline
       await runDemoUpload(payload);
       mergePayloadIntoStore(payload);
 
       await animTo(100, 400);
       endSyncUI();
 
-      if (gearArea) gearArea.classList.remove("hidden");
+      // Animation IA visible 2s
+      ensureGearMarkup();
+      if (iaGear) iaGear.classList.remove("hidden");
       if (status) status.textContent = "Analyse IA en cours…";
-      await new Promise(r=>setTimeout(r, 1000));
-      if (gearArea) gearArea.classList.add("hidden");
+      await new Promise(r=>setTimeout(r, 2000));
+      if (iaGear) iaGear.classList.add("hidden");
       if (doneEl) {
         doneEl.classList.remove("hidden");
         doneEl.innerHTML = `✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`;
@@ -545,26 +551,19 @@ function setupSyncAnimation(){
       console.error(e);
       if (status) status.textContent = "Erreur de synchronisation.";
       if (textProgress) textProgress.textContent = "La démo a un fallback intégré, recharge la page si le problème persiste.";
+      // Éteindre le pulsar en cas d'erreur
+      if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display = 'none'; }
+      btn.disabled = false;
     }
   }
 
-  // état initial : check visible, progress caché
+  // état initial : check visible, progress caché, pulsar off
   gCheck.style.display = 'block';
   gProg.style.display  = 'none';
   setProgress(0);
+  if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display = 'none'; }
 
   btn.addEventListener('click', startSync);
-}
-
-// état initial : check visible, progress caché
-gCheck.style.display = 'block';
-gProg.style.display  = 'none';
-setProgress(0);
-
-// >> PULSAR INIT <<
-if (gPulsar){
-  gPulsar.classList.remove('animate');
-  gPulsar.style.display = 'none';
 }
 
 // =======================

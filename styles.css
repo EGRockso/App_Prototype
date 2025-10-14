@@ -343,20 +343,11 @@ body{ background: #0b0e12; }
 .sync-ico{ color: var(--muted); display:grid; place-items:center; }
 .sync-label{ color: var(--muted); font-size:14px; }
 .sync-val{ font-weight:800; color: var(--text); }
-.sync-actions{ display:flex; justify-content:flex-start; margin-top:10px; }
+.sync-actions{ display:flex; justify-content:flex-start; margin-top:10px; gap:8px; }
 .sync-actions .btn[disabled]{ filter:saturate(.85) opacity(.7); cursor:not-allowed; }
 
-/* Ondes dans l’écran (ancienne animation) */
-@keyframes wave-pop {
-  0% { opacity:0; transform:scale(0.9) }
-  10%{ opacity:1; transform:scale(1) }
-  60%{ opacity:1 }
-  100%{ opacity:0; transform:scale(1.05) }
-}
-#sync-waves .wave { opacity: 0; }
-#sync-waves .w1 { animation: wave-pop 1.2s linear infinite; animation-delay: 0s; }
-#sync-waves .w2 { animation: wave-pop 1.2s linear infinite; animation-delay: .25s; }
-#sync-waves .w3 { animation: wave-pop 1.2s linear infinite; animation-delay: .5s; }
+/* Zone sortie sous les boutons (progress text, engrenages, message fin) */
+.sync-output .muted { font-size: 13px; }
 
 /* Pulsar centré (point + 3 ondes concentriques) — déclenché quand JS ajoute .animate */
 #sync-pulsar .p-dot, #sync-pulsar .p-ring{ opacity:0; }
@@ -439,23 +430,18 @@ body{ background: #0b0e12; }
 .journal-btn,
 .journal-btn:link,
 .journal-btn:visited{
-  display: block;            /* ← was inline-block */
-  text-align: center;        /* ← centers the text */
+  display: block;
+  text-align: center;
   margin-top: 10px;
   padding: 0;
   background: transparent;
   border: 0;
   box-shadow: none;
-  color: var(--text) !important;   /* vert Rockso */
+  color: var(--text) !important;
   font-weight: 800;
   text-decoration: none !important;
 }
-
-.journal-btn:hover{
-  text-decoration: underline;  /* petit feedback au survol */
-  opacity: .95;
-}
-
+.journal-btn:hover{ text-decoration: underline; opacity: .95; }
 .journal-btn:focus-visible{
   outline: 2px solid rgba(63,140,106,.35);
   outline-offset: 2px;
@@ -482,12 +468,14 @@ body{ background: #0b0e12; }
 .card-title{ font-weight:700; margin-bottom:8px; }
 .card-body{ line-height:1.5; }
 
-/* Engrenage "Analyse IA" (id=gear-area) */
-#gear-area { width: 48px; height: 48px; margin: 12px auto; position: relative; }
-#gear-area::before, #gear-area::after {
-  content: ""; position: absolute; inset: 0; border-radius: 50%;
-  border: 4px solid #999; border-top-color: transparent; border-right-color: transparent;
-  animation: rockso-spin 0.9s linear infinite;
-}
-#gear-area::after { inset: 8px; animation-duration: 1.4s; opacity: 0.6; }
-@keyframes rockso-spin { to { transform: rotate(360deg); } }
+/* --- Nouvelle animation "3 engrenages" pour #ia-gear --- */
+.gears { display:flex; align-items:center; gap:8px; color: var(--brand); padding:8px 0; }
+.gear  { display:block; opacity:.95; }
+.g-lg  { animation: spin-cw 2.2s linear infinite; }
+.g-md  { animation: spin-ccw 1.8s linear infinite; margin-left:-6px; }
+.g-sm  { animation: spin-cw 1.6s linear infinite;  margin-left:-6px; }
+@keyframes spin-cw  { from{ transform: rotate(0turn) } to{ transform: rotate(1turn) } }
+@keyframes spin-ccw { from{ transform: rotate(0turn) } to{ transform: rotate(-1turn) } }
+
+/* Légère réduction de taille du texte de progression (sous boutons) */
+.sync-output .muted { font-size: 13px; }
