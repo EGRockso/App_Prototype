@@ -396,6 +396,8 @@ function setupSyncAnimation(){
   const gearArea = document.getElementById('gear-area');
   const doneEl   = document.getElementById('sync-done');
   const resetBtn = document.getElementById('reset-demo');
+  const gPulsar = document.getElementById('sync-pulsar');
+
 
   if(!btn || !bar || !gProg || !gCheck) return; // pas sur la page
 
@@ -438,6 +440,12 @@ function setupSyncAnimation(){
     setProgress(0);
     if (textProgress) textProgress.textContent = '';
     if (doneEl) { doneEl.classList.add('hidden'); doneEl.innerHTML = ''; }
+    
+    // >> PULSAR ON <<
+    if (gPulsar){
+      gPulsar.style.display = '';
+      gPulsar.classList.add('animate');
+    }
   }
   function endSyncUI(){
     gProg.style.display  = 'none';
@@ -446,6 +454,13 @@ function setupSyncAnimation(){
     const last = document.querySelector('[data-sync-last]') ||
                  document.getElementById('sync-last') ||
                  document.querySelector('.sync-row .sync-label + .sync-val');
+
+    // >> PULSAR OFF <<
+    if (gPulsar){
+      gPulsar.classList.remove('animate');
+      gPulsar.style.display = 'none';
+    }
+    
     if(last){
       const d = new Date();
       last.textContent = `aujourd’hui ${d.toLocaleString('fr-FR', { hour:'2-digit', minute:'2-digit' })}`;
@@ -539,6 +554,17 @@ function setupSyncAnimation(){
   setProgress(0);
 
   btn.addEventListener('click', startSync);
+}
+
+// état initial : check visible, progress caché
+gCheck.style.display = 'block';
+gProg.style.display  = 'none';
+setProgress(0);
+
+// >> PULSAR INIT <<
+if (gPulsar){
+  gPulsar.classList.remove('animate');
+  gPulsar.style.display = 'none';
 }
 
 // =======================
