@@ -374,128 +374,181 @@ function hydrateHome(){
 // ----- ANALYSE "APPLE-LIKE" -------------------------------------------------
 
 function renderAnalysisPanelFromStore(){
-  const wrapper = document.getElementById("analysis-panel");
-  if (!wrapper) return;
+  const host = document.getElementById("analysis-panel");
+  if (!host) return;
 
   const st = getStore();
   const weeks = st.weeks || [];
   const cur = weeks[weeks.length - 1];
-  const prev = weeks[weeks.length - 2] || cur;
+  const prev = weeks[weeks.length - 2] || weeks[0];
 
-  if (!cur) {
-    wrapper.innerHTML = `<div class="card"><div class="card-body"><p>Pas d'analyse disponible.</p></div></div>`;
+  if (!cur){
+    host.innerHTML = `<div class="card"><div class="card-body"><p>Pas d'analyse disponible.</p></div></div>`;
     return;
   }
 
-  // --- agrégats utiles ---
-  const volCur = cur.summary?.total_km || 0;
-  const volPrev = prev.summary?.total_km || 0;
-  const durCurMin = cur.summary?.duration_min || 0;
-  const sesCur = cur.summary?.sessions || (cur.activities?.length || 0);
+  // === Données dérivées ===
+  const vol  = cur.summary?.total_km ?? 0;
+  const durM = cur.summary?.duration_min ?? 0;
+  const ses  = cur.summary?.sessions ?? 0;
+  const intensKm = cur.summary?.km_z5t ?? 0;
 
-  const intCur = (cur.summary?.km_z5t || 0) / Math.max(1, volCur);
-  const intPrev = (prev.summary?.km_z5t || 0) / Math.max(1, volPrev);
-  const volDelta = volPrev > 0 ? (volCur - volPrev) / volPrev : 0;
-  const intDelta = intCur - intPrev;
+  const volPrev = prev?.summary?.total_km ?? vol;
+  const zPrev   = prev?.summary?.km_z5t ?? 0;
 
-  const d7 = (cur.daily || []);
-  const d7prev = (prev.daily || []);
-  const avg = (arr, k) => !arr.length ? 0 : arr.reduce((a,x)=>a+(x[k]||0),0)/arr.length;
+  const evolVolPct = volPrev ? Math.round(((vol - volPrev)/volPrev)*100) : 0;
+  const partInt    = vol ? Math.round((intensKm/vol)*100) : 0;
+  const partIntPrev= volPrev ? Math.round((zPrev/volPrev)*100) : 0;
 
-  const sleepAvg = avg(d7, 'sleep_min');
-  const hrvAvg = avg(d7, 'hrv_ms');
-  const rhrAvg = avg(d7, 'rhr_bpm');
-  const sleepPrev = avg(d7prev, 'sleep_min');
-  const hrvPrev = avg(d7prev, 'hrv_ms');
-  const rhrPrev = avg(d7prev, 'rhr_bpm');
+  // Récap recup (moyennes 7j)
+  const days = cur.daily || [];
+  const avg = (k)=> Math.round((days.reduce((a,d)=>a+(+d[k]||0),0)/(days.length||1)) );
+  const avgSleep = avg('sleep_min');            // minutes
+  const avgHRV   = avg('hrv_ms');               // ms
+  const avgRHR   = avg('rhr_bpm');              // bpm
 
-  // statut récup simple
-  const recScore =
-    (Math.min(1, (sleepAvg/ (7*60))/0.5) * 0.35) +            // poids sommeil
-    (Math.min(1, (hrvAvg/80)) * 0.40) +                        // poids HRV
-    (Math.max(0, (80 - (rhrAvg||80)) / 40) * 0.25);            // poids FC repos
-  const recText = recScore > .70 ? "Optimale"
-               : recScore > .50 ? "Bonne"
-               : recScore > .35 ? "Moyenne"
-               : "Fragile";
-
-  // coaching contextuel (utilise notre “recherche” + état du modèle)
-  const highRisk = !!cur.ml?.predicted_label || (volDelta > .20) || (intDelta > .06) || (hrvAvg && hrvPrev && (hrvAvg - hrvPrev) < -4);
-  const tips = buildCoachTips({
-    highRisk,
-    volCur, volPrev, volDelta,
-    intCur, intPrev, intDelta,
-    sleepAvg, hrvAvg, rhrAvg,
-    sesCur
-  });
-
-  // --- slides (4) ---
-  const slides = [
-    {
-      key:'resume',
-      title:'Semaine en 5 chiffres',
-      accent:'🧭',
-      html: `
-        <div class="ac-metrics">
-          <div class="m"><span class="k">Distance</span><strong>${volCur.toFixed(1)} km</strong></div>
-          <div class="m"><span class="k">Durée</span><strong>${fmtMinutesToHM(durCurMin)}</strong></div>
-          <div class="m"><span class="k">Séances</span><strong>${sesCur}</strong></div>
-          <div class="m"><span class="k">Volume vs S-1</span><strong>${volPrev? (volDelta>0?'+':'')+Math.round(volDelta*100)+'%':'—'}</strong></div>
-          <div class="m"><span class="k">Intensité</span><strong>${Math.round(intCur*100)}%</strong></div>
-        </div>
-      `
-    },
-    {
-      key:'charge',
-      title:'Charge & Intensité',
-      accent: volDelta>0 ? '📈' : '📉',
-      html: `
-        <div class="ac-bars">
-          <div class="b">
-            <span class="k">Volume</span>
-            <div class="bar bar--z2"><div class="fill" style="width:${Math.min(100, 50 + volDelta*100)}%"></div></div>
-            <span class="delta ${volDelta>=0?'up':'down'}">${volPrev? (volDelta>0?'+':'')+Math.round(volDelta*100)+'%':'—'}</span>
-          </div>
-          <div class="b">
-            <span class="k">Part d’intensité</span>
-            <div class="bar bar--z4"><div class="fill" style="width:${Math.round(intCur*100)}%"></div></div>
-            <span class="delta ${intDelta>=0?'up':'down'}">${(intDelta>=0?'+':'')+Math.round(intDelta*100)} pts</span>
-          </div>
-        </div>
-        <div class="pill ${highRisk?'pill-red':'pill-green'}">
-          ${highRisk ? '⚠️ Risque accru — charge à lisser' : '✅ Charge maîtrisée — progression saine'}
-        </div>
-      `
-    },
-    {
-      key:'recup',
-      title:'Récupération',
-      accent:'💤',
-      html: `
-        <div class="ac-metrics three">
-          <div class="m"><span class="k">Sommeil (moy.)</span><strong>${fmtMinutesToHM(sleepAvg||0)}</strong><span class="s">${sleepPrev?trendTag(sleepAvg-sleepPrev,'min'):''}</span></div>
-          <div class="m"><span class="k">HRV (moy.)</span><strong>${Math.round(hrvAvg||0)} ms</strong><span class="s">${hrvPrev?trendTag(hrvAvg-hrvPrev,'ms'):''}</span></div>
-          <div class="m"><span class="k">FC repos</span><strong>${Math.round(rhrAvg||0)} bpm</strong><span class="s">${rhrPrev?trendTag(-(rhrAvg-rhrPrev),'bpm','↑ mieux'):''}</span></div>
-        </div>
-        <div class="pill ${recText==='Optimale' || recText==='Bonne' ? 'pill-green' : 'pill-amber'}">${recText}</div>
-      `
-    },
-    {
-      key:'coach',
-      title:'Conseil pour la semaine à venir',
-      accent:'🎯',
-      html: tips
+  // Texte conseil (déjà cohérent avec S0/S1/S2 côté données)
+  const risk = cur.ml?.predicted_label ? "high" : "low";
+  const advice = (()=>{
+    if (risk === "high"){
+      return {
+        title: "Alléger pour consolider",
+        items: [
+          {k:"Volume", v:"–20 à –30% (1 sortie en moins)"},
+          {k:"Intensité", v:"2×(6–8)×200–300m, récup longue"},
+          {k:"Remplacement", v:"1 sortie → vélo 60–75’ Z2"},
+          {k:"Plan séance — détails",
+            v:"Mercredi «15×400m SL2» → «10×400m», +5’ jog retour au calme", cls:"clamp-3"}
+        ]
+      };
     }
-  ];
+    // faible risque → progression douce
+    return {
+      title: "Poursuis — progression saine",
+      items: [
+        {k:"Volume", v:`${evolVolPct > 0 ? "+6%" : "+4–6%"} max (cible ~${(vol*1.06).toFixed(1)} km)`},
+        {k:"Intensité", v:"Stable (1 pic qualitatif)"},
+        {k:"Remplacement", v:"1 sortie → vélo 60–75’ Z2"},
+        {k:"Plan séance — détails",
+          v:"Mercredi, garde l’allure mais raccourcis l’échauffement si fatigue perçue.", cls:"clamp-3"}
+      ]
+    };
+  })();
 
-  wrapper.innerHTML = `
-    <section class="analysis-carousel" aria-label="Analyse de la semaine">
-      <div class="ac-track" role="group"></div>
-      <div class="ac-dots" role="tablist"></div>
-    </section>
+  // === Markup ===
+  host.innerHTML = `
+    <div class="story-stage is-autoplay" id="storyStage" aria-roledescription="carousel" aria-label="Analyse de la semaine">
+      <!-- Carte 1 : 5 chiffres -->
+      <section class="story-card" aria-label="Semaine en 5 chiffres">
+        <div class="story-title">Semaine en 5 chiffres</div>
+        <div class="story-grid">
+          <div class="story-chip"><span class="lbl">Distance</span><span class="val">${vol.toFixed(1)} km</span></div>
+          <div class="story-chip"><span class="lbl">Durée</span><span class="val">${fmtMinutesToHM(durM)}</span></div>
+          <div class="story-chip"><span class="lbl">Séances</span><span class="val">${ses}</span></div>
+          <div class="story-chip"><span class="lbl">Volume vs S-1</span><span class="val">${evolVolPct>0?`+${evolVolPct}`:evolVolPct}%</span></div>
+          <div class="story-chip"><span class="lbl">Intensité</span><span class="val">${partInt}%</span></div>
+        </div>
+        <div class="story-dots" aria-hidden="true">
+          <div class="story-dot active"></div><div class="story-dot"></div><div class="story-dot"></div><div class="story-dot"></div>
+        </div>
+      </section>
+
+      <!-- Carte 2 : Charge & Intensité -->
+      <section class="story-card" aria-label="Charge et intensité">
+        <div class="story-title">Charge & Intensité</div>
+        <div>
+          <div class="story-bars">
+            <div class="row" style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)">
+              <span>Volume</span><span>${evolVolPct>0?`+${evolVolPct}`:evolVolPct}%</span>
+            </div>
+            <div class="story-bar vol"><div class="fill" style="transform:scaleX(${Math.min(1, (100+evolVolPct)/100)});"></div></div>
+
+            <div class="row" style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)">
+              <span>Part d’intensité</span><span>${partIntPrev}→${partInt}%</span>
+            </div>
+            <div class="story-bar int"><div class="fill" style="transform:scaleX(${Math.min(1, partInt/100)});"></div></div>
+          </div>
+          <div class="story-bubble" style="margin-top:14px">✅ Charge maîtrisée — progression saine</div>
+        </div>
+        <div class="story-dots" aria-hidden="true">
+          <div class="story-dot"></div><div class="story-dot active"></div><div class="story-dot"></div><div class="story-dot"></div>
+        </div>
+      </section>
+
+      <!-- Carte 3 : Récupération -->
+      <section class="story-card" aria-label="Récupération">
+        <div class="story-title">Récupération</div>
+        <div class="story-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="story-chip"><span class="lbl">Sommeil (moy.)</span><span class="val">${fmtMinutesToHM(avgSleep)}</span></div>
+          <div class="story-chip"><span class="lbl">HRV (moy.)</span><span class="val">${avgHRV} ms</span></div>
+          <div class="story-chip"><span class="lbl">FC repos (moy.)</span><span class="val">${avgRHR} bpm</span></div>
+        </div>
+        <div class="story-bubble" style="background:rgba(0,179,122,.10); border-color: rgba(0,179,122,.25);">🟢 Optimale</div>
+        <div class="story-dots" aria-hidden="true">
+          <div class="story-dot"></div><div class="story-dot"></div><div class="story-dot active"></div><div class="story-dot"></div>
+        </div>
+      </section>
+
+      <!-- Carte 4 : Conseil -->
+      <section class="story-card" aria-label="Conseil pour la semaine à venir">
+        <div class="story-title">Conseil pour la semaine à venir</div>
+        <div class="story-grid" style="grid-template-columns: repeat(4, 1fr);">
+          ${advice.items.map(x=>`
+            <div class="story-chip">
+              <span class="lbl">${x.k}</span>
+              <span class="val ${x.cls||'clamp-2'}">${x.v}</span>
+            </div>`).join('')}
+        </div>
+        <div class="story-dots" aria-hidden="true">
+          <div class="story-dot"></div><div class="story-dot"></div><div class="story-dot"></div><div class="story-dot active"></div>
+        </div>
+      </section>
+    </div>
   `;
 
-  mountAnalysisCarousel(wrapper.querySelector('.analysis-carousel'), slides, { autoMs: 8000 });
+  // === Autoplay + pause au toucher/drag ===
+  const stage = document.getElementById('storyStage');
+  const dots  = [...stage.querySelectorAll('.story-dots')];
+  let index = 0, timerId = null, autoplaySec = 10;
+
+  stage.style.setProperty('--autoplay-sec', `${autoplaySec}s`);
+
+  const slides = [...stage.querySelectorAll('.story-card')];
+  function go(i){
+    index = (i + slides.length) % slides.length;
+    const target = slides[index];
+    target.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+    // maj des dots actifs
+    dots.forEach((g,gi)=>{
+      g.querySelectorAll('.story-dot').forEach((d,di)=>{
+        d.classList.toggle('active', di === index);
+      });
+    });
+  }
+  function play(){
+    stage.classList.add('is-autoplay');
+    stop();
+    timerId = setInterval(()=> go(index+1), autoplaySec*1000);
+  }
+  function stop(){
+    stage.classList.remove('is-autoplay');
+    if (timerId) clearInterval(timerId), timerId=null;
+  }
+
+  // interactions : pause quand l’utilisateur touche/drag, reprise après 2s
+  let resumeTO=null;
+  const pause = ()=>{ stop(); stage.classList.add('is-paused'); if(resumeTO) clearTimeout(resumeTO); };
+  const resume= ()=>{ stage.classList.remove('is-paused'); if(resumeTO) clearTimeout(resumeTO); resumeTO=setTimeout(play, 2000); };
+
+  stage.addEventListener('pointerdown', pause, {passive:true});
+  stage.addEventListener('pointerup',   resume, {passive:true});
+  stage.addEventListener('pointercancel',resume,{passive:true});
+  stage.addEventListener('mouseenter',  pause);
+  stage.addEventListener('mouseleave',  resume);
+  document.addEventListener('visibilitychange', ()=> document.hidden ? stop() : play());
+
+  // Mise en route
+  play();
 }
 
 function trendTag(delta, unit, upIsGoodTxt='↑ mieux'){

@@ -664,3 +664,128 @@ body{ background: #0b0e12; }
 
 /* Petite ligne d’info (sommeil/HRV) */
 .micro-hint{ margin-top:6px; font-size:12px; color:var(--muted); }
+
+/* ================== ROCKSO — ANALYSE (carousel Apple-like) ================== */
+:root{
+  --story-peek: 14px;          /* “morceaux” visibles à droite/gauche */
+  --story-h: 260px;            /* hauteur uniforme des cartes */
+  --story-pad: 14px;           /* padding interne des cartes */
+}
+
+/* Stage = conteneur scrollable */
+.story-stage{
+  position: relative;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: var(--story-peek);
+  scroll-padding-right: var(--story-peek);
+  padding: 0 var(--story-peek);
+  display: flex;
+  gap: 12px;
+  -webkit-overflow-scrolling: touch;
+  mask-image: linear-gradient(to right,
+      transparent 0, black 16px,
+      black calc(100% - 16px), transparent 100%); /* bords doux façon Apple */
+}
+
+/* Chaque slide occupe la largeur utile – les “peek” restent visibles */
+.story-card{
+  flex: 0 0 calc(100% - var(--story-peek)*2);
+  min-height: var(--story-h);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(0,0,0,.06);
+  padding: var(--story-pad);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* titre en haut, contenu centre, footer en bas */
+}
+
+/* Titre de carte */
+.story-title{
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: 13px;
+  color: var(--text);
+  opacity: .9;
+  margin: 2px 0 8px;
+}
+
+/* Ligne de chips (5 chiffres, etc.) – grille stable */
+.story-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.story-chip{
+  background: #fffdf8;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+.story-chip .lbl{ font-size: 12px; color: var(--muted); }
+.story-chip .val{ font-weight: 800; font-size: 18px; color:#1c3b2f; }
+
+/* Barre double (charge/intensité) */
+.story-bars{ display:grid; gap:8px; margin-top:4px; }
+.story-bar{ height:10px; border-radius:999px; background: var(--line); position:relative; overflow:hidden; }
+.story-bar .fill{ position:absolute; inset:0; transform-origin:left center; }
+.story-bar.vol .fill{ background: var(--brand); }
+.story-bar.int .fill{ background: var(--rockso-orange); }
+
+/* Bulle (feedback visuel) */
+.story-bubble{
+  align-self: center;
+  background: rgba(0,179,122,.12);
+  border: 1px solid rgba(0,179,122,.28);
+  color: #1c3b2f;
+  border-radius: 999px;
+  padding: 14px 16px;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* Multiline clamp (warning-free) */
+.clamp-2,
+.clamp-3{
+  display: -webkit-box;          /* needed for WebKit clamp */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Put the standard prop first, then the vendor prop */
+.clamp-2{ line-clamp: 2; -webkit-line-clamp: 2; }
+.clamp-3{ line-clamp: 3; -webkit-line-clamp: 3; }
+
+/* Optional non-WebKit fallback (keeps layout tidy even without clamp) */
+@supports not (-webkit-line-clamp: 2){
+  .clamp-2{ display:block; line-height:1.3; max-height: calc(1.3em * 2); }
+  .clamp-3{ display:block; line-height:1.3; max-height: calc(1.3em * 3); }
+}
+
+/* Pagination “ovale qui se remplit” */
+.story-dots{
+  display:flex; justify-content:center; gap:10px; margin-top:10px;
+}
+.story-dot{
+  position:relative; width:26px; height:6px; border-radius:999px;
+  background: rgba(0,0,0,.08);
+  overflow:hidden;
+}
+.story-dot::after{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:0%;
+  background: #fff; border-radius:inherit;
+}
+/* Animation de remplissage (activée par JS) */
+.story-stage.is-autoplay .story-dot.active::after{
+  animation: dotfill var(--autoplay-sec,10s) linear forwards;
+}
+.story-stage.is-paused .story-dot.active::after{
+  animation-play-state: paused;
+}
+@keyframes dotfill{ from{ width:0% } to{ width:100% } }
