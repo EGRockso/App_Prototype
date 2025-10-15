@@ -507,45 +507,52 @@ function trendTag(delta, unit, upIsGoodTxt='↑ mieux'){
 }
 
 function buildCoachTips(ctx){
-  const {
-    highRisk, volCur, volPrev, volDelta, intCur, intPrev, intDelta,
-    sleepAvg, hrvAvg, rhrAvg, sesCur
-  } = ctx;
+  const { highRisk, volCur, intDelta, sesCur, sleepAvg, hrvAvg } = ctx;
 
-  const p = (x)=>Math.round(x*100);
-  const h = (min)=>`${Math.floor(min/60)}h${String(Math.round(min%60)).padStart(2,'0')}`;
+  // Cible de volume compacte (réduc si risque, +light sinon)
+  const incSafe   = Math.min(.08, Math.max(0, .06 - Math.max(0,intDelta)));
+  const targetVol = highRisk ? volCur * 0.75 : volCur * (1 + incSafe);
 
-  if (highRisk){
-    const targetVol = Math.max(0, volCur * 0.75);
-    const cut = Math.max(1, Math.round((sesCur||4)*0.25));
-    return `
-      <ul class="coach">
-        <li><strong>Réduis le volume ≈ ${p(.20)}–${p(.30)}%</strong> → vise ~<strong>${targetVol.toFixed(1)} km</strong> cette semaine.</li>
-        <li><strong>Intensité technique courte</strong> : remplace les blocs longs par <em>8×200m</em> léger (récup 200m), reste sous le seuil.</li>
-        <li><strong>Allège ${cut} séance${cut>1?'s':''}</strong> : remplace la sortie la plus longue par <em>60–75′ vélo Z2</em>.</li>
-        <li><strong>Sommeil</strong> : cible <em>${h(7*60+30)}</em> / nuit, HRV à surveiller (actuel ~${Math.round(hrvAvg||0)} ms).</li>
-      </ul>
-      <div class="tip-card">
-        <div class="t">Mercredi (ex&nbsp;: 15×400m SL2)</div>
-        <div class="b"><span>⚠︎</span> Passe à <strong>10×400m</strong>, récup. identique. Ajoute <strong>+5′ jog easy</strong> au retour au calme.</div>
-      </div>
-    `;
-  }
+  const volLabel  = highRisk
+    ? `Réduis ${Math.round((1 - targetVol/volCur)*100)}%`
+    : `+${Math.round((targetVol/volCur - 1)*100)}% max`;
 
-  // faible risque / progression contrôlée
-  const gentleInc = Math.min(.08, Math.max(0, .06 - Math.max(0,intDelta))); // +5–8% si intensité stable ou ↓
-  const target = volCur * (1 + gentleInc);
+  const intensiteLabel = highRisk ? 'Courte < seuil' : 'Stable (1 pic)';
+  const replaceLabel   = '1 sortie → vélo';
+
+  const detailTitle = highRisk ? 'Mercredi (15×400m SL2)' : 'Mercredi (SL2)';
+  const detailBody  = highRisk
+    ? 'Passe à 10×400m, récup identique. Ajoute +5′ jog easy au retour au calme.'
+    : 'Garde 12×400m. Si jambes lourdes : 10×400m et +1 km d’échauffement.';
+
   return `
-    <ul class="coach">
-      <li><strong>Garde l’intensité stable</strong> (${p(intCur)}% de la semaine) et vise <strong>+${p(gentleInc)}%</strong> de volume → ~<strong>${target.toFixed(1)} km</strong>.</li>
-      <li><strong>Un seul gros stimulus</strong> : conserve une séance qualité, le reste en Z1–Z2.</li>
-      <li><strong>Varie le support</strong> : remplace une footing par <em>60′ vélo Z2</em> pour charger sans impacter la mécanique.</li>
-      <li><strong>Récup active</strong> : 10′ de mobilité le soir si sommeil &lt; ${fmtMinutesToHM(7*60+10)} (actuel ~${fmtMinutesToHM(sleepAvg||0)}).</li>
-    </ul>
-    <div class="tip-card ok">
-      <div class="t">Mercredi (ex&nbsp;: SL2)</div>
-      <div class="b"><span>✓</span> Conserve le format (ex&nbsp;: 12×400m). Si jambes lourdes, fais <strong>10×400m</strong> et +1&nbsp;km d’échauffement.</div>
+    <div class="coach-tiles">
+      <div class="tile">
+        <div class="t">Volume</div>
+        <div class="v">${volLabel}</div>
+        <p class="hint">cible ~${targetVol.toFixed(1)} km</p>
+      </div>
+      <div class="tile">
+        <div class="t">Intensité</div>
+        <div class="v">${intensiteLabel}</div>
+        <p class="hint">${highRisk ? '8×200m léger' : 'Qualité unique'}</p>
+      </div>
+      <div class="tile">
+        <div class="t">Remplacement</div>
+        <div class="v">${replaceLabel}</div>
+        <p class="hint">60–75′ Z2</p>
+      </div>
     </div>
+
+    <details class="coach-details">
+      <summary>Plan séance — détails</summary>
+      <div class="tip-card ${highRisk ? '' : 'ok'}">
+        <div class="t">${detailTitle}</div>
+        <div class="b"><span>${highRisk ? '⚠︎' : '✓'}</span> ${detailBody}</div>
+      </div>
+    </details>
+
+    <div class="micro-hint">Sommeil ~${fmtMinutesToHM(sleepAvg||0)} · HRV ~${Math.round(hrvAvg||0)} ms</div>
   `;
 }
 

@@ -630,3 +630,37 @@ body{ background: #0b0e12; }
 
 /* légère impression de drag */
 .analysis-carousel .ac-track{ transform: translateX(calc(var(--i,0) * -100%)) translateX(calc(var(--drag, 0px) * -1)); }
+
+/* === Coach card compact ================================================ */
+.coach-tiles{
+  display:grid; grid-template-columns: repeat(3,1fr); gap:8px;
+}
+.tile{
+  background:#FFFDF8; border:1px solid var(--line);
+  border-radius:12px; padding:8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.05);
+}
+.tile .t{ font-size:11px; color:var(--muted); }
+.tile .v{ font-weight:800; margin-top:2px; color:#1c3b2f; }
+.tile .hint{ margin:2px 0 0; font-size:12px; color:var(--muted); }
+
+/* Détails repliés (évite le gros pavé) */
+.coach-details{ margin-top:6px; }
+.coach-details summary{
+  cursor:pointer; list-style:none; padding:6px 0;
+  font-weight:700; font-size:13px; color:#1c3b2f;
+}
+.coach-details summary::-webkit-details-marker{ display:none; }
+
+/* Clamp du texte pour garantir une hauteur homogène */
+/* Clamp du texte pour garantir une hauteur homogène */
+.tip-card .b{
+  display: -webkit-box;          /* legacy WebKit */
+  -webkit-box-orient: vertical;  /* legacy WebKit */
+  -webkit-line-clamp: 3;         /* legacy WebKit */
+  line-clamp: 3;                 /* propriété standard */
+  overflow: hidden;
+}
+
+/* Petite ligne d’info (sommeil/HRV) */
+.micro-hint{ margin-top:6px; font-size:12px; color:var(--muted); }
