@@ -479,3 +479,51 @@ body{ background: #0b0e12; }
 
 /* Légère réduction de taille du texte de progression (sous boutons) */
 .sync-output .muted { font-size: 13px; }
+
+/* ===== Analyse de la semaine (Apple-like) ===== */
+.anx{ padding:14px 12px }
+.anx-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px }
+.anx-head .left{ display:flex; align-items:center; gap:8px; min-width:0 }
+.anx-date{ font-size:12px }
+
+.anx .pill{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px;
+  border:1px solid var(--line); background:#FFFDF8; color:#1c3b2f;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+.pill--green{ background:#E7F8EE; color:#0F8A3B; border-color:rgba(15,138,59,.25) }
+.pill--red{   background:#FDE8E8; color:#C62828; border-color:rgba(198,40,40,.25) }
+
+.anx-proba{ font-size:12px; color:var(--muted) }
+
+.anx-kpis{
+  display:grid; grid-template-columns: repeat(3,1fr);
+  gap:8px; margin:8px 0;
+}
+.anx-kpi{
+  background:#FFFDF8; border:1px solid var(--line);
+  border-radius:12px; padding:8px 10px; box-shadow:0 4px 12px rgba(0,0,0,.04);
+}
+.anx-kpi .lbl{ font-size:11px; color:var(--muted) }
+.anx-kpi .val{ margin-top:2px; font-size:15px; font-weight:800; color:#1c3b2f }
+.anx-kpi .sub{ margin-left:6px; font-weight:700; font-size:12px; color:var(--muted) }
+.anx-kpi .sub.pos{ color:#0F8A3B }
+.anx-kpi .sub.neg{ color:#C65353 }
+
+.anx-sep{
+  border:0; height:1px; background:linear-gradient(90deg, transparent, rgba(0,0,0,.06), transparent);
+  margin:10px 0 8px;
+}
+
+/* Mise en forme du texte d’analyse (celui que tu écris dans analysis_text) */
+.anx-body{ line-height:1.55 }
+.anx-body strong{ font-weight:800 }
+.anx-body ul{ margin:6px 0 8px; padding:0; list-style:none }
+.anx-body li{ position:relative; padding-left:14px; margin:6px 0 }
+.anx-body li::before{
+  content:""; position:absolute; left:0; top:.7em;
+  width:6px; height:6px; border-radius:50%;
+  background: var(--brand); box-shadow:0 0 0 4px rgba(63,140,106,.14);
+}
+.anx-body small.muted{ display:block; margin-top:6px }

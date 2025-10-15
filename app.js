@@ -297,28 +297,80 @@ function hydrateHome(){
 function renderAnalysisPanelFromStore(){
   const panel = document.getElementById("analysis-panel");
   if (!panel) return;
+
   const st = getStore();
-  const lastW = (st.weeks||[])[(st.weeks||[]).length-1];
-  if (!lastW){
+  const weeks = st.weeks || [];
+  if (!weeks.length){
     panel.innerHTML = `<div class="card"><div class="card-body"><p>Pas d'analyse disponible.</p></div></div>`;
     return;
   }
-  const badge = lastW.ml?.predicted_label
-    ? `<span class="badge badge-red">Risque de blessure</span>`
-    : `<span class="badge badge-green">Risque faible</span>`;
+
+  const W = weeks[weeks.length-1];
+  const Prev = weeks[weeks.length-2];
+
+  // Petits helpers locaux
+  const minutesToHM = (min)=> {
+    const h = Math.floor((min||0)/60), m = Math.round((min||0)%60);
+    return `${h}h ${String(m).padStart(2,'0')}`;
+  };
+  const fmtShort = (d)=> new Date(d).toLocaleDateString('fr-FR',{ day:'2-digit', month:'short'}).replace('.', '');
+  const fmtRange = (a,b)=> (a && b) ? `du ${fmtShort(a)} au ${fmtShort(b)}` : '';
+
+  // KPI
+  const totalKm   = Number(W.summary?.total_km || 0);
+  const durMin    = Number(W.summary?.duration_min || (W.activities||[]).reduce((acc,x)=>acc+(x.duration_min||0),0));
+  const kmZ5      = Number(W.summary?.km_z5t || 0);
+  const intPct    = totalKm ? Math.round((kmZ5/totalKm)*100) : 0;
+
+  // Progression (spike déclaré, sinon calcul vs semaine précédente)
+  const prevKm    = Number(Prev?.summary?.total_km || 0);
+  const spike     = W.summary?.load_spike_rel_w1_w2 || (prevKm ? (totalKm/prevKm) : 1);
+  const evolVol   = prevKm ? Math.round(((totalKm - prevKm)/prevKm)*100) : 0;
+
+  // Risque
+  const prob      = W.ml?.predicted_probability != null ? Math.round(W.ml.predicted_probability*100) : null;
+  const isRisk    = !!W.ml?.predicted_label;
+  const pillCls   = isRisk ? 'pill--red' : 'pill--green';
+  const pillTxt   = isRisk ? 'Risque de blessure' : 'Risque faible';
+
+  const dateLabel = fmtRange(W.start_iso, W.end_iso);
+
   panel.innerHTML = `
-    <div class="card">
-      <div class="card-title">Analyse de la semaine</div>
-      <div class="card-body">
-        <p>${badge} — proba=${Math.round((lastW.ml?.predicted_probability||0)*100)}%</p>
-        <p><strong>Total:</strong> ${lastW.summary?.total_km ?? '—'} km &nbsp;|&nbsp; 
-           <strong>Intensité Z5/T1/T2:</strong> ${lastW.summary?.km_z5t ?? '—'} km &nbsp;|&nbsp;
-           <strong>Progression:</strong> x${lastW.summary?.load_spike_rel_w1_w2 ?? '—'}</p>
-        <p>${lastW.analysis_text || ''}</p>
-        <p class="muted">Modèle: ${lastW.ml?.model || "global_sgd_tuned.joblib (simulé)"} </p>
+    <div class="card anx">
+      <div class="anx-head">
+        <div class="left">
+          <span class="pill ${pillCls}">${pillTxt}</span>
+          ${prob != null ? `<span class="anx-proba">(${prob}% proba)</span>` : ``}
+        </div>
+        ${dateLabel ? `<span class="anx-date muted">${dateLabel}</span>` : ``}
       </div>
-    </div>`;
+
+      <div class="anx-kpis">
+        <div class="anx-kpi">
+          <div class="lbl">Volume</div>
+          <div class="val"><strong>${totalKm.toFixed(1)} km</strong><span class="sub">• ${minutesToHM(durMin)}</span></div>
+        </div>
+        <div class="anx-kpi">
+          <div class="lbl">Intensité</div>
+          <div class="val"><strong>${kmZ5.toFixed(1)} km</strong><span class="sub">• ${intPct}%</span></div>
+        </div>
+        <div class="anx-kpi">
+          <div class="lbl">Progression</div>
+          <div class="val">
+            <strong>x${Number(spike).toFixed(2)}</strong>
+            ${prevKm ? `<span class="sub ${evolVol>=0?'pos':'neg'}">${evolVol>0?'+':''}${evolVol}% vs S-1</span>` : ``}
+          </div>
+        </div>
+      </div>
+
+      <hr class="anx-sep"/>
+      <div class="anx-body">
+        ${W.analysis_text || ''}
+      </div>
+    </div>
+  `;
 }
+
 
 function hydrateActivities(){
   const list = $('#activity-list');
