@@ -856,3 +856,42 @@ body{ background: #0b0e12; }
 #coach-sheet .coach-actions{ display:flex; gap:8px; padding:10px 14px 14px; border-top:1px solid var(--line); }
 #coach-sheet .coach-title{ font-weight:800; }
 #coach-sheet .coach-body{ line-height:1.5; }
+
+/* Chips sur une seule ligne, texte court et ellipsis */
+.ap-reason-row{
+  display:flex; gap:6px; margin-bottom:8px; flex-wrap:nowrap;
+}
+.ap-reason-row .chip{
+  flex:1 1 0; min-width:0; justify-content:center;
+  font-size:12.5px; padding:6px 8px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+/* Sparkline un peu plus lisible */
+.ap-sparkwrap{ display:flex; align-items:center; justify-content:space-between; }
+.ap-spark{ display:block; height:56px; }
+.ap-spark text{ font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+
+/* Slots “Conseil S+1” : plus compacts + clamp 2 lignes */
+.ap-plan-slots{ display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:8px; }
+.ap-slot{ padding:8px 8px; font-size:14px; line-height:1.1; }
+.ap-slot span{
+  display:block; margin-top:2px; font-weight:600;
+  display:-webkit-box; -webkit-box-orient:vertical;
+  -webkit-line-clamp:2; line-clamp:2; overflow:hidden;
+  font-size:13px; line-height:1.2;
+}
+/* Sous 380px: 2 colonnes (évite tout dépassement) */
+@media (max-width: 380px){
+  .ap-plan-slots{ grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+
+/* KPI chiffres : jamais sur 2 lignes */
+.kpi-num{ white-space:nowrap; font-variant-numeric: tabular-nums; font-size:18px; line-height:1; }
+
+/* Bottom-sheet largeur = largeur de l'app (centrée) */
+#coach-sheet .coach-panel{
+  width: min(100vw, var(--coach-w, 430px));
+  left: 50%; transform: translateX(-50%);
+  border-top-left-radius: 20px; border-top-right-radius: 20px;
+}

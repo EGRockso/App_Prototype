@@ -371,6 +371,8 @@ function hydrateHome(){
   `;
 } */
 
+const SHOW_SPARK = true; // passe à false pour masquer la sparkline
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  ANALYSE — GLANCE → REASON → PLAN
 //  • Home: 2-slide carousel (GLANCE first) + bottom-sheet CTA
@@ -432,8 +434,8 @@ function renderAnalysisPanelFromStore(){
 
   // PLAN slots (generated from tone)
   let plan = {
-    vol: tone==='risk' ? 'Alléger −20 à −30 %' : 'Stabiliser (≤ +6 %)',
-    int: tone==='risk' ? 'Limiter à 1 séance courte' : '1 séance qualité (SL2/intervalle)',
+    vol: tone==='risk' ? '−20 à −30 %' : 'Stabiliser (≤ +6 %)',
+    int: tone==='risk' ? '1 séance courte' : '1 séance qualité',
     sub: "1 sortie → vélo 60–75’ Z2"
   };
 
@@ -471,21 +473,23 @@ function renderAnalysisPanelFromStore(){
     </div>
   `;
 
-  // build REASON (chips + sparkline)
-  const spark = buildMiniSparkline((st.weeks||[]).slice(-6).map(w => Number(w.summary?.total_km||0)), km);
-  const reason = `
-    <div class="ap-card ap-reason">
-      <div class="ap-reason-row">
-        <span class="chip chip-soft">😴 Sommeil ~${hm(slpMin)} <span class="muted">/ nuit</span></span>
-        <span class="chip chip-soft">🫀 HRV ${Math.round(hrvMs)||'—'} ms</span>
-        <span class="chip chip-soft">🧭 RPE ${(rpe||0).toFixed(1)}</span>
+    // --- REASON (chips courts + sparkline optionnelle)
+    const sleepHM = hm(slpMin).replace(' ', '');       // "7h21"
+    const rpeTxt  = (rpe || 0).toFixed(1);
+    const reason = `
+      <div class="ap-card ap-reason">
+        <div class="ap-reason-row">
+          <span class="chip chip-soft" title="Sommeil moyen">😴 ~${sleepHM}</span>
+          <span class="chip chip-soft" title="Variabilité cardiaque">🫀 ${Math.round(hrvMs)||'—'} ms</span>
+          <span class="chip chip-soft" title="Effort perçu">🧭 RPE&nbsp;${rpeTxt}</span>
+        </div>
+        ${SHOW_SPARK ? `
+        <div class="ap-sparkwrap">
+          <div class="ap-spark-title muted">Volume (6 sem.)</div>
+          ${buildMiniSparkline((st.weeks||[]).slice(-6).map(w => Number(w.summary?.total_km||0)), km, prevKm)}
+        </div>` : ``}
       </div>
-      <div class="ap-sparkwrap">
-        <div class="ap-spark-title muted">Volume (6 sem.)</div>
-        ${spark}
-      </div>
-    </div>
-  `;
+    `;
 
   // build PLAN (3 slots + CTA)
   const planCard = `
@@ -525,18 +529,34 @@ function renderAnalysisPanelFromStore(){
   }
 }
 
-// ── tiny sparkline (inline SVG bars)
-function buildMiniSparkline(values, current){
-  const v = (values && values.length) ? values : [current];
+function synthesizeTrend(cur, prev){
+  const start = prev > 0 ? prev : cur * 0.9;
+  // 6 points du S-5 à S0, progression lissée vers la valeur courante
+  return Array.from({length:6}, (_,i)=> start + (cur - start) * (i/5));
+}
+
+function buildMiniSparkline(values, current, prev){
+  let v = (values||[]).filter(x=>x>0);
+  v = (v.length >= 6) ? v.slice(-6) : synthesizeTrend(current, prev);
+
   const max = Math.max(...v, 1);
-  const cols = v.map((x,i)=> {
-    const h = Math.max(6, Math.round((x/max)*40));
-    const y = 44 - h;
-    const active = (i === v.length-1) ? 'active' : '';
-    const xPos = 6 + i*12;
-    return `<rect class="bar ${active}" x="${xPos}" y="${y}" width="8" height="${h}" rx="3"></rect>`;
-  }).join('');
-  return `<svg class="ap-spark" viewBox="0 0 80 48" width="100" height="60" aria-hidden="true">${cols}</svg>`;
+  const pts = v.map((x,i)=>{
+    const xPos = 10 + i*(100/5);             // 6 points
+    const yPos = 48 - Math.max(6, (x/max)*42);
+    return `${xPos},${yPos}`;
+  }).join(' ');
+
+  const last = v.length-1;
+  const cx = 10 + last*(100/5);
+  const cy = 48 - Math.max(6, (v[last]/max)*42);
+
+  return `
+    <svg class="ap-spark" viewBox="0 0 120 56" width="120" height="56" aria-hidden="true">
+      <polyline points="${pts}" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="2" />
+      <circle cx="${cx}" cy="${cy}" r="4" fill="#3F8C6A"/>
+      <text x="6" y="54" font-size="8" fill="rgba(0,0,0,.45)">S-5</text>
+      <text x="98" y="54" font-size="8" fill="rgba(0,0,0,.45)">S0</text>
+    </svg>`;
 }
 
 // ── minimal carousel (auto-advance + dots; pauses on interaction)
@@ -599,9 +619,16 @@ function ensureCoachSheet(){
 function openCoachSheet(innerHTML){
   const sheet = document.getElementById('coach-sheet');
   if (!sheet) return;
+
+  // largeur = largeur du conteneur de l'app (ici le panel d'analyse)
+  const host = document.getElementById('analysis-panel');
+  const w = host ? host.getBoundingClientRect().width : Math.min(window.innerWidth, 430);
+  document.documentElement.style.setProperty('--coach-w', `${Math.round(w)}px`);
+
   sheet.querySelector('.coach-content').innerHTML = innerHTML;
   sheet.classList.add('open');
 }
+
 function closeCoachSheet(){
   document.getElementById('coach-sheet')?.classList.remove('open');
 }
