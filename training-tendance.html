@@ -36,29 +36,19 @@
         <div class="card" style="margin-bottom:12px">
             <strong>Modification de la condition physique</strong>
             <div class="bar-scale">
-            <span class="tick tick--neg"></span><span class="tick"></span><span class="tick"></span>
-            <span class="tick"></span><span class="tick tick--pos"></span>
-            <div class="needle" style="left:38%"></div>
+                <div class="needle" id="trend-needle"></div>
             </div>
             <p class="muted" style="margin:6px 0 0">Plage : 6 semaines</p>
         </div>
 
         <div class="card chart">
             <h3 class="muted" style="margin:0 0 6px">VO₂max (dernières 6 semaines)</h3>
-            <svg viewBox="0 0 320 160" preserveAspectRatio="none">
-            <polyline points="0,120 40,118 80,115 120,110 160,108 200,112 240,118 280,126 320,132"
-                        fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-            </svg>
+            <div class="card chart" id="trend-vo2"></div>
         </div>
 
         <div class="card chart">
             <h3 class="muted" style="margin:0 0 6px">CTL / ATL / TSB</h3>
-            <svg viewBox="0 0 320 160" preserveAspectRatio="none">
-            <polyline points="0,80 40,82 80,86 120,90 160,92 200,95 240,98 280,102 320,106"
-                fill="none" stroke="#00B37A" stroke-width="3"/>
-            <polyline points="0,40 40,46 80,60 120,70 160,75 200,82 240,86 280,94 320,100"
-                fill="none" stroke="#EB6E9A" stroke-width="3"/>
-            </svg>
+            <div class="card chart" id="trend-ctl-atl"></div>
         </div>
         </section>
 

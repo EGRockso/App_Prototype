@@ -41,11 +41,11 @@
             </div>
             <div class="quick-card">
                 <span class="qc-label">Calories actives</span>
-                <strong class="qc-value" id="dq-active-cal">—</strong>
+                <strong class="qc-value" id="dq-cal">—</strong>
             </div>
             <div class="quick-card">
                 <span class="qc-label">FC moyenne</span>
-                <strong class="qc-value" id="dq-rhr">—</strong>
+                <strong class="qc-value" id="dq-resthr">—</strong>
             </div>
         </div>
 
@@ -60,14 +60,13 @@
             </div>
             <div class="quick-card">
                 <span class="qc-label">Minutes actives</span>
-                <strong class="qc-value" id="dq-act-min">—</strong>
+                <strong class="qc-value" id="dq-active-min">—</strong>
             </div>
         </div>
 
-
         <div class="section">
           <h2 class="section-title">Activité (7 derniers jours)</h2>
-          <div class="card chart">
+          <div class="card chart" id="qd-activity-bars">
             <svg viewBox="0 0 320 160" preserveAspectRatio="none">
               <rect x="20"  y="110" width="28" height="30" rx="6" class="cbar z1"/>
               <rect x="64"  y="70"  width="28" height="70" rx="6" class="cbar z2"/>
@@ -90,7 +89,7 @@
                 </div>
                 <div class="quick-card">
                     <span class="qc-label">Sommeil (moy. 7j)</span>
-                    <strong class="qc-value" id="dq-sleep-avg">—</strong>
+                    <strong class="qc-value" id="dq-slp-avg">—</strong>
                 </div>
                 <div class="quick-card">
                     <span class="qc-label">HRV (moy. 7j)</span>
@@ -107,6 +106,9 @@
                     <span class="qc-label">FC repos (moy. 7j)</span>
                 <strong class="qc-value" id="dq-rhr-avg">—</strong>
                 </div>
+                <div class="quick-card"><span class="qc-label">Statut</span>
+                    <strong class="qc-value" id="qd-status-text"></strong>
+                </div>
                 <div class="quick-card" style="visibility:hidden;"></div>
             </div>
         </section>
@@ -114,9 +116,8 @@
         <!-- Journal quotidien (7 jours) -->
         <section class="section">
             <h2 class="section-title">Journal quotidien (7 jours)</h2>
-            <div class="card" id="daily-list">
-                <p class="muted">Aucune donnée quotidienne disponible. Lance une synchronisation.</p>
-            </div>
+            <div class="card" id="qd-daily-list"></div>
+
         </section>
 
 
@@ -148,13 +149,6 @@
             <div class="card-body muted" id="sum-note" style="margin-top:8px"></div>
           </div>
         </div>
-
-        <!-- === NOUVEAU : Journal quotidien === -->
-        <div class="section">
-          <h2 class="section-title">Journal quotidien (7 jours)</h2>
-          <div class="list" id="daily-list"></div>
-        </div>
-      </section>
 
       <!-- Tabbar (Training actif via JS) -->
       <nav class="tabbar" role="navigation" aria-label="Navigation principale">

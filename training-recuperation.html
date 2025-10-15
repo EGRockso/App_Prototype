@@ -42,8 +42,9 @@
             </div>
             <div>
                 <span class="muted">Sommeil (dernière nuit)</span>
-                <strong>8h 03</strong>
-                <div class="muted">Moy. 7j : 7h 18</div>
+                <strong class="qc-value" id="rec-sleep-last"></strong>
+                <div class="muted">Moy. 7j : <span id="rec-sleep-avg"></span></div>
+
             </div>
             </div>
         </div>
@@ -51,16 +52,15 @@
         <div class="card">
             <strong>Fatigue liée à l’entraînement</strong>
             <div class="grid-2" style="margin-top:8px">
-            <div>
-                <span class="muted">TSB</span>
-                <div class="bar bar--tsb" style="width:60%"></div>
-                <div class="muted">Prêt(e) à aller plus loin</div>
-            </div>
-            <div>
-                <span class="muted">RPE (7j)</span>
-                <div class="bar bar--rpe" style="width:70%"></div>
-                <div class="muted">Très bon(ne)</div>
-            </div>
+                <div class="metric">
+                    <span class="metric-label">TSB</span>
+                    <strong class="metric-value" id="rec-tsb-text"></strong>
+                </div>
+
+                <div class="metric">
+                    <span class="metric-label">RPE (7j)</span>
+                    <strong class="metric-value" id="rec-rpe-7d-text"></strong>
+                </div>
             </div>
         </div>
       </section>
