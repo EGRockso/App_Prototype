@@ -7,15 +7,15 @@
     { "datetime_iso":"2025-10-05T09:10:00", "type":"run", "distance_km":24.0, "duration_min":118, "avg_hr":156 }
   ],
   "daily": [
-    { "date":"2025-09-29", "sleep_min":405, "hrv_ms":72, "rhr_bpm":56, "rpe":4 },
-    { "date":"2025-09-30", "sleep_min":420, "hrv_ms":71, "rhr_bpm":57, "rpe":4 },
-    { "date":"2025-10-01", "sleep_min":395, "hrv_ms":70, "rhr_bpm":57, "rpe":5 },
-    { "date":"2025-10-02", "sleep_min":410, "hrv_ms":69, "rhr_bpm":58, "rpe":4 },
-    { "date":"2025-10-03", "sleep_min":400, "hrv_ms":70, "rhr_bpm":58, "rpe":5 },
-    { "date":"2025-10-04", "sleep_min":390, "hrv_ms":68, "rhr_bpm":58, "rpe":5 },
-    { "date":"2025-10-05", "sleep_min":380, "hrv_ms":69, "rhr_bpm":57, "rpe":6 }
+    { "date":"2025-09-29", "steps":13200, "active_cal":820,  "act_min":60, "rhr_bpm":57, "hrv_ms":69, "sleep_min":415, "resp_rpm":15, "spo2_pct":97, "rpe":6 },
+    { "date":"2025-09-30", "steps":9600,  "active_cal":590,  "act_min":36, "rhr_bpm":56, "hrv_ms":68, "sleep_min":410, "resp_rpm":15, "spo2_pct":97, "rpe":4 },
+    { "date":"2025-10-01", "steps":14000, "active_cal":900,  "act_min":72, "rhr_bpm":58, "hrv_ms":66, "sleep_min":405, "resp_rpm":15, "spo2_pct":97, "rpe":7 },
+    { "date":"2025-10-02", "steps":10100, "active_cal":620,  "act_min":40, "rhr_bpm":57, "hrv_ms":67, "sleep_min":420, "resp_rpm":15, "spo2_pct":97, "rpe":5 },
+    { "date":"2025-10-03", "steps":12800, "active_cal":840,  "act_min":62, "rhr_bpm":59, "hrv_ms":65, "sleep_min":400, "resp_rpm":15, "spo2_pct":97, "rpe":7 },
+    { "date":"2025-10-04", "steps":8700,  "active_cal":520,  "act_min":26, "rhr_bpm":56, "hrv_ms":70, "sleep_min":455, "resp_rpm":14, "spo2_pct":98, "rpe":3 },
+    { "date":"2025-10-05", "steps":18000, "active_cal":1150, "act_min":88, "rhr_bpm":60, "hrv_ms":63, "sleep_min":395, "resp_rpm":16, "spo2_pct":97, "rpe":8 }
   ],
-  "summary": { "total_km":61.2, "km_z5t":10.0, "load_spike_rel_w1_w2":1.24, "sessions":4, "rest_days":3 },
+  "summary": { "total_km":61.2, "km_z5t":10.0, "load_spike_rel_w1_w2":1.24, "sessions":4, "rest_days":3, "duration_min":298 },
   "ml": { "predicted_label":1, "predicted_probability":0.76, "model":"global_sgd_tuned.joblib (simulé)" },
   "analysis_text":"Surcharge (+24 % vs S-1) et hausse d’intensité (~10 km rapides). Signes de fatigue (HRV ↓, FC repos ↑, sommeil < 7 h). Risque accru — alléger le volume et fractionner la récup."
 }

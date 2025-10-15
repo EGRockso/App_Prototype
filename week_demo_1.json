@@ -7,15 +7,15 @@
     { "datetime_iso":"2025-09-28T09:00:00", "type":"run", "distance_km":18.5, "duration_min":95, "avg_hr":152 }
   ],
   "daily": [
-    { "date":"2025-09-22", "sleep_min":450, "hrv_ms":75, "rhr_bpm":54, "rpe":3 },
-    { "date":"2025-09-23", "sleep_min":470, "hrv_ms":77, "rhr_bpm":53, "rpe":2 },
-    { "date":"2025-09-24", "sleep_min":455, "hrv_ms":76, "rhr_bpm":54, "rpe":3 },
-    { "date":"2025-09-25", "sleep_min":440, "hrv_ms":74, "rhr_bpm":54, "rpe":2 },
-    { "date":"2025-09-26", "sleep_min":465, "hrv_ms":75, "rhr_bpm":54, "rpe":3 },
-    { "date":"2025-09-27", "sleep_min":455, "hrv_ms":75, "rhr_bpm":54, "rpe":3 },
-    { "date":"2025-09-28", "sleep_min":470, "hrv_ms":76, "rhr_bpm":53, "rpe":4 }
+    { "date":"2025-09-22", "steps":11000, "active_cal":700, "act_min":48, "rhr_bpm":55, "hrv_ms":73, "sleep_min":440, "resp_rpm":14, "spo2_pct":97, "rpe":4 },
+    { "date":"2025-09-23", "steps":9800,  "active_cal":610, "act_min":38, "rhr_bpm":54, "hrv_ms":74, "sleep_min":448, "resp_rpm":14, "spo2_pct":98, "rpe":3 },
+    { "date":"2025-09-24", "steps":12500, "active_cal":820, "act_min":64, "rhr_bpm":56, "hrv_ms":72, "sleep_min":430, "resp_rpm":14, "spo2_pct":97, "rpe":5 },
+    { "date":"2025-09-25", "steps":10200, "active_cal":630, "act_min":40, "rhr_bpm":55, "hrv_ms":73, "sleep_min":445, "resp_rpm":14, "spo2_pct":98, "rpe":3 },
+    { "date":"2025-09-26", "steps":11300, "active_cal":720, "act_min":52, "rhr_bpm":55, "hrv_ms":73, "sleep_min":435, "resp_rpm":14, "spo2_pct":98, "rpe":4 },
+    { "date":"2025-09-27", "steps":9000,  "active_cal":540, "act_min":28, "rhr_bpm":53, "hrv_ms":76, "sleep_min":470, "resp_rpm":13, "spo2_pct":98, "rpe":2 },
+    { "date":"2025-09-28", "steps":15000, "active_cal":940, "act_min":76, "rhr_bpm":56, "hrv_ms":71, "sleep_min":420, "resp_rpm":14, "spo2_pct":97, "rpe":6 }
   ],
-  "summary": { "total_km":49.3, "km_z5t":4.2, "load_spike_rel_w1_w2":1.12, "sessions":4, "rest_days":3 },
+  "summary": { "total_km":49.3, "km_z5t":4.2, "load_spike_rel_w1_w2":1.12, "sessions":4, "rest_days":3, "duration_min":254 },
   "ml": { "predicted_label":0, "predicted_probability":0.12, "model":"global_sgd_tuned.joblib (simulé)" },
   "analysis_text":"Progression modérée (+12 % vs S-0) et intensité contenue (~4 km rapides). HRV/sommeil stables. Risque faible — on continue."
 }

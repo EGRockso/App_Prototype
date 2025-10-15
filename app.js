@@ -23,7 +23,7 @@ const BASELINE_S0 = {
   week_index: 0,
   start_iso: "2025-09-15",
   end_iso:   "2025-09-21",
-  summary: { total_km: 44.0, km_z5t: 3.5, load_spike_rel_w1_w2: 1.00, sessions: 4, duration_min: 270 },
+  summary: { total_km: 44.0, km_z5t: 3.5, load_spike_rel_w1_w2: 1.00, sessions: 4, duration_min: 230 },
   activities: [
     { datetime_iso:"2025-09-16T07:00:00", type:"run", distance_km:10.0, duration_min:51, avg_hr:148 },
     { datetime_iso:"2025-09-18T18:10:00", type:"run", distance_km:8.5,  duration_min:43, avg_hr:150 },
@@ -40,7 +40,7 @@ const BASELINE_S0 = {
     { date:"2025-09-21", steps:14000,active_cal:880, act_min:70, rhr_bpm:55, hrv_ms:72, sleep_min:420, resp_rpm:14, spo2_pct:97, rpe:5 }
   ],
   ml: { predicted_label: 0, predicted_probability: 0.09, model: "global_sgd_tuned.joblib (simulé)" },
-  analysis_text: "Semaine de référence (44 km) régulière : 4 séances, progression contrôlée, sommeil ~7h20, HRV ~74 ms. Charge tolérée et intensité mesurée → risque faible."
+  analysis_text: "Semaine de référence (44 km) régulière : 4 séances, progression contrôlée, sommeil ~7h19, HRV ~74 ms. Charge tolérée et intensité mesurée → risque faible."
 };
 
 const DEMO_INLINE = [
@@ -246,8 +246,8 @@ function hydrateHome(){
     const curInt  = (st.weeks[st.weeks.length-1].summary?.km_z5t || 0)/(live.weekly.load||1);
     setEvolution('evol-int', Math.round((curInt - prevInt)*100));
   } else {
-    setEvolution('evol-vol', 0);
-    setEvolution('evol-int', 0);
+    setEvolution('evol-vol', -4);
+    setEvolution('evol-int', +8);
   }
 
   // Sports chips
@@ -409,11 +409,25 @@ function hydrateTrainingQuotidien(){
 function hydrateProfile(){
   const pLoad = $('#p-load');
   if (!pLoad) return;
+
   const live = getLiveState();
   pLoad.textContent = formatKm(live.weekly.load);
-  $('#p-hours') && ($('#p-hours').textContent = fmtMinutesToHM(live.weekly.durationMin));
-  $('#p-rest')  && ($('#p-rest').textContent  = 'OK');
+
+  const durMin = typeof live.weekly.durationMin === 'number'
+    ? live.weekly.durationMin
+    : (typeof live.weekly.hours === 'number' ? live.weekly.hours * 60 : 0);
+  const hEl = $('#p-hours');
+  if (hEl) hEl.textContent = fmtMinutesToHM(durMin);
+
+  const restEl = $('#p-rest');
+  if (restEl) {
+    const st = getStore();
+    const weeks = st.weeks || [];
+    const lastW = weeks[weeks.length - 1];
+    restEl.textContent = (lastW?.ml?.predicted_label ? 'Attention' : 'OK');
+  }
 }
+
 
 /* --------- Récupération --------- */
 function hydrateTrainingRecuperation(){
