@@ -294,7 +294,7 @@ function hydrateHome(){
   renderAnalysisPanelFromStore();
 }
 
-function renderAnalysisPanelFromStore(){
+/* function renderAnalysisPanelFromStore(){
   const panel = document.getElementById("analysis-panel");
   if (!panel) return;
 
@@ -369,8 +369,263 @@ function renderAnalysisPanelFromStore(){
       </div>
     </div>
   `;
+} */
+
+// ----- ANALYSE "APPLE-LIKE" -------------------------------------------------
+
+function renderAnalysisPanelFromStore(){
+  const wrapper = document.getElementById("analysis-panel");
+  if (!wrapper) return;
+
+  const st = getStore();
+  const weeks = st.weeks || [];
+  const cur = weeks[weeks.length - 1];
+  const prev = weeks[weeks.length - 2] || cur;
+
+  if (!cur) {
+    wrapper.innerHTML = `<div class="card"><div class="card-body"><p>Pas d'analyse disponible.</p></div></div>`;
+    return;
+  }
+
+  // --- agrégats utiles ---
+  const volCur = cur.summary?.total_km || 0;
+  const volPrev = prev.summary?.total_km || 0;
+  const durCurMin = cur.summary?.duration_min || 0;
+  const sesCur = cur.summary?.sessions || (cur.activities?.length || 0);
+
+  const intCur = (cur.summary?.km_z5t || 0) / Math.max(1, volCur);
+  const intPrev = (prev.summary?.km_z5t || 0) / Math.max(1, volPrev);
+  const volDelta = volPrev > 0 ? (volCur - volPrev) / volPrev : 0;
+  const intDelta = intCur - intPrev;
+
+  const d7 = (cur.daily || []);
+  const d7prev = (prev.daily || []);
+  const avg = (arr, k) => !arr.length ? 0 : arr.reduce((a,x)=>a+(x[k]||0),0)/arr.length;
+
+  const sleepAvg = avg(d7, 'sleep_min');
+  const hrvAvg = avg(d7, 'hrv_ms');
+  const rhrAvg = avg(d7, 'rhr_bpm');
+  const sleepPrev = avg(d7prev, 'sleep_min');
+  const hrvPrev = avg(d7prev, 'hrv_ms');
+  const rhrPrev = avg(d7prev, 'rhr_bpm');
+
+  // statut récup simple
+  const recScore =
+    (Math.min(1, (sleepAvg/ (7*60))/0.5) * 0.35) +            // poids sommeil
+    (Math.min(1, (hrvAvg/80)) * 0.40) +                        // poids HRV
+    (Math.max(0, (80 - (rhrAvg||80)) / 40) * 0.25);            // poids FC repos
+  const recText = recScore > .70 ? "Optimale"
+               : recScore > .50 ? "Bonne"
+               : recScore > .35 ? "Moyenne"
+               : "Fragile";
+
+  // coaching contextuel (utilise notre “recherche” + état du modèle)
+  const highRisk = !!cur.ml?.predicted_label || (volDelta > .20) || (intDelta > .06) || (hrvAvg && hrvPrev && (hrvAvg - hrvPrev) < -4);
+  const tips = buildCoachTips({
+    highRisk,
+    volCur, volPrev, volDelta,
+    intCur, intPrev, intDelta,
+    sleepAvg, hrvAvg, rhrAvg,
+    sesCur
+  });
+
+  // --- slides (4) ---
+  const slides = [
+    {
+      key:'resume',
+      title:'Semaine en 5 chiffres',
+      accent:'🧭',
+      html: `
+        <div class="ac-metrics">
+          <div class="m"><span class="k">Distance</span><strong>${volCur.toFixed(1)} km</strong></div>
+          <div class="m"><span class="k">Durée</span><strong>${fmtMinutesToHM(durCurMin)}</strong></div>
+          <div class="m"><span class="k">Séances</span><strong>${sesCur}</strong></div>
+          <div class="m"><span class="k">Volume vs S-1</span><strong>${volPrev? (volDelta>0?'+':'')+Math.round(volDelta*100)+'%':'—'}</strong></div>
+          <div class="m"><span class="k">Intensité</span><strong>${Math.round(intCur*100)}%</strong></div>
+        </div>
+      `
+    },
+    {
+      key:'charge',
+      title:'Charge & Intensité',
+      accent: volDelta>0 ? '📈' : '📉',
+      html: `
+        <div class="ac-bars">
+          <div class="b">
+            <span class="k">Volume</span>
+            <div class="bar bar--z2"><div class="fill" style="width:${Math.min(100, 50 + volDelta*100)}%"></div></div>
+            <span class="delta ${volDelta>=0?'up':'down'}">${volPrev? (volDelta>0?'+':'')+Math.round(volDelta*100)+'%':'—'}</span>
+          </div>
+          <div class="b">
+            <span class="k">Part d’intensité</span>
+            <div class="bar bar--z4"><div class="fill" style="width:${Math.round(intCur*100)}%"></div></div>
+            <span class="delta ${intDelta>=0?'up':'down'}">${(intDelta>=0?'+':'')+Math.round(intDelta*100)} pts</span>
+          </div>
+        </div>
+        <div class="pill ${highRisk?'pill-red':'pill-green'}">
+          ${highRisk ? '⚠️ Risque accru — charge à lisser' : '✅ Charge maîtrisée — progression saine'}
+        </div>
+      `
+    },
+    {
+      key:'recup',
+      title:'Récupération',
+      accent:'💤',
+      html: `
+        <div class="ac-metrics three">
+          <div class="m"><span class="k">Sommeil (moy.)</span><strong>${fmtMinutesToHM(sleepAvg||0)}</strong><span class="s">${sleepPrev?trendTag(sleepAvg-sleepPrev,'min'):''}</span></div>
+          <div class="m"><span class="k">HRV (moy.)</span><strong>${Math.round(hrvAvg||0)} ms</strong><span class="s">${hrvPrev?trendTag(hrvAvg-hrvPrev,'ms'):''}</span></div>
+          <div class="m"><span class="k">FC repos</span><strong>${Math.round(rhrAvg||0)} bpm</strong><span class="s">${rhrPrev?trendTag(-(rhrAvg-rhrPrev),'bpm','↑ mieux'):''}</span></div>
+        </div>
+        <div class="pill ${recText==='Optimale' || recText==='Bonne' ? 'pill-green' : 'pill-amber'}">${recText}</div>
+      `
+    },
+    {
+      key:'coach',
+      title:'Conseil pour la semaine à venir',
+      accent:'🎯',
+      html: tips
+    }
+  ];
+
+  wrapper.innerHTML = `
+    <section class="analysis-carousel" aria-label="Analyse de la semaine">
+      <div class="ac-track" role="group"></div>
+      <div class="ac-dots" role="tablist"></div>
+    </section>
+  `;
+
+  mountAnalysisCarousel(wrapper.querySelector('.analysis-carousel'), slides, { autoMs: 8000 });
 }
 
+function trendTag(delta, unit, upIsGoodTxt='↑ mieux'){
+  const d = Math.round(delta);
+  if (!d) return '—';
+  if (d>0) return `↑ +${d} ${unit}`;
+  if (d<0) return `↓ ${d} ${unit}`.replace(' -',' -');
+  return '—';
+}
+
+function buildCoachTips(ctx){
+  const {
+    highRisk, volCur, volPrev, volDelta, intCur, intPrev, intDelta,
+    sleepAvg, hrvAvg, rhrAvg, sesCur
+  } = ctx;
+
+  const p = (x)=>Math.round(x*100);
+  const h = (min)=>`${Math.floor(min/60)}h${String(Math.round(min%60)).padStart(2,'0')}`;
+
+  if (highRisk){
+    const targetVol = Math.max(0, volCur * 0.75);
+    const cut = Math.max(1, Math.round((sesCur||4)*0.25));
+    return `
+      <ul class="coach">
+        <li><strong>Réduis le volume ≈ ${p(.20)}–${p(.30)}%</strong> → vise ~<strong>${targetVol.toFixed(1)} km</strong> cette semaine.</li>
+        <li><strong>Intensité technique courte</strong> : remplace les blocs longs par <em>8×200m</em> léger (récup 200m), reste sous le seuil.</li>
+        <li><strong>Allège ${cut} séance${cut>1?'s':''}</strong> : remplace la sortie la plus longue par <em>60–75′ vélo Z2</em>.</li>
+        <li><strong>Sommeil</strong> : cible <em>${h(7*60+30)}</em> / nuit, HRV à surveiller (actuel ~${Math.round(hrvAvg||0)} ms).</li>
+      </ul>
+      <div class="tip-card">
+        <div class="t">Mercredi (ex&nbsp;: 15×400m SL2)</div>
+        <div class="b"><span>⚠︎</span> Passe à <strong>10×400m</strong>, récup. identique. Ajoute <strong>+5′ jog easy</strong> au retour au calme.</div>
+      </div>
+    `;
+  }
+
+  // faible risque / progression contrôlée
+  const gentleInc = Math.min(.08, Math.max(0, .06 - Math.max(0,intDelta))); // +5–8% si intensité stable ou ↓
+  const target = volCur * (1 + gentleInc);
+  return `
+    <ul class="coach">
+      <li><strong>Garde l’intensité stable</strong> (${p(intCur)}% de la semaine) et vise <strong>+${p(gentleInc)}%</strong> de volume → ~<strong>${target.toFixed(1)} km</strong>.</li>
+      <li><strong>Un seul gros stimulus</strong> : conserve une séance qualité, le reste en Z1–Z2.</li>
+      <li><strong>Varie le support</strong> : remplace une footing par <em>60′ vélo Z2</em> pour charger sans impacter la mécanique.</li>
+      <li><strong>Récup active</strong> : 10′ de mobilité le soir si sommeil &lt; ${fmtMinutesToHM(7*60+10)} (actuel ~${fmtMinutesToHM(sleepAvg||0)}).</li>
+    </ul>
+    <div class="tip-card ok">
+      <div class="t">Mercredi (ex&nbsp;: SL2)</div>
+      <div class="b"><span>✓</span> Conserve le format (ex&nbsp;: 12×400m). Si jambes lourdes, fais <strong>10×400m</strong> et +1&nbsp;km d’échauffement.</div>
+    </div>
+  `;
+}
+
+// Carrousel minimal (auto + dots progress + swipe + reprise quand visible)
+function mountAnalysisCarousel(root, slides, { autoMs=8000 } = {}){
+  const track = root.querySelector('.ac-track');
+  const dots  = root.querySelector('.ac-dots');
+
+  track.innerHTML = slides.map((s,i)=>`
+    <article class="ac-slide" data-i="${i}">
+      <header class="ac-head">
+        <span class="accent">${s.accent||''}</span>
+        <h3>${s.title}</h3>
+      </header>
+      <div class="ac-body">${s.html}</div>
+    </article>
+  `).join('');
+
+  dots.innerHTML = slides.map((_,i)=>`
+    <button class="ac-dot" role="tab" aria-selected="${i===0?'true':'false'}" data-i="${i}">
+      <span class="fill"></span>
+    </button>
+  `).join('');
+
+  const N = slides.length;
+  let i = 0, hold=false, raf=null, t0=0, prog=0;
+
+  function apply(){
+    track.style.setProperty('--i', i);
+    dots.querySelectorAll('.ac-dot').forEach((d,k)=>{
+      d.classList.toggle('active', k===i);
+      d.style.setProperty('--p', k===i ? prog : 0);
+      d.setAttribute('aria-selected', k===i?'true':'false');
+    });
+  }
+  function next(){ i = (i+1)%N; prog = 0; t0 = performance.now(); apply(); }
+  function prev(){ i = (i-1+N)%N; prog = 0; t0 = performance.now(); apply(); }
+
+  function tick(now){
+    if (hold){ t0 = now - prog*(autoMs); }
+    else{
+      prog = Math.min(1, (now - t0) / autoMs);
+      dots.querySelectorAll('.ac-dot')[i]?.style.setProperty('--p', prog);
+      if (prog >= 1){ next(); }
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  // interactions
+  dots.addEventListener('click', e=>{
+    const btn = e.target.closest('.ac-dot');
+    if (!btn) return;
+    i = Number(btn.dataset.i||0); prog=0; t0=performance.now(); apply();
+  });
+
+  // swipe
+  let sx=0, dx=0;
+  track.addEventListener('pointerdown', e=>{ hold=true; sx=e.clientX; dx=0; track.setPointerCapture(e.pointerId); });
+  track.addEventListener('pointermove', e=>{ if(!hold)return; dx=e.clientX - sx; track.style.setProperty('--drag', dx); });
+  track.addEventListener('pointerup',   e=>{
+    track.releasePointerCapture(e.pointerId);
+    track.style.removeProperty('--drag');
+    if (Math.abs(dx) > 40){ dx<0 ? next() : prev(); }
+    hold=false;
+  });
+
+  // pause si hors écran / onglet
+  const io = new IntersectionObserver(([ent])=>{
+    const visible = ent?.isIntersecting;
+    hold = !visible;
+  }, { threshold: .5 });
+  io.observe(root);
+
+  document.addEventListener('visibilitychange', ()=>{
+    hold = (document.visibilityState !== 'visible');
+  });
+
+  // start
+  apply(); t0 = performance.now(); raf = requestAnimationFrame(tick);
+}
 
 function hydrateActivities(){
   const list = $('#activity-list');
