@@ -40,7 +40,26 @@ const BASELINE_S0 = {
     { date:"2025-09-21", steps:14000,active_cal:880, act_min:70, rhr_bpm:55, hrv_ms:72, sleep_min:420, resp_rpm:14, spo2_pct:97, rpe:5 }
   ],
   ml: { predicted_label: 0, predicted_probability: 0.09, model: "global_sgd_tuned.joblib (simulé)" },
-  analysis_text: "Semaine de référence (44 km) régulière : 4 séances, progression contrôlée, sommeil ~7h19, HRV ~74 ms. Charge tolérée et intensité mesurée → risque faible."
+  // analysis_text: "Semaine de référence (44 km) régulière : 4 séances, progression contrôlée, sommeil ~7h19, HRV ~74 ms. Charge tolérée et intensité mesurée → risque faible."
+  analysis_text: `
+  <strong>Semaine de référence, fluide et maîtrisée</strong><br>
+  <ul>
+    <li><strong>Charge :</strong> 44 km en 3h50 (4 séances), intensité mesurée (~3,5 km rapides).</li>
+    <li><strong>Récupération :</strong> sommeil ≈ <strong>7h19</strong>, HRV ~<strong>74 ms</strong>, RPE moyen 3–4 → bonne tolérance.</li>
+  </ul>
+  <strong>Ce que ça raconte</strong><br>
+  <ul>
+    <li>Distribution d’intensité “80/20” cohérente : la base aérobie progresse sans dérive cardiaque.</li>
+    <li>Variations naturelles : volume ~<strong>-4%</strong> vs semaine précédente estimée, intensité ~<strong>+8%</strong> → signal normal, sans surcharge.</li>
+  </ul>
+  <strong>Suggestion pour S+1</strong><br>
+  <ul>
+    <li>Garder le volume dans une fourchette <strong>±0–5%</strong> (≈ 42–46 km) et <strong>1 seule</strong> séance de qualité.</li>
+    <li>Mercredi : <em>10×400 m</em> à SL2 (récup 200 m trot), échauffement 15’ + retour au calme 10’.</li>
+    <li>1 jour de repos total + 1 jour de récup active (vélo Z2 40–60’) pour consolider les adaptations.</li>
+  </ul>
+  <small class="muted">Analyse basée sur la progression graduelle de la charge, la distribution d’intensité et les marqueurs de récupération (HRV, RPE, sommeil).</small>
+  `.trim()
 };
 
 const DEMO_INLINE = [
