@@ -371,184 +371,253 @@ function hydrateHome(){
   `;
 } */
 
-// ----- ANALYSE "APPLE-LIKE" -------------------------------------------------
-
+// ─────────────────────────────────────────────────────────────────────────────
+//  ANALYSE — GLANCE → REASON → PLAN
+//  • Home: 2-slide carousel (GLANCE first) + bottom-sheet CTA
+//  • Training/Entraînement: stacked sections (no carousel) + same sheet
+// ─────────────────────────────────────────────────────────────────────────────
 function renderAnalysisPanelFromStore(){
-  const host = document.getElementById("analysis-panel");
-  if (!host) return;
+  const mount = document.getElementById("analysis-panel");
+  if (!mount) return;
 
   const st = getStore();
   const weeks = st.weeks || [];
   const cur = weeks[weeks.length - 1];
-  const prev = weeks[weeks.length - 2] || weeks[0];
+  const prev = weeks[weeks.length - 2];
 
   if (!cur){
-    host.innerHTML = `<div class="card"><div class="card-body"><p>Pas d'analyse disponible.</p></div></div>`;
+    mount.innerHTML = `<div class="card"><div class="card-body"><p>Pas d'analyse disponible.</p></div></div>`;
     return;
   }
 
-  // === Données dérivées ===
-  const vol  = cur.summary?.total_km ?? 0;
-  const durM = cur.summary?.duration_min ?? 0;
-  const ses  = cur.summary?.sessions ?? 0;
-  const intensKm = cur.summary?.km_z5t ?? 0;
+  // --- basic numbers ---
+  const km         = Number(cur.summary?.total_km || 0);
+  const durMin     = Number(cur.summary?.duration_min || 0);
+  const sessions   = Number(cur.summary?.sessions || (cur.activities?.length || 0));
+  const kmInt      = Number(cur.summary?.km_z5t || 0);
+  const shareInt   = km > 0 ? (kmInt / km) : 0;         // 0..1
 
-  const volPrev = prev?.summary?.total_km ?? vol;
-  const zPrev   = prev?.summary?.km_z5t ?? 0;
+  const prevKm       = Number(prev?.summary?.total_km || 0);
+  const prevShareInt = prevKm > 0 ? (Number(prev?.summary?.km_z5t || 0) / prevKm) : null;
 
-  const evolVolPct = volPrev ? Math.round(((vol - volPrev)/volPrev)*100) : 0;
-  const partInt    = vol ? Math.round((intensKm/vol)*100) : 0;
-  const partIntPrev= volPrev ? Math.round((zPrev/volPrev)*100) : 0;
+  // deltas (+ default S0: -4% vol / +8% intensité)
+  const deltaVol = prevKm > 0 ? ((km - prevKm) / prevKm) * 100 : -4;
+  const deltaInt = (prevShareInt != null) ? ((shareInt - prevShareInt) * 100) : +8;
 
-  // Récap recup (moyennes 7j)
-  const days = cur.daily || [];
-  const avg = (k)=> Math.round((days.reduce((a,d)=>a+(+d[k]||0),0)/(days.length||1)) );
-  const avgSleep = avg('sleep_min');            // minutes
-  const avgHRV   = avg('hrv_ms');               // ms
-  const avgRHR   = avg('rhr_bpm');              // bpm
+  // daily avgs for “Reason”
+  const days = cur.daily || st.daily || [];
+  const avg = (arr, k) => (arr.length ? arr.reduce((a,x)=>a+(x[k]||0),0)/arr.length : 0);
+  const slpMin = avg(days,'sleep_min'); // minutes
+  const hrvMs  = avg(days,'hrv_ms');
+  const rpe    = avg(days,'rpe');
 
-  // Texte conseil (déjà cohérent avec S0/S1/S2 côté données)
-  const risk = cur.ml?.predicted_label ? "high" : "low";
-  const advice = (()=>{
-    if (risk === "high"){
-      return {
-        title: "Alléger pour consolider",
-        items: [
-          {k:"Volume", v:"–20 à –30% (1 sortie en moins)"},
-          {k:"Intensité", v:"2×(6–8)×200–300m, récup longue"},
-          {k:"Remplacement", v:"1 sortie → vélo 60–75’ Z2"},
-          {k:"Plan séance — détails",
-            v:"Mercredi «15×400m SL2» → «10×400m», +5’ jog retour au calme", cls:"clamp-3"}
-        ]
-      };
-    }
-    // faible risque → progression douce
-    return {
-      title: "Poursuis — progression saine",
-      items: [
-        {k:"Volume", v:`${evolVolPct > 0 ? "+6%" : "+4–6%"} max (cible ~${(vol*1.06).toFixed(1)} km)`},
-        {k:"Intensité", v:"Stable (1 pic qualitatif)"},
-        {k:"Remplacement", v:"1 sortie → vélo 60–75’ Z2"},
-        {k:"Plan séance — détails",
-          v:"Mercredi, garde l’allure mais raccourcis l’échauffement si fatigue perçue.", cls:"clamp-3"}
-      ]
-    };
-  })();
+  // verdict
+  const spike = Number(cur.summary?.load_spike_rel_w1_w2 || 1.0);
+  const ml    = cur.ml || {};
+  let tone = 'ok', pill = 'Risque faible', oneLiner = 'Semaine maîtrisée';
+  if (ml.predicted_label === 1 || spike >= 1.25 || shareInt >= 0.18){
+    tone = 'risk'; pill = 'Risque accru'; oneLiner = 'Surcharge et intensité élevée';
+  } else if (Math.abs(deltaVol) > 15 || shareInt >= 0.12){
+    tone = 'warn'; pill = 'A surveiller'; oneLiner = 'Hausse sensible à contrôler';
+  } else {
+    tone = 'ok'; pill = 'Risque faible'; oneLiner = prev ? 'Progression sans excès' : 'Semaine de référence';
+  }
 
-  // === Markup ===
-  host.innerHTML = `
-    <div class="story-stage is-autoplay" id="storyStage" aria-roledescription="carousel" aria-label="Analyse de la semaine">
-      <!-- Carte 1 : 5 chiffres -->
-      <section class="story-card" aria-label="Semaine en 5 chiffres">
-        <div class="story-title">Semaine en 5 chiffres</div>
-        <div class="story-grid">
-          <div class="story-chip"><span class="lbl">Distance</span><span class="val">${vol.toFixed(1)} km</span></div>
-          <div class="story-chip"><span class="lbl">Durée</span><span class="val">${fmtMinutesToHM(durM)}</span></div>
-          <div class="story-chip"><span class="lbl">Séances</span><span class="val">${ses}</span></div>
-          <div class="story-chip"><span class="lbl">Volume vs S-1</span><span class="val">${evolVolPct>0?`+${evolVolPct}`:evolVolPct}%</span></div>
-          <div class="story-chip"><span class="lbl">Intensité</span><span class="val">${partInt}%</span></div>
+  // tiny helpers
+  const pct = (n, d=0) => `${(n>=0?'+':'')}${n.toFixed(d)}%`;
+  const hm  = (m) => {
+    const h = Math.floor((m||0)/60), mm = Math.round((m||0)%60);
+    return `${h}h ${String(mm).padStart(2,'0')}`;
+  };
+
+  // PLAN slots (generated from tone)
+  let plan = {
+    vol: tone==='risk' ? 'Alléger −20 à −30 %' : 'Stabiliser (≤ +6 %)',
+    int: tone==='risk' ? 'Limiter à 1 séance courte' : '1 séance qualité (SL2/intervalle)',
+    sub: "1 sortie → vélo 60–75’ Z2"
+  };
+
+  // long form (coach sheet): use your existing analysis text if present, otherwise synthesize
+  const longText = (cur.analysis_text?.trim())
+    ? cur.analysis_text
+    : (tone==='risk'
+       ? "Semaine en surcharge : volume et/ou intensité élevés. Réduis le volume de 20–30 %, conserve une seule séance technique courte et dors ≥7h30 2 nuits."
+       : "Semaine maîtrisée : progression dans la zone sûre. Conserve 1 séance de qualité, stabilise le volume et ajoute du vélo Z2 si jambes lourdes.");
+
+  // build GLANCE card
+  const glance = `
+    <div class="ap-card ap-hero ap-${tone}">
+      <div class="ap-row">
+        <span class="ap-pill">${pill}</span>
+        <span class="ap-oneliner clamp-1">${oneLiner}</span>
+      </div>
+      <div class="ap-kpis">
+        <div class="ap-kpi">
+          <div class="ap-kpi-label">Distance</div>
+          <div class="ap-kpi-val kpi-num">${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km</div>
+          <div class="ap-kpi-sub">${pct(deltaVol,0)} vs sem. préc.</div>
         </div>
-        <div class="story-dots" aria-hidden="true">
-          <div class="story-dot active"></div><div class="story-dot"></div><div class="story-dot"></div><div class="story-dot"></div>
+        <div class="ap-kpi">
+          <div class="ap-kpi-label">Durée</div>
+          <div class="ap-kpi-val kpi-num">${hm(durMin)}</div>
+          <div class="ap-kpi-sub">${prev ? (Math.abs((durMin-(prev.summary?.duration_min||0))/(prev.summary?.duration_min||1)*100)<3 ? '≈' : '') : '—'}</div>
         </div>
-      </section>
-
-      <!-- Carte 2 : Charge & Intensité -->
-      <section class="story-card" aria-label="Charge et intensité">
-        <div class="story-title">Charge & Intensité</div>
-        <div>
-          <div class="story-bars">
-            <div class="row" style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)">
-              <span>Volume</span><span>${evolVolPct>0?`+${evolVolPct}`:evolVolPct}%</span>
-            </div>
-            <div class="story-bar vol"><div class="fill" style="transform:scaleX(${Math.min(1, (100+evolVolPct)/100)});"></div></div>
-
-            <div class="row" style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)">
-              <span>Part d’intensité</span><span>${partIntPrev}→${partInt}%</span>
-            </div>
-            <div class="story-bar int"><div class="fill" style="transform:scaleX(${Math.min(1, partInt/100)});"></div></div>
-          </div>
-          <div class="story-bubble" style="margin-top:14px">✅ Charge maîtrisée — progression saine</div>
+        <div class="ap-kpi">
+          <div class="ap-kpi-label">% Intensité</div>
+          <div class="ap-kpi-val kpi-num">${Math.round(shareInt*100)}%</div>
+          <div class="ap-kpi-sub">${prevShareInt!=null ? pct((shareInt-prevShareInt)*100,0) : '+8%'}</div>
         </div>
-        <div class="story-dots" aria-hidden="true">
-          <div class="story-dot"></div><div class="story-dot active"></div><div class="story-dot"></div><div class="story-dot"></div>
-        </div>
-      </section>
-
-      <!-- Carte 3 : Récupération -->
-      <section class="story-card" aria-label="Récupération">
-        <div class="story-title">Récupération</div>
-        <div class="story-grid" style="grid-template-columns: repeat(3, 1fr);">
-          <div class="story-chip"><span class="lbl">Sommeil (moy.)</span><span class="val">${fmtMinutesToHM(avgSleep)}</span></div>
-          <div class="story-chip"><span class="lbl">HRV (moy.)</span><span class="val">${avgHRV} ms</span></div>
-          <div class="story-chip"><span class="lbl">FC repos (moy.)</span><span class="val">${avgRHR} bpm</span></div>
-        </div>
-        <div class="story-bubble" style="background:rgba(0,179,122,.10); border-color: rgba(0,179,122,.25);">🟢 Optimale</div>
-        <div class="story-dots" aria-hidden="true">
-          <div class="story-dot"></div><div class="story-dot"></div><div class="story-dot active"></div><div class="story-dot"></div>
-        </div>
-      </section>
-
-      <!-- Carte 4 : Conseil -->
-      <section class="story-card" aria-label="Conseil pour la semaine à venir">
-        <div class="story-title">Conseil pour la semaine à venir</div>
-        <div class="story-grid" style="grid-template-columns: repeat(4, 1fr);">
-          ${advice.items.map(x=>`
-            <div class="story-chip">
-              <span class="lbl">${x.k}</span>
-              <span class="val ${x.cls||'clamp-2'}">${x.v}</span>
-            </div>`).join('')}
-        </div>
-        <div class="story-dots" aria-hidden="true">
-          <div class="story-dot"></div><div class="story-dot"></div><div class="story-dot"></div><div class="story-dot active"></div>
-        </div>
-      </section>
+      </div>
     </div>
   `;
 
-  // === Autoplay + pause au toucher/drag ===
-  const stage = document.getElementById('storyStage');
-  const dots  = [...stage.querySelectorAll('.story-dots')];
-  let index = 0, timerId = null, autoplaySec = 10;
+  // build REASON (chips + sparkline)
+  const spark = buildMiniSparkline((st.weeks||[]).slice(-6).map(w => Number(w.summary?.total_km||0)), km);
+  const reason = `
+    <div class="ap-card ap-reason">
+      <div class="ap-reason-row">
+        <span class="chip chip-soft">😴 Sommeil ~${hm(slpMin)} <span class="muted">/ nuit</span></span>
+        <span class="chip chip-soft">🫀 HRV ${Math.round(hrvMs)||'—'} ms</span>
+        <span class="chip chip-soft">🧭 RPE ${(rpe||0).toFixed(1)}</span>
+      </div>
+      <div class="ap-sparkwrap">
+        <div class="ap-spark-title muted">Volume (6 sem.)</div>
+        ${spark}
+      </div>
+    </div>
+  `;
 
-  stage.style.setProperty('--autoplay-sec', `${autoplaySec}s`);
+  // build PLAN (3 slots + CTA)
+  const planCard = `
+    <div class="ap-card ap-plan">
+      <div class="ap-plan-title">Conseil pour S+1</div>
+      <div class="ap-plan-slots">
+        <button class="ap-slot" data-plan="vol">📈 <strong>Volume</strong><br><span>${plan.vol}</span></button>
+        <button class="ap-slot" data-plan="int">⚡ <strong>Intensité</strong><br><span>${plan.int}</span></button>
+        <button class="ap-slot" data-plan="sub">🚲 <strong>Substitution</strong><br><span>${plan.sub}</span></button>
+      </div>
+      <button class="btn btn-primary ap-plan-cta" data-open-sheet>Appliquer au plan</button>
+    </div>
+  `;
 
-  const slides = [...stage.querySelectorAll('.story-card')];
+  const isTrainingPage = document.body.dataset.page === 'training';
+
+  if (isTrainingPage){
+    // STACKED (no carousel)
+    mount.innerHTML = `<div class="ap-stack">${glance}${reason}${planCard}</div>`;
+    wireCoachSheet(longText, cur);
+  } else {
+    // 2-SLIDE CAROUSEL (GLANCE first)
+    mount.innerHTML = `
+      <div class="ap-carousel" data-auto="9000">
+        <div class="ap-track">
+          <div class="ap-slide">${glance}</div>
+          <div class="ap-slide">
+            ${reason}
+            ${planCard}
+          </div>
+        </div>
+        <div class="ap-dots"><button class="dot active"></button><button class="dot"></button></div>
+      </div>
+    `;
+    initApCarousel(mount.querySelector('.ap-carousel'));
+    wireCoachSheet(longText, cur);
+  }
+}
+
+// ── tiny sparkline (inline SVG bars)
+function buildMiniSparkline(values, current){
+  const v = (values && values.length) ? values : [current];
+  const max = Math.max(...v, 1);
+  const cols = v.map((x,i)=> {
+    const h = Math.max(6, Math.round((x/max)*40));
+    const y = 44 - h;
+    const active = (i === v.length-1) ? 'active' : '';
+    const xPos = 6 + i*12;
+    return `<rect class="bar ${active}" x="${xPos}" y="${y}" width="8" height="${h}" rx="3"></rect>`;
+  }).join('');
+  return `<svg class="ap-spark" viewBox="0 0 80 48" width="100" height="60" aria-hidden="true">${cols}</svg>`;
+}
+
+// ── minimal carousel (auto-advance + dots; pauses on interaction)
+function initApCarousel(node){
+  if (!node) return;
+  const track = node.querySelector('.ap-track');
+  const slides = Array.from(node.querySelectorAll('.ap-slide'));
+  const dots = Array.from(node.querySelectorAll('.ap-dots .dot'));
+  let idx = 0, timer = null, dur = Number(node.dataset.auto||9000);
+
   function go(i){
-    index = (i + slides.length) % slides.length;
-    const target = slides[index];
-    target.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
-    // maj des dots actifs
-    dots.forEach((g,gi)=>{
-      g.querySelectorAll('.story-dot').forEach((d,di)=>{
-        d.classList.toggle('active', di === index);
-      });
-    });
+    idx = (i+slides.length)%slides.length;
+    track.style.transform = `translateX(${-idx*100}%)`;
+    dots.forEach((d,j)=> d.classList.toggle('active', j===idx));
   }
-  function play(){
-    stage.classList.add('is-autoplay');
-    stop();
-    timerId = setInterval(()=> go(index+1), autoplaySec*1000);
-  }
-  function stop(){
-    stage.classList.remove('is-autoplay');
-    if (timerId) clearInterval(timerId), timerId=null;
-  }
+  function start(){ stop(); timer = setInterval(()=>go(idx+1), dur); }
+  function stop(){ if (timer){ clearInterval(timer); timer=null; } }
 
-  // interactions : pause quand l’utilisateur touche/drag, reprise après 2s
-  let resumeTO=null;
-  const pause = ()=>{ stop(); stage.classList.add('is-paused'); if(resumeTO) clearTimeout(resumeTO); };
-  const resume= ()=>{ stage.classList.remove('is-paused'); if(resumeTO) clearTimeout(resumeTO); resumeTO=setTimeout(play, 2000); };
+  dots.forEach((d,i)=> d.addEventListener('click', ()=>{ stop(); go(i); start(); }));
+  node.addEventListener('pointerdown', stop);
+  node.addEventListener('pointerup',   start);
+  node.addEventListener('pointerleave',start);
+  go(0); start();
+}
 
-  stage.addEventListener('pointerdown', pause, {passive:true});
-  stage.addEventListener('pointerup',   resume, {passive:true});
-  stage.addEventListener('pointercancel',resume,{passive:true});
-  stage.addEventListener('mouseenter',  pause);
-  stage.addEventListener('mouseleave',  resume);
-  document.addEventListener('visibilitychange', ()=> document.hidden ? stop() : play());
-
-  // Mise en route
-  play();
+// ── Bottom-sheet (coach)
+function wireCoachSheet(longText, curWeek){
+  ensureCoachSheet(); // injects if absent
+  const openers = document.querySelectorAll('[data-open-sheet], .ap-slot');
+  openers.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const detail = buildCoachDetail(longText, curWeek);
+      openCoachSheet(detail);
+    }, { once:false });
+  });
+}
+function ensureCoachSheet(){
+  if (document.getElementById('coach-sheet')) return;
+  const el = document.createElement('div');
+  el.innerHTML = `
+    <div id="coach-sheet">
+      <div class="coach-backdrop" data-close-sheet></div>
+      <div class="coach-panel" role="dialog" aria-modal="true" aria-label="Conseil Rockso">
+        <div class="coach-grabber" aria-hidden="true"></div>
+        <div class="coach-content">
+          <!-- filled dynamically -->
+        </div>
+        <div class="coach-actions">
+          <button class="btn" data-close-sheet>Fermer</button>
+          <button class="btn btn-primary">Ajouter au plan</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(el.firstElementChild);
+  document.querySelectorAll('[data-close-sheet]').forEach(x=>{
+    x.addEventListener('click', closeCoachSheet);
+  });
+}
+function openCoachSheet(innerHTML){
+  const sheet = document.getElementById('coach-sheet');
+  if (!sheet) return;
+  sheet.querySelector('.coach-content').innerHTML = innerHTML;
+  sheet.classList.add('open');
+}
+function closeCoachSheet(){
+  document.getElementById('coach-sheet')?.classList.remove('open');
+}
+function buildCoachDetail(longText, curWeek){
+  const km   = Number(curWeek.summary?.total_km || 0);
+  const ses  = Number(curWeek.summary?.sessions || (curWeek.activities?.length||0));
+  const intK = Number(curWeek.summary?.km_z5t || 0);
+  return `
+    <div class="coach-head">
+      <div class="coach-title">Plan S+1 — ajustements</div>
+      <div class="coach-meta muted">${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km • ${ses} séances • ~${intK.toFixed(1)} km int.</div>
+    </div>
+    <div class="coach-body">
+      ${longText}
+    </div>
+  `;
 }
 
 function trendTag(delta, unit, upIsGoodTxt='↑ mieux'){

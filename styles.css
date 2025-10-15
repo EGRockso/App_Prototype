@@ -789,3 +789,70 @@ body{ background: #0b0e12; }
   animation-play-state: paused;
 }
 @keyframes dotfill{ from{ width:0% } to{ width:100% } }
+
+/* ─────────────────────────────────────────────────────────
+   ANALYSE GLANCE → REASON → PLAN + bottom-sheet
+   ──────────────────────────────────────────────────────── */
+.ap-card{ background:var(--surface-2); border:1px solid var(--line); border-radius:16px; padding:12px; box-shadow:0 6px 16px rgba(0,0,0,.06); }
+.ap-stack{ display:flex; flex-direction:column; gap:10px; }
+
+/* GLANCE */
+.ap-hero{ position:relative; overflow:hidden; }
+.ap-hero::after{ content:""; position:absolute; inset:-1px; border-radius:16px; pointer-events:none;
+  background: radial-gradient(80% 60% at 100% 0%, rgba(0,179,122,.08), transparent 60%),
+              radial-gradient(80% 60% at   0% 0%, rgba(242,166,90,.06), transparent 60%); }
+.ap-hero.ap-ok{  }
+.ap-hero.ap-warn::after{ background: radial-gradient(80% 60% at 100% 0%, rgba(242,193,78,.12), transparent 60%); }
+.ap-hero.ap-risk::after{ background: radial-gradient(80% 60% at 100% 0%, rgba(198,83,83,.12),  transparent 60%); }
+
+.ap-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+.ap-pill{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+  border:1px solid rgba(63,140,106,.28); background:rgba(63,140,106,.10); font-weight:700; color:#1c3b2f; }
+.ap-hero.ap-warn .ap-pill{ border-color:rgba(242,193,78,.35); background:rgba(242,193,78,.12); color:#6a5200; }
+.ap-hero.ap-risk .ap-pill{ border-color:rgba(198,83,83,.35); background:rgba(198,83,83,.12); color:#7a1e1e; }
+
+.ap-oneliner{ font-weight:800; letter-spacing:.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:65%; }
+.clamp-1{ display:block; line-clamp:1; -webkit-line-clamp:1; -webkit-box-orient:vertical; display:-webkit-box; overflow:hidden; }
+
+.ap-kpis{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
+.ap-kpi{ background:#FFFDF8; border:1px solid var(--line); border-radius:12px; padding:8px 10px; }
+.ap-kpi-label{ color:var(--muted); font-size:12px; }
+.ap-kpi-val{ font-weight:800; margin-top:2px; }
+.kpi-num{ white-space:nowrap; font-variant-numeric: tabular-nums; font-size:18px; line-height:1; }
+.ap-kpi-sub{ color:var(--muted); font-size:12px; margin-top:2px; white-space:nowrap; }
+
+/* REASON */
+.ap-reason{ }
+.ap-reason-row{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.chip-soft{ background:#FFFDF8; border:1px solid var(--line); }
+.ap-sparkwrap{ display:flex; align-items:center; justify-content:space-between; }
+.ap-spark-title{ font-size:12px; }
+.ap-spark{ display:block; height:48px; }
+.ap-spark .bar{ fill:#E7DECF; }
+.ap-spark .bar.active{ fill:#3F8C6A; }
+
+/* PLAN */
+.ap-plan-title{ font-weight:800; margin-bottom:8px; letter-spacing:.02em; }
+.ap-plan-slots{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
+.ap-slot{ text-align:left; border:1px solid var(--line); background:#FFFDF8; border-radius:12px; padding:8px 10px; font: inherit; color:inherit; }
+.ap-slot span{ display:block; margin-top:2px; font-weight:600; line-height:1.15; }
+.ap-plan-cta{ width:100%; margin-top:10px; }
+
+/* Carousel shell (home) */
+.ap-carousel{ position:relative; overflow:hidden; border-radius:16px; }
+.ap-carousel .ap-track{ display:flex; transition: transform .45s ease; }
+.ap-carousel .ap-slide{ min-width:100%; padding:0; }
+.ap-dots{ display:flex; gap:6px; justify-content:center; margin-top:8px; }
+.ap-dots .dot{ width:24px; height:6px; border-radius:999px; border:0; background:rgba(0,0,0,.10); }
+.ap-dots .dot.active{ background: rgba(63,140,106,.85); }
+
+/* Bottom-sheet coach */
+#coach-sheet{ position:fixed; inset:0; z-index:1000; display:none; }
+#coach-sheet.open{ display:block; }
+#coach-sheet .coach-backdrop{ position:absolute; inset:0; background: rgba(0,0,0,.35); backdrop-filter: blur(4px); }
+#coach-sheet .coach-panel{ position:absolute; left:0; right:0; bottom:0; background: var(--surface); border-top-left-radius:20px; border-top-right-radius:20px; box-shadow: 0 -8px 30px rgba(0,0,0,.25); }
+#coach-sheet .coach-grabber{ width:44px; height:4px; background:rgba(0,0,0,.12); border-radius:999px; margin:8px auto; }
+#coach-sheet .coach-content{ max-height:55vh; overflow:auto; padding: 6px 14px 12px; }
+#coach-sheet .coach-actions{ display:flex; gap:8px; padding:10px 14px 14px; border-top:1px solid var(--line); }
+#coach-sheet .coach-title{ font-weight:800; }
+#coach-sheet .coach-body{ line-height:1.5; }
