@@ -1,5 +1,5 @@
 // =======================
-// Rockso prototype — app.js (cohérence S0→S1→S2, quotidien, sync)
+// Rockso prototype — app.js (cohérence S0→S1→S2, quotidien, tendance, récup, sync)
 // =======================
 
 /* -------------------------------------------------------------------- *
@@ -8,44 +8,28 @@
 const STORE_KEY = "rocksoState";
 
 function getStore() {
-  try {
-    return JSON.parse(localStorage.getItem(STORE_KEY)) || {};
-  } catch (_) {
-    return {};
-  }
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+  catch { return {}; }
 }
 function saveStore(st) {
   localStorage.setItem(STORE_KEY, JSON.stringify(st));
-  // Notifie toutes les pages pour réhydrater sans reload
   window.dispatchEvent(new CustomEvent("rockso:storeUpdated"));
 }
 
 /* -------------------------------------------------------------------- *
  * 2) Données démo : Baseline S-0 (cohérente avec S-1 et S-2)
- *    - S0 (44.0 km, 4 séances)
- *    - S1 (49.3 km, modèle => faible risque)
- *    - S2 (61.2 km, modèle => risque élevé)
- *    NB: S1/S2 seront chargées par la synchronisation (JSON ou fallback inline)
  * -------------------------------------------------------------------- */
 const BASELINE_S0 = {
   week_index: 0,
   start_iso: "2025-09-15",
   end_iso:   "2025-09-21",
-  summary: {
-    total_km: 44.0,
-    km_z5t: 3.5,
-    load_spike_rel_w1_w2: 1.00, // référence
-    sessions: 4,
-    duration_min: 270 // 4 h 30
-  },
+  summary: { total_km: 44.0, km_z5t: 3.5, load_spike_rel_w1_w2: 1.00, sessions: 4, duration_min: 270 },
   activities: [
-    // cohérence : allure ~5:00–5:25 / km, HR 146–154 bpm
     { datetime_iso:"2025-09-16T07:00:00", type:"run", distance_km:10.0, duration_min:51, avg_hr:148 },
     { datetime_iso:"2025-09-18T18:10:00", type:"run", distance_km:8.5,  duration_min:43, avg_hr:150 },
     { datetime_iso:"2025-09-19T07:05:00", type:"run", distance_km:9.5,  duration_min:48, avg_hr:146 },
     { datetime_iso:"2025-09-21T09:00:00", type:"run", distance_km:16.0, duration_min:88, avg_hr:152 }
   ],
-  // Quotidien 7 jours (moyennes réalistes)
   daily: [
     { date:"2025-09-15", steps:9800, active_cal:650, act_min:42, rhr_bpm:54, hrv_ms:74, sleep_min:430, resp_rpm:14, spo2_pct:97, rpe:3 },
     { date:"2025-09-16", steps:12100,active_cal:760, act_min:58, rhr_bpm:55, hrv_ms:72, sleep_min:445, resp_rpm:14, spo2_pct:97, rpe:4 },
@@ -56,15 +40,12 @@ const BASELINE_S0 = {
     { date:"2025-09-21", steps:14000,active_cal:880, act_min:70, rhr_bpm:55, hrv_ms:72, sleep_min:420, resp_rpm:14, spo2_pct:97, rpe:5 }
   ],
   ml: { predicted_label: 0, predicted_probability: 0.09, model: "global_sgd_tuned.joblib (simulé)" },
-  analysis_text:
-    "Semaine de référence (44 km) régulière : 4 séances, progression contrôlée, sommeil ~7h20, HRV ~74 ms. Charge tolérée et intensité mesurée → risque faible."
+  analysis_text: "Semaine de référence (44 km) régulière : 4 séances, progression contrôlée, sommeil ~7h20, HRV ~74 ms. Charge tolérée et intensité mesurée → risque faible."
 };
 
-// Fallback inline si les JSON S1/S2 ne sont pas trouvés (les tiens peuvent rester à la racine)
 const DEMO_INLINE = [
   { // S1 — semaine maîtrisée
-    week_index: 1,
-    start_iso: "2025-09-22", end_iso: "2025-09-28",
+    week_index: 1, start_iso: "2025-09-22", end_iso: "2025-09-28",
     activities: [
       { datetime_iso:"2025-09-22T07:10:00", type:"run",  distance_km:12.6, duration_min:63, avg_hr:148 },
       { datetime_iso:"2025-09-24T18:00:00", type:"run",  distance_km:8.0,  duration_min:42, avg_hr:151 },
@@ -82,12 +63,10 @@ const DEMO_INLINE = [
       { date:"2025-09-28", steps:15000,active_cal:940, act_min:76, rhr_bpm:56, hrv_ms:71, sleep_min:420, resp_rpm:14, spo2_pct:97, rpe:6 }
     ],
     ml: { predicted_label: 0, predicted_probability: 0.12, model:"global_sgd_tuned.joblib (simulé)" },
-    analysis_text:
-      "Semaine maîtrisée : 49 km (+12% vs réf), intensité contrôlée (~4 km Z5/T1/T2). Sommeil stable, HRV ~73 ms, RPE moyen 4 → risque faible."
+    analysis_text: "Semaine maîtrisée : 49 km (+12% vs réf), intensité contrôlée (~4 km Z5/T1/T2). Sommeil stable, HRV ~73 ms, RPE moyen 4 → risque faible."
   },
   { // S2 — surcharge
-    week_index: 2,
-    start_iso: "2025-09-29", end_iso: "2025-10-05",
+    week_index: 2, start_iso: "2025-09-29", end_iso: "2025-10-05",
     activities: [
       { datetime_iso:"2025-09-29T06:55:00", type:"run",  distance_km:15.0, duration_min:74, avg_hr:154 },
       { datetime_iso:"2025-10-01T19:05:00", type:"run",  distance_km:10.2, duration_min:50, avg_hr:158 },
@@ -105,12 +84,10 @@ const DEMO_INLINE = [
       { date:"2025-10-05", steps:18000,active_cal:1150,act_min:88, rhr_bpm:60, hrv_ms:63, sleep_min:395, resp_rpm:16, spo2_pct:97, rpe:8 }
     ],
     ml: { predicted_label: 1, predicted_probability: 0.74, model:"global_sgd_tuned.joblib (simulé)" },
-    analysis_text:
-      "Surcharge (+39% vs réf) et intensité élevée (~10 km Z5/T1/T2). HRV en baisse (~66 ms), sommeil en retrait, RPE élevé → risque accru. Conseils : réduire le volume 20-30 %, maintenir l’intensité technique courte, 2 nuits ≥ 7h30."
+    analysis_text: "Surcharge (+39% vs réf) et intensité élevée (~10 km Z5/T1/T2). HRV en baisse (~66 ms), sommeil en retrait, RPE élevé → risque accru. Conseils : réduire le volume 20-30 %, maintenir l’intensité technique courte, 2 nuits ≥ 7h30."
   }
 ];
 
-// Emplacements possibles des fichiers S1/S2
 const DEMO_WEEKS = ["week_demo_1.json","week_demo_2.json"];
 const DEMO_ALT_PREFIXES = ["./","./assets/","./data/","./assets/data/"];
 
@@ -130,7 +107,6 @@ async function loadWeek(idx){
     try { return await tryFetch(resolveUrl(p + file)); }
     catch(_) { /* continue */ }
   }
-  // Fallback inline
   return DEMO_INLINE[idx];
 }
 
@@ -174,15 +150,14 @@ function formatKm(n){
   const v = Number(n||0);
   return `${v.toLocaleString('fr-FR',{ maximumFractionDigits:1 })} km`;
 }
-function paceSecPerKm(distanceKm, durationMin){
-  if (!distanceKm || distanceKm<=0) return 0;
-  return Math.round((durationMin*60)/distanceKm);
-}
+function paceSecPerKm(distanceKm, durationMin){ if (!distanceKm || distanceKm<=0) return 0; return Math.round((durationMin*60)/distanceKm); }
 function fmtPace(secPerKm){
   if (!secPerKm) return '—';
   const m = Math.floor(secPerKm/60), s = String(Math.round(secPerKm%60)).padStart(2,'0');
   return `${m}:${s}/km`;
 }
+function avg(arr, key){ const n=arr.length||0; if(!n) return 0; return arr.reduce((a,x)=>a+(x[key]||0),0)/n; }
+function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
 
 /* -------------------------------------------------------------------- *
  * 5) Live state (depuis store)
@@ -191,34 +166,29 @@ function getLiveState(){
   const st = getStore();
   if (st.weeks && st.weeks.length){
     const lastW = st.weeks[st.weeks.length-1];
-    const acts = (st.activities||[]).slice().sort((a,b)=> new Date(a.datetime_iso||a.dateISO) - new Date(b.datetime_iso||b.dateISO));
-    const totalKm = lastW.summary?.total_km || 0;
-    const durationMin = lastW.summary?.duration_min || 0;
-    const sessions = lastW.summary?.sessions || acts.length;
-
-    // map UI activities
+    const acts = (st.activities||[]).slice()
+      .sort((a,b)=> new Date(a.datetime_iso||a.dateISO) - new Date(b.datetime_iso||b.dateISO));
     const uiActs = acts.map((a,i)=>({
       id: `wk${(a.week_index ?? lastW.week_index)}-a${i+1}`,
-      type: a.type === 'run' ? 'Course' : 'Course',
+      type: 'Course',
       dateISO: a.datetime_iso,
-      distanceKm: Number(a.distance_km ?? a.distance_km === 0 ? a.distance_km : a.distance_km) || Number(a.distance_km) || a.distance_km || a.distanceKm || 0,
+      distanceKm: Number(a.distance_km ?? a.distanceKm ?? 0),
       durationSec: Math.round((a.duration_min||0)*60),
       paceSecPerKm: paceSecPerKm(a.distance_km || 0, a.duration_min || 0),
       hrAvg: a.avg_hr || null,
       elevPos: 0, calories: 0
     }));
-
     const lastRaw = acts[acts.length-1];
     const lastActivity = lastRaw ? uiActs[uiActs.length-1] : null;
 
     return {
       weekly: {
-        load: totalKm,
-        hours: durationMin/60,
-        sessions,
-        durationMin
+        load: lastW.summary?.total_km || 0,
+        hours: (lastW.summary?.duration_min || 0)/60,
+        sessions: lastW.summary?.sessions || acts.length,
+        durationMin: lastW.summary?.duration_min || 0
       },
-      lastActivity: lastActivity,
+      lastActivity,
       activities: uiActs,
       sports: [
         { name:"Course", color:"#EB6E9A" },
@@ -227,14 +197,13 @@ function getLiveState(){
         { name:"Renfo", color:"#E9DDC9" }
       ],
       daily: st.daily || [],
-      lastWeekAnalysis: st.lastWeekAnalysis || null
+      lastWeekAnalysis: st.lastWeekAnalysis || null,
+      weeks: st.weeks
     };
   }
-
-  // Fallback très léger (ne devrait plus être utilisé après ensureBaselineS0)
   return {
     weekly: { load: 0, hours: 0, sessions: 0, durationMin: 0 },
-    lastActivity: null, activities: [], sports: [], daily: [], lastWeekAnalysis: null
+    lastActivity: null, activities: [], sports: [], daily: [], lastWeekAnalysis: null, weeks:[]
   };
 }
 
@@ -267,31 +236,43 @@ function hydrateHome(){
   const hoursEl = $('#metric-hours');
   if (hoursEl) hoursEl.textContent = fmtMinutesToHM(live.weekly.durationMin);
 
-  // Si tu affiches l’évolution, on la calcule vs S-0 si possible
+  // Évolution (si 2+ semaines), sinon 0%
   const st = getStore();
   if (st.weeks && st.weeks.length >= 2){
     const prev = st.weeks[st.weeks.length-2].summary?.total_km || live.weekly.load;
     const evol = prev ? ((live.weekly.load - prev)/prev)*100 : 0;
     setEvolution('evol-vol', evol);
-    // Intensité proxy : km_z5t / total_km (écart vs semaine précédente)
     const prevInt = (st.weeks[st.weeks.length-2].summary?.km_z5t || 0)/(prev||1);
     const curInt  = (st.weeks[st.weeks.length-1].summary?.km_z5t || 0)/(live.weekly.load||1);
     setEvolution('evol-int', Math.round((curInt - prevInt)*100));
+  } else {
+    setEvolution('evol-vol', 0);
+    setEvolution('evol-int', 0);
   }
 
-  // Dernière activité (si dispo)
+  // Sports chips
+  const chips = $('#sport-chips');
+  if (chips && chips.children.length === 0){
+    live.sports.forEach(sp=>{
+      const el = document.createElement('span');
+      el.className = 'chip';
+      el.innerHTML = `<span class="dot" style="background:${sp.color}"></span>${sp.name}`;
+      chips.appendChild(el);
+    });
+  }
+
+  // Dernière activité
   const last = live.lastActivity;
   if (last){
-    $('#last-type')?.appendChild(document.createTextNode(''));
     const t = $('#last-type'); if (t) t.textContent = last.type;
-    $('#last-date') && ($('#last-date').textContent = fmtDate(last.dateISO));
-    $('#last-distance') && ($('#last-distance').textContent = `${(last.distanceKm||0).toFixed(2)} km`);
-    $('#last-duration') && ($('#last-duration').textContent = fmtDurSec(last.durationSec||0));
-    $('#last-pace') && ($('#last-pace').textContent = fmtPace(last.paceSecPerKm));
-    $('#last-activity') && ($('#last-activity').href = `./activity.html?id=${last.id}`);
+    $('#last-date')      && ($('#last-date').textContent = fmtDate(last.dateISO));
+    $('#last-distance')  && ($('#last-distance').textContent = `${(last.distanceKm||0).toFixed(2)} km`);
+    $('#last-duration')  && ($('#last-duration').textContent = fmtDurSec(last.durationSec||0));
+    $('#last-pace')      && ($('#last-pace').textContent = fmtPace(last.paceSecPerKm));
+    $('#last-activity')  && ($('#last-activity').href = `./activity.html?id=${last.id}`);
   }
 
-  renderAnalysisPanelFromStore(); // panneau "Analyse IA" si présent
+  renderAnalysisPanelFromStore();
 }
 
 function renderAnalysisPanelFromStore(){
@@ -366,43 +347,62 @@ function hydrateTrainingEntr(){
   if (sEl) sEl.textContent = String(live.weekly.sessions);
 }
 
-// Helpers quotidiens
-function avg(arr, key){ const n=arr.length||0; if(!n) return 0; return arr.reduce((a,x)=>a+(x[key]||0),0)/n; }
-function last(arr){ return arr[arr.length-1]; }
-
+/* --------- Quotidien (IDs alignés avec ton HTML) --------- */
 function hydrateTrainingQuotidien(){
-  const anchor = $('#dq-steps') || $('#daily-list');
-  if (!anchor) return; // page pas affichée
+  // Ancre : on teste un ID qui existe sur ta page
+  const anchor = $('#dq-steps') || $('#qd-daily-list');
+  if (!anchor) return;
 
   const live = getLiveState();
   const days = live.daily || [];
+  const sortedDesc = days.slice().sort((a,b)=> new Date(b.date) - new Date(a.date));
+  const D = sortedDesc[0] || {};
 
-  // Cartes "Santé du quotidien"
-  const D = last(days) || {};
-  $('#dq-steps')      && ($('#dq-steps').textContent      = (D.steps||0).toLocaleString('fr-FR'));
-  $('#dq-active-cal') && ($('#dq-active-cal').textContent = `${D.active_cal||0} kcal`);
-  $('#dq-rhr')        && ($('#dq-rhr').textContent        = D.rhr_bpm ? `${D.rhr_bpm} bpm` : '—');
-  $('#dq-resp')       && ($('#dq-resp').textContent       = D.resp_rpm ? `${D.resp_rpm} rpm` : '—');
-  $('#dq-spo2')       && ($('#dq-spo2').textContent       = D.spo2_pct ? `${D.spo2_pct}%` : '—');
-  $('#dq-act-min')    && ($('#dq-act-min').textContent    = D.act_min ? `${D.act_min} min` : '—');
+  // Cartes
+  $('#dq-steps')     && ($('#dq-steps').textContent     = (D.steps||0).toLocaleString('fr-FR'));
+  $('#dq-cal')       && ($('#dq-cal').textContent       = `${D.active_cal||0} kcal`);
+  $('#dq-resthr')    && ($('#dq-resthr').textContent    = D.rhr_bpm ? `${D.rhr_bpm} bpm` : '—');
+  $('#dq-resp')      && ($('#dq-resp').textContent      = D.resp_rpm ? `${D.resp_rpm} rpm` : '—'); // rpm = respirations/min
+  $('#dq-spo2')      && ($('#dq-spo2').textContent      = D.spo2_pct ? `${D.spo2_pct}%` : '—');
+  $('#dq-active-min')&& ($('#dq-active-min').textContent= D.act_min ? `${D.act_min} min` : '—');
 
-  // Récap récupération (moyennes 7j)
-  $('#dq-sleep-last') && ($('#dq-sleep-last').textContent = D.sleep_min ? fmtMinutesToHM(D.sleep_min) : '—');
-  $('#dq-sleep-avg')  && ($('#dq-sleep-avg').textContent  = fmtMinutesToHM(avg(days,'sleep_min')));
-  $('#dq-hrv-avg')    && ($('#dq-hrv-avg').textContent    = `${Math.round(avg(days,'hrv_ms'))} ms`);
-  $('#dq-rpe-avg')    && ($('#dq-rpe-avg').textContent    = `${avg(days,'rpe').toFixed(1)}`);
-  $('#dq-rhr-avg')    && ($('#dq-rhr-avg').textContent    = `${Math.round(avg(days,'rhr_bpm'))} bpm`);
+  // Récap récup (cartes hautes)
+  $('#dq-sleep-last')&& ($('#dq-sleep-last').textContent= D.sleep_min ? fmtMinutesToHM(D.sleep_min) : '—');
+  $('#dq-slp-avg')   && ($('#dq-slp-avg').textContent   = fmtMinutesToHM(avg(days,'sleep_min')));
+  $('#dq-hrv-avg')   && ($('#dq-hrv-avg').textContent   = `${Math.round(avg(days,'hrv_ms'))} ms`);
+  $('#dq-rpe-avg')   && ($('#dq-rpe-avg').textContent   = `${avg(days,'rpe').toFixed(1)}`);
+  $('#dq-rhr-avg')   && ($('#dq-rhr-avg').textContent   = `${Math.round(avg(days,'rhr_bpm'))} bpm`);
 
-  // Journal quotidien (7 jours)
-  const list = $('#daily-list');
+  // Statut simple (OK / Attention)
+  const sleepAvgMin = avg(days,'sleep_min');
+  const hrvAvg      = avg(days,'hrv_ms');
+  const rpeAvg      = avg(days,'rpe');
+  const ok = (sleepAvgMin >= 7*60) && (hrvAvg >= 70) && (rpeAvg <= 5);
+  $('#qd-status-text') && ($('#qd-status-text').textContent = ok ? 'OK' : 'Attention');
+
+  // Journal quotidien (du + récent au + ancien)
+  const list = $('#qd-daily-list');
   if (list){
-    list.innerHTML = days.map(d => `
+    list.innerHTML = sortedDesc.map(d => `
       <div class="list row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)">
         <div><div class="meta">${new Date(d.date).toLocaleDateString('fr-FR',{ weekday:'short', day:'2-digit', month:'short'})}</div><strong>${(d.steps||0).toLocaleString('fr-FR')} pas</strong></div>
         <div><div class="meta">Sommeil</div><strong>${fmtMinutesToHM(d.sleep_min||0)}</strong></div>
         <div><div class="meta">HRV</div><strong>${d.hrv_ms||'—'} ms</strong></div>
       </div>
     `).join('');
+  }
+
+  // Récap “bas de page” (sum-sleep / sum-hrv / sum-rpe / statut)
+  $('#sum-sleep')      && ($('#sum-sleep').textContent   = fmtMinutesToHM(sleepAvgMin));
+  $('#sum-hrv')        && ($('#sum-hrv').textContent     = `${Math.round(hrvAvg)} ms`);
+  $('#sum-rpe')        && ($('#sum-rpe').textContent     = `${rpeAvg.toFixed(1)}`);
+  const dot = $('#sum-status-dot'), stx = $('#sum-status-text'), note = $('#sum-note');
+  if (dot && stx && note) {
+    dot.className = 'dot ' + (ok ? 'dot--ok' : 'dot--warn');
+    stx.textContent = ok ? 'OK' : 'Attention';
+    note.textContent = ok
+      ? "Sommeil et variabilité cardiaque dans la cible sur 7 jours. Poursuivre la progression contrôlée."
+      : "Signes de charge/fatigue : surveiller le sommeil et réduire légèrement l’intensité si besoin.";
   }
 }
 
@@ -415,6 +415,88 @@ function hydrateProfile(){
   $('#p-rest')  && ($('#p-rest').textContent  = 'OK');
 }
 
+/* --------- Récupération --------- */
+function hydrateTrainingRecuperation(){
+  const root = $('#rec-sleep-last') || $('#rec-tsb-text') || $('#rec-rpe-7d-text');
+  if (!root) return;
+  const st = getStore();
+  const live = getLiveState();
+  const days = live.daily || [];
+  const sortedDesc = days.slice().sort((a,b)=> new Date(b.date)-new Date(a.date));
+  const D = sortedDesc[0] || {};
+
+  // Sommeil
+  $('#rec-sleep-last') && ($('#rec-sleep-last').textContent = D.sleep_min ? fmtMinutesToHM(D.sleep_min) : '—');
+  $('#rec-sleep-avg')  && ($('#rec-sleep-avg').textContent  = fmtMinutesToHM(avg(days,'sleep_min')));
+
+  // RPE 7j
+  $('#rec-rpe-7d-text') && ($('#rec-rpe-7d-text').textContent = avg(days,'rpe').toFixed(1));
+
+  // TSB simple : CTL(τ=7) - ATL(τ=2) calculés sur les semaines connues à partir du volume (proxy TSS)
+  const vols = (st.weeks||[]).map(w=> w.summary?.total_km || 0);
+  function ema(arr, alpha){
+    let v = arr[0] || 0;
+    for (let i=1;i<arr.length;i++) v = alpha*arr[i] + (1-alpha)*v;
+    return v;
+  }
+  const ctl = ema(vols, 1/7);
+  const atl = ema(vols, 1/2);
+  const tsb = ctl - atl;
+  const tsbTxt = `${tsb>=0?'+':''}${Math.round(tsb)}`;
+  $('#rec-tsb-text') && ($('#rec-tsb-text').textContent = tsbTxt);
+}
+
+/* --------- Tendance (VO2 & CTL/ATL) --------- */
+function miniLine(containerId, seriesList, opts={}){
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const w = opts.w||320, h = opts.h||120, pad = 16;
+  // seriesList: [{data:[...], color:'#...', label:'...'}, ...]
+  const all = seriesList.flatMap(s=>s.data);
+  const min = Math.min(...all), max = Math.max(...all);
+  const sx = (i, N)=> pad + (w-2*pad) * (N<=1 ? 0.5 : (i/(N-1)));
+  const sy = (v)=> pad + (h-2*pad) * (1 - ( (v-min)/(max-min || 1) ));
+  const svgs = seriesList.map(s=>{
+    const pts = s.data.map((v,i)=> `${sx(i,s.data.length)},${sy(v)}`).join(' ');
+    return `<polyline points="${pts}" fill="none" stroke="${s.color||'#2E6E55'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }).join('');
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${svgs}</svg>`;
+}
+
+function hydrateTrainingTendance(){
+  const needle = $('#trend-needle') || $('#trend-vo2') || $('#trend-ctl-atl');
+  if (!needle) return;
+
+  const st = getStore();
+  const weeks = st.weeks || [];
+  // Proxy VO2max relatif (stable S0→S1, léger retrait S2)
+  // On part sur une base 52 → 52.5 → 52.2
+  const vo2 = [51.8, 52.0, 52.2, 52.1, 52.5, 52.2]; // 6 semaines fictives mais cohérentes
+  miniLine('trend-vo2', [{ data: vo2, color:'#3F8C6A' }]);
+
+  // CTL/ATL depuis volumes des semaines dispo + 3 semaines “historique” stables
+  const volsKnown = weeks.map(w=> w.summary?.total_km || 0);
+  const seed = volsKnown.length ? volsKnown[0] : 44;
+  const vols = [seed*0.95, seed*0.98, seed].concat(volsKnown); // 3 semaines avant S0, puis S0..Sn
+  function emaSeries(arr, alpha){
+    const out=[arr[0]||0]; for(let i=1;i<arr.length;i++){ out.push(alpha*arr[i] + (1-alpha)*out[i-1]); } return out;
+  }
+  const CTL = emaSeries(vols, 1/7);
+  const ATL = emaSeries(vols, 1/2);
+  miniLine('trend-ctl-atl', [
+    { data: CTL.slice(-6), color:'#2E6E55' },
+    { data: ATL.slice(-6), color:'#F2A65A' }
+  ]);
+
+  // Aiguille “modif condition physique” : delta CTL 3 dernières vs 3 précédentes
+  const last3 = CTL.slice(-3).reduce((a,b)=>a+b,0)/3;
+  const prev3 = CTL.slice(-6,-3).reduce((a,b)=>a+b,0)/3;
+  // scale -10..+10 → 0..100 %
+  const delta = clamp(last3 - prev3, -10, 10);
+  const pos = Math.round((delta + 10) * 5); // 0..100
+  const n = $('#trend-needle'); if (n) n.style.left = `${pos}%`;
+}
+
 /* -------------------------------------------------------------------- *
  * 7) Synchronisation (UI + merge + IA)
  * -------------------------------------------------------------------- */
@@ -425,7 +507,7 @@ function setupSyncAnimation(){
   const gCheck  = document.getElementById('sync-check');
   const status  = document.getElementById('sync-status');
   const textProgress = document.getElementById('sync-progress-text');
-  const iaGear  = document.getElementById('gear-area');
+  const iaGear  = document.getElementById('ia-gear');
   const doneEl  = document.getElementById('sync-done');
   const resetBtn= document.getElementById('reset-demo');
   const gPulsar = document.getElementById('sync-pulsar');
@@ -437,7 +519,10 @@ function setupSyncAnimation(){
   if ((persisted.synced || 0) > 0) {
     gCheck.style.display = 'block';
     gProg.style.display  = 'none';
-    doneEl && (doneEl.classList.remove('hidden'), doneEl.innerHTML = `✅ Rockso a déjà analysé l'entraînement. Consulte l'analyse sur <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`);
+    if (doneEl){
+      doneEl.classList.remove('hidden');
+      doneEl.innerHTML = `✅ Rockso a déjà analysé l'entraînement. Consulte l'analyse sur <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`;
+    }
     const last = document.querySelector('[data-sync-last]') || document.getElementById('sync-last') || document.querySelector('.sync-row .sync-label + .sync-val');
     if(last){
       const d = new Date();
@@ -445,12 +530,14 @@ function setupSyncAnimation(){
     }
   }
 
-  // Reset démo
-  resetBtn && resetBtn.addEventListener('click', ()=>{
-    localStorage.removeItem(STORE_KEY);
-    ensureBaselineS0(); // réinjecte S0 propre
-    window.dispatchEvent(new CustomEvent("rockso:storeUpdated"));
-  });
+  // Reset démo → réinjecte S0 et recharge la page (retour état initial visible)
+  if (resetBtn) {
+    resetBtn.addEventListener('click', ()=>{
+      localStorage.removeItem(STORE_KEY);
+      ensureBaselineS0();
+      window.location.reload();
+    });
+  }
 
   const CIRC = 2*Math.PI*60;
   function setProgress(pct){ bar.style.strokeDashoffset = (CIRC*(1-pct/100)).toFixed(1); }
@@ -459,6 +546,8 @@ function setupSyncAnimation(){
     gCheck.style.display = 'none';
     gProg.style.display  = 'block';
     btn.disabled = true;
+    bar.style.strokeDasharray = String(CIRC);
+    bar.style.strokeDashoffset = String(CIRC);
     setProgress(0);
     textProgress && (textProgress.textContent = '');
     doneEl && (doneEl.classList.add('hidden'), doneEl.innerHTML = '');
@@ -510,7 +599,6 @@ function setupSyncAnimation(){
     const st = getStore();
     st.weeks = (st.weeks||[]).concat(payload);
     st.activities = (st.activities||[]).concat(payload.activities||[]);
-    // si la semaine apporte du quotidien, on remplace la fenêtre courante par celle reçue
     if (payload.daily && payload.daily.length) st.daily = payload.daily.slice();
     st.lastActivity = st.activities[st.activities.length-1];
     st.lastWeekAnalysis = { text: payload.analysis_text, ml: payload.ml };
@@ -555,7 +643,6 @@ function setupSyncAnimation(){
   // État initial
   gCheck.style.display = 'block';
   gProg.style.display  = 'none';
-  bar && (bar.style.strokeDasharray = String(2*Math.PI*60), bar.style.strokeDashoffset = String(2*Math.PI*60));
   if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display='none'; }
 
   btn.addEventListener('click', startSync);
@@ -571,18 +658,18 @@ function bootHydrations(){
   hydrateProfile();
   hydrateTrainingEntr();
   hydrateTrainingQuotidien();
+  hydrateTrainingRecuperation();
+  hydrateTrainingTendance();
   renderAnalysisPanelFromStore();
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  ensureBaselineS0();     // ← injecte S0 si nécessaire
+  ensureBaselineS0();     // injecte S0 si nécessaire
   bootHydrations();
   setupSyncAnimation();
 
-  // Re-hydrate toutes les pages quand le store change (après sync / reset)
   window.addEventListener('rockso:storeUpdated', bootHydrations);
 
-  // Active onglet Training si on y est
   if (document.body.dataset.page === 'training') {
     const t = document.getElementById('tab-training');
     t && t.classList.add('active');
