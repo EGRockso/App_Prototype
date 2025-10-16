@@ -446,32 +446,39 @@ function renderAnalysisPanelFromStore(){
        ? "Semaine en surcharge : volume et/ou intensité élevés. Réduis le volume de 20–30 %, conserve une seule séance technique courte et dors ≥7h30 2 nuits."
        : "Semaine maîtrisée : progression dans la zone sûre. Conserve 1 séance de qualité, stabilise le volume et ajoute du vélo Z2 si jambes lourdes.");
 
-  // build GLANCE card
-  const glance = `
-    <div class="ap-card ap-hero ap-${tone}">
-      <div class="ap-row">
-        <span class="ap-pill">${pill}</span>
-        <span class="ap-oneliner clamp-1">${oneLiner}</span>
+    // build GLANCE card (ajout d'une micro-synthèse pour combler le vide)
+    const briefTxt = `${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km • ${hm(durMin)} • ${Math.round(shareInt*100)}% int. • ${pct(deltaVol,0)} vs ${prev ? 'S-1' : 'réf.'}`;
+
+    const glance = `
+      <div class="ap-card ap-hero ap-${tone}">
+        <div class="ap-row">
+          <span class="ap-pill">${pill}</span>
+          <span class="ap-oneliner clamp-1">${oneLiner}</span>
+        </div>
+        <div class="ap-kpis">
+          <div class="ap-kpi">
+            <div class="ap-kpi-label">Distance</div>
+            <div class="ap-kpi-val kpi-num">${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km</div>
+            <div class="ap-kpi-sub">${pct(deltaVol,0)} vs sem. préc.</div>
+          </div>
+          <div class="ap-kpi">
+            <div class="ap-kpi-label">Durée</div>
+            <div class="ap-kpi-val kpi-num">${hm(durMin)}</div>
+            <div class="ap-kpi-sub">${prev ? (Math.abs((durMin-(prev.summary?.duration_min||0))/(prev.summary?.duration_min||1)*100)<3 ? '≈' : '') : '—'}</div>
+          </div>
+          <div class="ap-kpi">
+            <div class="ap-kpi-label">% Intensité</div>
+            <div class="ap-kpi-val kpi-num">${Math.round(shareInt*100)}%</div>
+            <div class="ap-kpi-sub">${prevShareInt!=null ? pct((shareInt-prevShareInt)*100,0) : '+8%'}</div>
+          </div>
+        </div>
+        <!-- Micro-synthèse compacte pour remplir l'espace, 1 seule ligne -->
+        <div class="ap-brief muted" style="margin-top:8px;font-size:12px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          ${briefTxt}
+        </div>
       </div>
-      <div class="ap-kpis">
-        <div class="ap-kpi">
-          <div class="ap-kpi-label">Distance</div>
-          <div class="ap-kpi-val kpi-num">${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km</div>
-          <div class="ap-kpi-sub">${pct(deltaVol,0)} vs sem. préc.</div>
-        </div>
-        <div class="ap-kpi">
-          <div class="ap-kpi-label">Durée</div>
-          <div class="ap-kpi-val kpi-num">${hm(durMin)}</div>
-          <div class="ap-kpi-sub">${prev ? (Math.abs((durMin-(prev.summary?.duration_min||0))/(prev.summary?.duration_min||1)*100)<3 ? '≈' : '') : '—'}</div>
-        </div>
-        <div class="ap-kpi">
-          <div class="ap-kpi-label">% Intensité</div>
-          <div class="ap-kpi-val kpi-num">${Math.round(shareInt*100)}%</div>
-          <div class="ap-kpi-sub">${prevShareInt!=null ? pct((shareInt-prevShareInt)*100,0) : '+8%'}</div>
-        </div>
-      </div>
-    </div>
-  `;
+    `;
+
 
     // --- REASON (chips courts + sparkline optionnelle)
     const sleepHM = hm(slpMin).replace(' ', '');       // "7h21"
@@ -536,27 +543,46 @@ function synthesizeTrend(cur, prev){
 }
 
 function buildMiniSparkline(values, current, prev){
-  let v = (values||[]).filter(x=>x>0);
-  v = (v.length >= 6) ? v.slice(-6) : synthesizeTrend(current, prev);
+  // --- Série 6 semaines : vraie data si dispo, sinon remplissage cohérent
+  let v = (values || []).map(n => Number(n)||0).filter(n => n>0);
+  if (v.length < 6) {
+    const need = 6 - v.length;
+    const base = v.length ? v[0] : (current || 44);
+    let gen = [];
+    let x = base * 0.92; // léger trend rétro cohérent
+    for (let i=0;i<need;i++){ gen.unshift(Math.max(1, Number(x.toFixed(1)))); x *= 0.97; }
+    v = gen.concat(v);
+  } else {
+    v = v.slice(-6);
+  }
 
   const max = Math.max(...v, 1);
-  const pts = v.map((x,i)=>{
-    const xPos = 10 + i*(100/5);             // 6 points
-    const yPos = 48 - Math.max(6, (x/max)*42);
-    return `${xPos},${yPos}`;
-  }).join(' ');
+  const w = 120, h = 56;
+  const padX = 10, padY = 6;
+  const chartW = w - padX*2;
+  const chartH = h - padY*2 - 10; // laisse un peu de place aux labels bas
+  const bw = Math.floor(chartW / 6) - 2; // largeur barre
+  const baseY = padY + chartH;
 
-  const last = v.length-1;
-  const cx = 10 + last*(100/5);
-  const cy = 48 - Math.max(6, (v[last]/max)*42);
+  // Génère les barres (dernière = S0, mise en avant)
+  const bars = v.map((val, i) => {
+    const x = padX + i * (chartW / 6) + 1;
+    const hBar = Math.max(2, Math.round((val / max) * (chartH - 2)));
+    const y = baseY - hBar;
+    const isLast = (i === v.length - 1);
+    const fill = isLast ? '#3F8C6A' : 'rgba(0,0,0,.18)';
+    return `<rect x="${x}" y="${y}" width="${bw}" height="${hBar}" rx="2" fill="${fill}"/>`;
+  }).join('');
 
+  // Axe de base + labels S-5 / S0 très compacts
   return `
-    <svg class="ap-spark" viewBox="0 0 120 56" width="120" height="56" aria-hidden="true">
-      <polyline points="${pts}" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="2" />
-      <circle cx="${cx}" cy="${cy}" r="4" fill="#3F8C6A"/>
-      <text x="6" y="54" font-size="8" fill="rgba(0,0,0,.45)">S-5</text>
-      <text x="98" y="54" font-size="8" fill="rgba(0,0,0,.45)">S0</text>
-    </svg>`;
+    <svg class="ap-spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">
+      <line x1="${padX}" y1="${baseY}" x2="${w-padX}" y2="${baseY}" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
+      ${bars}
+      <text x="${padX-4}" y="${h-2}" font-size="8" text-anchor="start" fill="rgba(0,0,0,.45)">S-5</text>
+      <text x="${w-padX-4}" y="${h-2}" font-size="8" text-anchor="end" fill="rgba(0,0,0,.45)">S0</text>
+    </svg>
+  `;
 }
 
 // ── minimal carousel (auto-advance + dots; pauses on interaction)
