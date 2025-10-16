@@ -535,7 +535,19 @@ function renderAnalysisPanelFromStore(){
     `;
     initApCarousel(mount.querySelector('.ap-carousel'));
     wireCoachSheet(longText, cur);
-  }
+    // Caler la phrase IA pour remplir exactement l'espace avant les points
+    const doFit = () => fitGlanceToDots(mount);
+    requestAnimationFrame(() => { 
+      doFit();           // 1er layout
+      setTimeout(doFit, 60);   // fonts / reflow
+      setTimeout(doFit, 240);  // sécurité
+    });
+    window.addEventListener('resize', doFit, { passive:true });
+    const ro = new ResizeObserver(doFit);
+    const carEl = mount.querySelector('.ap-carousel');
+    if (carEl) ro.observe(carEl);
+
+    }
 }
 
 function synthesizeTrend(cur, prev){
@@ -618,6 +630,39 @@ function buildMiniSparkline(values, current, prev){
       <text x="${w-padX-4}" y="${h-2}" font-size="8" text-anchor="end" fill="rgba(0,0,0,.45)">S0</text>
     </svg>
   `;
+}
+
+// Remplit la phrase IA exactement jusqu'aux points du carrousel (sans dépasser)
+function fitGlanceToDots(mount){
+  const car   = mount.querySelector('.ap-carousel');
+  if (!car) return;
+  const brief = car.querySelector('.ap-slide:first-child .ap-brief');
+  const dots  = car.querySelector('.ap-dots');
+  if (!brief || !dots) return;
+
+  // Espace disponible entre le TOP du brief et le TOP des points (petite marge de sécu)
+  const br = brief.getBoundingClientRect();
+  const dr = dots.getBoundingClientRect();
+  const cap = Math.max(0, Math.floor(dr.top - br.top - 12)); // 12 px de marge
+
+  // Line-height réel (fallback si 'normal')
+  const cs = window.getComputedStyle(brief);
+  let lh = parseFloat(cs.lineHeight);
+  if (isNaN(lh)) {
+    const fs = parseFloat(cs.fontSize) || 12;
+    lh = Math.round(fs * 1.3);
+  }
+
+  // Nombre de lignes qui tiennent exactement
+  const maxLines = Math.max(1, Math.floor(cap / lh));
+
+  // Clamp multi-ligne standard + webkit (et coupe stricte en max-height)
+  brief.style.display = '-webkit-box';
+  brief.style.webkitBoxOrient = 'vertical';
+  brief.style.overflow = 'hidden';
+  brief.style.setProperty('-webkit-line-clamp', String(maxLines));
+  brief.style.setProperty('line-clamp',        String(maxLines));
+  brief.style.maxHeight = `${maxLines * lh}px`;
 }
 
 // ── minimal carousel (auto-advance + dots; pauses on interaction)
