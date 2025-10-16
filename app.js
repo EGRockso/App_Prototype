@@ -446,38 +446,40 @@ function renderAnalysisPanelFromStore(){
        ? "Semaine en surcharge : volume et/ou intensité élevés. Réduis le volume de 20–30 %, conserve une seule séance technique courte et dors ≥7h30 2 nuits."
        : "Semaine maîtrisée : progression dans la zone sûre. Conserve 1 séance de qualité, stabilise le volume et ajoute du vélo Z2 si jambes lourdes.");
 
-    // build GLANCE card (ajout d'une micro-synthèse pour combler le vide)
-    const briefTxt = `${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km • ${hm(durMin)} • ${Math.round(shareInt*100)}% int. • ${pct(deltaVol,0)} vs ${prev ? 'S-1' : 'réf.'}`;
+      // build GLANCE card — phrase IA (one-liner) pour combler l'espace
+      const briefDefault = `${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km • ${hm(durMin)} • ${Math.round(shareInt*100)}% int. • ${pct(deltaVol,0)} vs ${prev ? 'S-1' : 'réf.'}`;
+      const briefTxt = extractAiOneLiner(cur, briefDefault);
 
-    const glance = `
-      <div class="ap-card ap-hero ap-${tone}">
-        <div class="ap-row">
-          <span class="ap-pill">${pill}</span>
-          <span class="ap-oneliner clamp-1">${oneLiner}</span>
-        </div>
-        <div class="ap-kpis">
-          <div class="ap-kpi">
-            <div class="ap-kpi-label">Distance</div>
-            <div class="ap-kpi-val kpi-num">${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km</div>
-            <div class="ap-kpi-sub">${pct(deltaVol,0)} vs sem. préc.</div>
+      const glance = `
+        <div class="ap-card ap-hero ap-${tone}">
+          <div class="ap-row">
+            <span class="ap-pill">${pill}</span>
+            <span class="ap-oneliner clamp-1">${oneLiner}</span>
           </div>
-          <div class="ap-kpi">
-            <div class="ap-kpi-label">Durée</div>
-            <div class="ap-kpi-val kpi-num">${hm(durMin)}</div>
-            <div class="ap-kpi-sub">${prev ? (Math.abs((durMin-(prev.summary?.duration_min||0))/(prev.summary?.duration_min||1)*100)<3 ? '≈' : '') : '—'}</div>
+          <div class="ap-kpis">
+            <div class="ap-kpi">
+              <div class="ap-kpi-label">Distance</div>
+              <div class="ap-kpi-val kpi-num">${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km</div>
+              <div class="ap-kpi-sub">${pct(deltaVol,0)} vs sem. préc.</div>
+            </div>
+            <div class="ap-kpi">
+              <div class="ap-kpi-label">Durée</div>
+              <div class="ap-kpi-val kpi-num">${hm(durMin)}</div>
+              <div class="ap-kpi-sub">${prev ? (Math.abs((durMin-(prev.summary?.duration_min||0))/(prev.summary?.duration_min||1)*100)<3 ? '≈' : '') : '—'}</div>
+            </div>
+            <div class="ap-kpi">
+              <div class="ap-kpi-label">% Intensité</div>
+              <div class="ap-kpi-val kpi-num">${Math.round(shareInt*100)}%</div>
+              <div class="ap-kpi-sub">${prevShareInt!=null ? pct((shareInt-prevShareInt)*100,0) : '+8%'}</div>
+            </div>
           </div>
-          <div class="ap-kpi">
-            <div class="ap-kpi-label">% Intensité</div>
-            <div class="ap-kpi-val kpi-num">${Math.round(shareInt*100)}%</div>
-            <div class="ap-kpi-sub">${prevShareInt!=null ? pct((shareInt-prevShareInt)*100,0) : '+8%'}</div>
+          <!-- Micro-phrase d'analyse IA (1 ligne, ellipsée) -->
+          <div class="ap-brief muted" style="margin-top:8px;font-size:12px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            ${briefTxt}
           </div>
         </div>
-        <!-- Micro-synthèse compacte pour remplir l'espace, 1 seule ligne -->
-        <div class="ap-brief muted" style="margin-top:8px;font-size:12px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-          ${briefTxt}
-        </div>
-      </div>
-    `;
+      `;
+
 
 
     // --- REASON (chips courts + sparkline optionnelle)
@@ -542,39 +544,72 @@ function synthesizeTrend(cur, prev){
   return Array.from({length:6}, (_,i)=> start + (cur - start) * (i/5));
 }
 
+function stripHtmlToText(html){
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return (tmp.textContent || tmp.innerText || '').replace(/\s+/g,' ').trim();
+}
+function extractAiOneLiner(cur, fallback){
+  try{
+    const raw = stripHtmlToText(cur.analysis_text);
+    if (!raw) return fallback;
+    // Couper avant la section "Suggestion…" si présente
+    const cutIdx = raw.toLowerCase().indexOf('suggestion');
+    let s = (cutIdx > 0 ? raw.slice(0, cutIdx) : raw).trim();
+
+    // Prendre la 1ère phrase si elle est raisonnable, sinon couper à ~140c
+    const dot = s.indexOf('.');
+    if (dot > 40 && dot < 140) s = s.slice(0, dot + 1);
+    if (s.length > 140) s = s.slice(0, 137).trimEnd() + '…';
+
+    return s;
+  } catch(_) { return fallback; }
+}
+
 function buildMiniSparkline(values, current, prev){
-  // --- Série 6 semaines : vraie data si dispo, sinon remplissage cohérent
+  // Série 6 semaines : vraie data si dispo, sinon synthèse cohérente
   let v = (values || []).map(n => Number(n)||0).filter(n => n>0);
   if (v.length < 6) {
     const need = 6 - v.length;
     const base = v.length ? v[0] : (current || 44);
     let gen = [];
-    let x = base * 0.92; // léger trend rétro cohérent
+    let x = base * 0.92;
     for (let i=0;i<need;i++){ gen.unshift(Math.max(1, Number(x.toFixed(1)))); x *= 0.97; }
     v = gen.concat(v);
   } else {
     v = v.slice(-6);
   }
 
+  // Delta volume courant vs semaine précédente (pour la couleur)
+  let deltaPct = -4;
+  if (typeof prev === 'number' && prev > 0 && typeof current === 'number') {
+    deltaPct = ((current - prev) / prev) * 100;
+  }
+  const abs = Math.abs(deltaPct);
+  let lastFill = '#3F8C6A'; // ok (vert)
+  if (abs > EVOL_THRESH.ok && abs <= EVOL_THRESH.warn) lastFill = '#F2A65A'; // warn (orangé)
+  else if (abs > EVOL_THRESH.warn) lastFill = '#D64545'; // risk (rouge)
+
+  // Dimensions compactes
   const max = Math.max(...v, 1);
   const w = 120, h = 56;
   const padX = 10, padY = 6;
   const chartW = w - padX*2;
-  const chartH = h - padY*2 - 10; // laisse un peu de place aux labels bas
-  const bw = Math.floor(chartW / 6) - 2; // largeur barre
+  const chartH = h - padY*2 - 10;
+  const bw = Math.floor(chartW / 6) - 2;
   const baseY = padY + chartH;
 
-  // Génère les barres (dernière = S0, mise en avant)
+  // Barres (S-5→S0), S0 = dernière, couleur selon delta volume
   const bars = v.map((val, i) => {
     const x = padX + i * (chartW / 6) + 1;
     const hBar = Math.max(2, Math.round((val / max) * (chartH - 2)));
     const y = baseY - hBar;
     const isLast = (i === v.length - 1);
-    const fill = isLast ? '#3F8C6A' : 'rgba(0,0,0,.18)';
+    const fill = isLast ? lastFill : 'rgba(0,0,0,.18)';
     return `<rect x="${x}" y="${y}" width="${bw}" height="${hBar}" rx="2" fill="${fill}"/>`;
   }).join('');
 
-  // Axe de base + labels S-5 / S0 très compacts
   return `
     <svg class="ap-spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">
       <line x1="${padX}" y1="${baseY}" x2="${w-padX}" y2="${baseY}" stroke="rgba(0,0,0,.12)" stroke-width="1"/>
