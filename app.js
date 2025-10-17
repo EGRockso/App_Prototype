@@ -452,7 +452,10 @@ function renderAnalysisPanelFromStore(){
             ${planCard}
           </div>
         </div>
-        <div class="ap-dots"><button class="dot active"></button><button class="dot"></button></div>
+        <div class="ap-dots" aria-label="Navigation">
+          <button class="dot active" aria-selected="true"><span class="fill"></span></button>
+          <button class="dot" aria-selected="false"><span class="fill"></span></button>
+        </div>
       </div>
     `;
 
@@ -618,27 +621,92 @@ function fitGlanceToDots(mount){
   brief.style.maxHeight = `${maxLines * lh}px`;
 }
 
-// ── minimal carousel (auto-advance + dots; pauses on interaction)
+// styles des dots (injectés une seule fois)
+function ensureApDotsStyles(){
+  if (document.getElementById('ap-dots-style')) return;
+  const s = document.createElement('style');
+  s.id = 'ap-dots-style';
+  s.textContent = `
+    .ap-dots{display:flex;justify-content:center;gap:12px;margin-top:8px}
+    .ap-dots .dot{position:relative; width:8px; height:8px; border:0; padding:0; border-radius:999px; background:var(--dot-inactive,rgba(0,0,0,.15))}
+    .ap-dots .dot .fill{position:absolute; inset:0; width:0%; border-radius:inherit; background:var(--dot-fill,#3F8C6A)}
+    /* tiret actif (capsule) : même “rayon” que les points inactifs */
+    .ap-dots .dot.active{ width:36px; height:8px; border-radius:999px; background:var(--dot-track,rgba(63,140,106,.18))}
+    .ap-dots .dot.active .fill{ width:calc(var(--p,0)*100%); transition:width .12s linear }
+    .ap-dots .dot:focus-visible{outline:2px solid rgba(0,0,0,.25); outline-offset:2px}
+  `;
+  document.head.appendChild(s);
+}
+
+// Carrousel avec remplissage progressif du tiret actif
 function initApCarousel(node){
   if (!node) return;
-  const track = node.querySelector('.ap-track');
+  ensureApDotsStyles();
+
+  const track  = node.querySelector('.ap-track');
   const slides = Array.from(node.querySelectorAll('.ap-slide'));
-  const dots = Array.from(node.querySelectorAll('.ap-dots .dot'));
-  let idx = 0, timer = null, dur = Number(node.dataset.auto||9000);
+  const dots   = Array.from(node.querySelectorAll('.ap-dots .dot'));
+  let idx = 0;
+  let raf = null;
+  const dur = Number(node.dataset.auto || 9000); // durée d'une slide
+
+  function seedForDot(d){
+    // petit “noyau” visible au début ≈ taille d’un point
+    const w = d.offsetWidth || 36, h = d.offsetHeight || 8;
+    return Math.min(0.40, Math.max(0.15, h / w)); // ~0.22 avec 36×8
+  }
+
+  function apply(){
+    track.style.transform = `translateX(${-idx*100}%)`;
+    dots.forEach((d,i)=>{
+      d.classList.toggle('active', i===idx);
+      d.setAttribute('aria-selected', i===idx ? 'true' : 'false');
+      d.style.removeProperty('--p'); // réinitialise le remplissage
+    });
+  }
+
+  let t0 = 0;               // départ de la progression
+  let paused = false;
+
+  function loop(now){
+    if (paused) { t0 = now; raf = requestAnimationFrame(loop); return; }
+    const d = dots[idx];
+    if (d){
+      const seed = seedForDot(d);
+      const p = Math.min(1, seed + ((now - t0) / dur) * (1 - seed));
+      d.style.setProperty('--p', p.toFixed(3));
+      if (p >= 1){ go(idx + 1); }  // slide suivante quand plein
+    }
+    raf = requestAnimationFrame(loop);
+  }
+
+  function start(){ cancelAnimationFrame(raf); t0 = performance.now(); paused=false; raf = requestAnimationFrame(loop); }
+  function stop(){  cancelAnimationFrame(raf); raf=null; paused=true; }
 
   function go(i){
-    idx = (i+slides.length)%slides.length;
-    track.style.transform = `translateX(${-idx*100}%)`;
-    dots.forEach((d,j)=> d.classList.toggle('active', j===idx));
+    idx = (i + slides.length) % slides.length;
+    apply();
+    start();                 // relance la progression avec le petit “noyau”
   }
-  function start(){ stop(); timer = setInterval(()=>go(idx+1), dur); }
-  function stop(){ if (timer){ clearInterval(timer); timer=null; } }
 
-  dots.forEach((d,i)=> d.addEventListener('click', ()=>{ stop(); go(i); start(); }));
+  // Interaction dots : va à la slide et “bloque” ⇒ plein instantané puis reprise
+  dots.forEach((d,i)=>{
+    d.addEventListener('click', ()=>{
+      stop();
+      go(i);                 // positionne + seed immédiat
+      dots[i].style.setProperty('--p', '1'); // plein instantané tant que c’est bloqué
+      setTimeout(()=>{ start(); }, 1200);    // reprise auto
+    });
+  });
+
+  // Pause/reprise au toucher (swipe déjà géré par le navigateur)
   node.addEventListener('pointerdown', stop);
   node.addEventListener('pointerup',   start);
   node.addEventListener('pointerleave',start);
-  go(0); start();
+
+  // boot
+  apply();
+  start();
 }
 
 // ── Bottom-sheet (coach)
