@@ -40,7 +40,6 @@ const BASELINE_S0 = {
     { date:"2025-09-21", steps:14000,active_cal:880, act_min:70, rhr_bpm:55, hrv_ms:72, sleep_min:420, resp_rpm:14, spo2_pct:97, rpe:5 }
   ],
   ml: { predicted_label: 0, predicted_probability: 0.09, model: "global_sgd_tuned.joblib (simulé)" },
-  // analysis_text: "Semaine de référence (44 km) régulière : 4 séances, progression contrôlée, sommeil ~7h19, HRV ~74 ms. Charge tolérée et intensité mesurée → risque faible."
   analysis_text: `
   <strong>Semaine de référence, fluide et maîtrisée</strong><br>
   <ul>
@@ -331,10 +330,10 @@ function renderAnalysisPanelFromStore(){
 
   // daily avgs for “Reason”
   const days = cur.daily || st.daily || [];
-  const avg = (arr, k) => (arr.length ? arr.reduce((a,x)=>a+(x[k]||0),0)/arr.length : 0);
-  const slpMin = avg(days,'sleep_min'); // minutes
-  const hrvMs  = avg(days,'hrv_ms');
-  const rpe    = avg(days,'rpe');
+  const avgLocal = (arr, k) => (arr.length ? arr.reduce((a,x)=>a+(x[k]||0),0)/arr.length : 0);
+  const slpMin = avgLocal(days,'sleep_min'); // minutes
+  const hrvMs  = avgLocal(days,'hrv_ms');
+  const rpe    = avgLocal(days,'rpe');
 
   // verdict
   const spike = Number(cur.summary?.load_spike_rel_w1_w2 || 1.0);
@@ -368,59 +367,59 @@ function renderAnalysisPanelFromStore(){
     : (tone==='risk'
        ? "Semaine en surcharge : volume et/ou intensité élevés. Réduis le volume de 20–30 %, conserve une seule séance technique courte et dors ≥7h30 2 nuits."
        : "Semaine maîtrisée : progression dans la zone sûre. Conserve 1 séance de qualité, stabilise le volume et ajoute du vélo Z2 si jambes lourdes.");
-      
-      const iaBrief = extractBriefText(cur.analysis_text || '', 220);
-      // build GLANCE card — phrase IA (one-liner) pour combler l'espace
-      const briefDefault = `${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km • ${hm(durMin)} • ${Math.round(shareInt*100)}% int. • ${pct(deltaVol,0)} vs ${prev ? 'S-1' : 'réf.'}`;
-      const briefTxt = extractAiOneLiner(cur, briefDefault);
 
-      const glance = `
-        <div class="ap-card ap-hero ap-${tone}">
-          <div class="ap-row">
-            <span class="ap-pill">${pill}</span>
-            <span class="ap-oneliner clamp-1">${oneLiner}</span>
-          </div>
+  // One-liners depuis analyse longue
+  const iaBrief = extractBriefText(cur.analysis_text || '', 220);
+  const briefDefault = `${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km • ${hm(durMin)} • ${Math.round(shareInt*100)}% int. • ${pct(deltaVol,0)} vs ${prev ? 'S-1' : 'réf.'}`;
+  const briefTxt = extractAiOneLiner(cur, briefDefault);
 
-          <div class="ap-kpis">
-            <div class="ap-kpi">
-              <div class="ap-kpi-label">Distance</div>
-              <div class="ap-kpi-val kpi-num">${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km</div>
-              <div class="ap-kpi-sub">${pct(deltaVol,0)} vs sem. préc.</div>
-            </div>
-            <div class="ap-kpi">
-              <div class="ap-kpi-label">Durée</div>
-              <div class="ap-kpi-val kpi-num">${hm(durMin)}</div>
-              <div class="ap-kpi-sub">${prev ? (Math.abs((durMin-(prev.summary?.duration_min||0))/(prev.summary?.duration_min||1)*100)<3 ? '≈' : '') : '—'}</div>
-            </div>
-            <div class="ap-kpi">
-              <div class="ap-kpi-label">% Intensité</div>
-              <div class="ap-kpi-val kpi-num">${Math.round(shareInt*100)}%</div>
-              <div class="ap-kpi-sub">${prevShareInt!=null ? pct((shareInt-prevShareInt)*100,0) : '+8%'}</div>
-            </div>
-          </div>
-
-          <!-- Résumé IA qui doit remplir l'espace jusqu'aux points -->
-          <p class="ap-brief">${briefTxt}</p>
-        </div>
-      `;
-
-    // --- REASON (chips courts + sparkline optionnelle)
-    const sleepHM = hm(slpMin).replace(' ', '');       // "7h21"
-    const rpeTxt  = (rpe || 0).toFixed(1);
-    const reason = `
-      <div class="ap-card ap-reason">
-        <div class="ap-reason-row">
-          <span class="chip chip-soft" title="Sommeil moyen">😴 ~${sleepHM}</span>
-          <span class="chip chip-soft" title="Variabilité cardiaque">🫀 ${Math.round(hrvMs)||'—'} ms</span>
-          <span class="chip chip-soft" title="Effort perçu">🧭 RPE&nbsp;${rpeTxt}</span>
-        </div>
-        ${SHOW_SPARK ? `
-        <div class="ap-sparkwrap">
-          <div class="ap-spark-title muted">Volume (6 sem.)</div>
-          ${buildMiniSparkline((st.weeks||[]).slice(-6).map(w => Number(w.summary?.total_km||0)), km, prevKm)}
-        </div>` : ``}
+  const glance = `
+    <div class="ap-card ap-hero ap-${tone}">
+      <div class="ap-row">
+        <span class="ap-pill">${pill}</span>
+        <span class="ap-oneliner clamp-1">${oneLiner}</span>
       </div>
-    `;
+
+      <div class="ap-kpis">
+        <div class="ap-kpi">
+          <div class="ap-kpi-label">Distance</div>
+          <div class="ap-kpi-val kpi-num">${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km</div>
+          <div class="ap-kpi-sub">${pct(deltaVol,0)} vs sem. préc.</div>
+        </div>
+        <div class="ap-kpi">
+          <div class="ap-kpi-label">Durée</div>
+          <div class="ap-kpi-val kpi-num">${hm(durMin)}</div>
+          <div class="ap-kpi-sub">${prev ? (Math.abs((durMin-(prev.summary?.duration_min||0))/(prev.summary?.duration_min||1)*100)<3 ? '≈' : '') : '—'}</div>
+        </div>
+        <div class="ap-kpi">
+          <div class="ap-kpi-label">% Intensité</div>
+          <div class="ap-kpi-val kpi-num">${Math.round(shareInt*100)}%</div>
+          <div class="ap-kpi-sub">${prevShareInt!=null ? pct((shareInt-prevShareInt)*100,0) : '+8%'}</div>
+        </div>
+      </div>
+
+      <!-- Résumé IA qui doit remplir l'espace jusqu'aux points -->
+      <p class="ap-brief">${briefTxt}</p>
+    </div>
+  `;
+
+  // --- REASON (chips courts + sparkline optionnelle)
+  const sleepHM = hm(slpMin).replace(' ', '');       // "7h21"
+  const rpeTxt  = (rpe || 0).toFixed(1);
+  const reason = `
+    <div class="ap-card ap-reason">
+      <div class="ap-reason-row">
+        <span class="chip chip-soft" title="Sommeil moyen">😴 ~${sleepHM}</span>
+        <span class="chip chip-soft" title="Variabilité cardiaque">🫀 ${Math.round(hrvMs)||'—'} ms</span>
+        <span class="chip chip-soft" title="Effort perçu">🧭 RPE&nbsp;${rpeTxt}</span>
+      </div>
+      ${SHOW_SPARK ? `
+      <div class="ap-sparkwrap">
+        <div class="ap-spark-title muted">Volume (6 sem.)</div>
+        ${buildMiniSparkline((st.weeks||[]).slice(-6).map(w => Number(w.summary?.total_km||0)), km, prevKm)}
+      </div>` : ``}
+    </div>
+  `;
 
   // build PLAN (3 slots + CTA)
   const planCard = `
@@ -462,7 +461,7 @@ function renderAnalysisPanelFromStore(){
     initApCarousel(mount.querySelector('.ap-carousel'));
     wireCoachSheet(longText, cur);
 
-    // ---- égalisation hauteur + ajustement du brief (sans redéclarer) ----
+    // ---- égalisation hauteur + ajustement du brief (bindings uniques) ----
     const carHome = mount.querySelector('.ap-carousel');
     if (carHome && !carHome.dataset.eqBound) {
       const doEqualizeHome = () => equalizeCarouselHeight(carHome);
@@ -513,6 +512,7 @@ function extractAiOneLiner(cur, fallback){
   } catch(_) { return fallback; }
 }
 
+// Série mini bar chart (S-5 → S0) avec couleur de la barre S0 selon delta volume (OK/AVERT/RISQUE)
 function buildMiniSparkline(values, current, prev){
   // Série 6 semaines : vraie data si dispo, sinon synthèse cohérente
   let v = (values || []).map(n => Number(n)||0).filter(n => n>0);
@@ -588,6 +588,7 @@ function equalizeCarouselHeight(car){
   car.style.setProperty('--ap-slide-h', `${maxH}px`);
   slides.forEach(s => s.style.minHeight = `var(--ap-slide-h)`);    // verrouille la hauteur
 }
+
 // Remplit la phrase IA exactement jusqu'aux points du carrousel (sans dépasser)
 function fitGlanceToDots(mount){
   const car   = mount.querySelector('.ap-carousel');
@@ -784,7 +785,61 @@ function ensureCoachSheet(){
     x.addEventListener('click', closeCoachSheet);
   });
 }
+
+// Styles + frame pour que la sheet démarre sous le header et finisse au-dessus de la tabbar
+function ensureCoachFrameStyles(){
+  if (document.getElementById('coach-frame-style')) return;
+  const s = document.createElement('style');
+  s.id = 'coach-frame-style';
+  s.textContent = `
+    :root{
+      --coach-w: 430px;
+      --coach-top: 56px;
+      --coach-bottom: 56px;
+    }
+    #coach-sheet .coach-backdrop{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.35);
+      opacity:0; transition:opacity .2s ease;
+    }
+    #coach-sheet.open .coach-backdrop{ opacity:1; }
+
+    #coach-sheet .coach-panel{
+      position:fixed;
+      left:50%;
+      width:min(var(--coach-w, 430px), 100vw);
+      top: calc(var(--coach-top) + env(safe-area-inset-top));
+      bottom: calc(var(--coach-bottom) + env(safe-area-inset-bottom));
+      transform: translate(-50%, calc(100% + 12px));
+      transition: transform .35s cubic-bezier(.2,.8,.2,1);
+      background: var(--card, #fff);
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.2);
+      overflow:hidden;
+    }
+    #coach-sheet.open .coach-panel{ transform: translate(-50%, 0); }
+  `;
+  document.head.appendChild(s);
+}
+function computeCoachFrame(){
+  const header = document.querySelector('.app-header, header, .topbar, .navbar, #header');
+  let topPx = 56;
+  if (header){
+    const r = header.getBoundingClientRect();
+    topPx = Math.max(0, Math.round(r.bottom));
+  }
+  const tabbar = document.querySelector('.tabbar, .app-tabbar, .bottom-nav, footer.tabbar, nav.tabbar, #tabbar');
+  let bottomPx = 56;
+  if (tabbar){
+    const rr = tabbar.getBoundingClientRect();
+    bottomPx = Math.max(0, Math.round(window.innerHeight - rr.top));
+  }
+  document.documentElement.style.setProperty('--coach-top', `${topPx}px`);
+  document.documentElement.style.setProperty('--coach-bottom', `${bottomPx}px`);
+}
+
 function openCoachSheet(innerHTML){
+  ensureCoachFrameStyles();
   const sheet = document.getElementById('coach-sheet');
   if (!sheet) return;
 
@@ -793,8 +848,22 @@ function openCoachSheet(innerHTML){
   const w = host ? host.getBoundingClientRect().width : Math.min(window.innerWidth, 430);
   document.documentElement.style.setProperty('--coach-w', `${Math.round(w)}px`);
 
+  // bornes entre header et tabbar
+  computeCoachFrame();
+
   sheet.querySelector('.coach-content').innerHTML = innerHTML;
   sheet.classList.add('open');
+
+  // recalc au resize/orientation jusqu’à fermeture
+  const onRsz = ()=> computeCoachFrame();
+  window.addEventListener('resize', onRsz, { passive:true });
+  const watcher = new MutationObserver(()=>{
+    if (!sheet.classList.contains('open')){
+      window.removeEventListener('resize', onRsz);
+      watcher.disconnect();
+    }
+  });
+  watcher.observe(sheet, { attributes:true, attributeFilter:['class'] });
 }
 
 function closeCoachSheet(){
@@ -873,7 +942,7 @@ function buildCoachTips(ctx){
   `;
 }
 
-// Carrousel minimal (auto + dots progress + swipe + reprise quand visible)
+// Carrousel minimal (auto + dots progress + swipe + reprise quand visible) — (non utilisé ici mais conservé)
 function mountAnalysisCarousel(root, slides, { autoMs=8000 } = {}){
   const track = root.querySelector('.ac-track');
   const dots  = root.querySelector('.ac-dots');
@@ -1134,8 +1203,7 @@ function hydrateTrainingTendance(){
   const st = getStore();
   const weeks = st.weeks || [];
   // Proxy VO2max relatif (stable S0→S1, léger retrait S2)
-  // On part sur une base 52 → 52.5 → 52.2
-  const vo2 = [51.8, 52.0, 52.2, 52.1, 52.5, 52.2]; // 6 semaines fictives mais cohérentes
+  const vo2 = [51.8, 52.0, 52.2, 52.1, 52.5, 52.2]; // 6 semaines fictives
   miniLine('trend-vo2', [{ data: vo2, color:'#3F8C6A' }]);
 
   // CTL/ATL depuis volumes des semaines dispo + 3 semaines “historique” stables
@@ -1282,6 +1350,7 @@ function setupSyncAnimation(){
         endSyncUI();
         return;
       }
+
       const payload = await loadWeek(idx);
       await runDemoUpload(payload);
       mergePayloadIntoStore(payload);
@@ -1293,8 +1362,14 @@ function setupSyncAnimation(){
       status && (status.textContent = "Analyse IA en cours…");
       await new Promise(r=>setTimeout(r, 2000));
       iaGear && iaGear.classList.add('hidden');
-      doneEl && (doneEl.classList.remove('hidden'),
-                 doneEl.innerHTML = `✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a class="link-cta" href="./index.html">d’Accueil</a> ou <a class="link-cta" href="./training-entrainement.html">Training</a>.`;)
+
+      // Message final (liens verts + "d’Accueil")
+      if (doneEl){
+        doneEl.classList.remove('hidden');
+        doneEl.innerHTML = `✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a class="link-cta" href="./index.html">d’Accueil</a> ou <a class="link-cta" href="./training-entrainement.html">Training</a>.`;
+      }
+
+    } catch(e){
       console.error(e);
       status && (status.textContent = "Erreur de synchronisation.");
       textProgress && (textProgress.textContent = "La démo a un fallback intégré, recharge la page si le problème persiste.");
