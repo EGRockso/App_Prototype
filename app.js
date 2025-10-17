@@ -294,83 +294,6 @@ function hydrateHome(){
   renderAnalysisPanelFromStore();
 }
 
-/* function renderAnalysisPanelFromStore(){
-  const panel = document.getElementById("analysis-panel");
-  if (!panel) return;
-
-  const st = getStore();
-  const weeks = st.weeks || [];
-  if (!weeks.length){
-    panel.innerHTML = `<div class="card"><div class="card-body"><p>Pas d'analyse disponible.</p></div></div>`;
-    return;
-  }
-
-  const W = weeks[weeks.length-1];
-  const Prev = weeks[weeks.length-2];
-
-  // Petits helpers locaux
-  const minutesToHM = (min)=> {
-    const h = Math.floor((min||0)/60), m = Math.round((min||0)%60);
-    return `${h}h ${String(m).padStart(2,'0')}`;
-  };
-  const fmtShort = (d)=> new Date(d).toLocaleDateString('fr-FR',{ day:'2-digit', month:'short'}).replace('.', '');
-  const fmtRange = (a,b)=> (a && b) ? `du ${fmtShort(a)} au ${fmtShort(b)}` : '';
-
-  // KPI
-  const totalKm   = Number(W.summary?.total_km || 0);
-  const durMin    = Number(W.summary?.duration_min || (W.activities||[]).reduce((acc,x)=>acc+(x.duration_min||0),0));
-  const kmZ5      = Number(W.summary?.km_z5t || 0);
-  const intPct    = totalKm ? Math.round((kmZ5/totalKm)*100) : 0;
-
-  // Progression (spike déclaré, sinon calcul vs semaine précédente)
-  const prevKm    = Number(Prev?.summary?.total_km || 0);
-  const spike     = W.summary?.load_spike_rel_w1_w2 || (prevKm ? (totalKm/prevKm) : 1);
-  const evolVol   = prevKm ? Math.round(((totalKm - prevKm)/prevKm)*100) : 0;
-
-  // Risque
-  const prob      = W.ml?.predicted_probability != null ? Math.round(W.ml.predicted_probability*100) : null;
-  const isRisk    = !!W.ml?.predicted_label;
-  const pillCls   = isRisk ? 'pill--red' : 'pill--green';
-  const pillTxt   = isRisk ? 'Risque de blessure' : 'Risque faible';
-
-  const dateLabel = fmtRange(W.start_iso, W.end_iso);
-
-  panel.innerHTML = `
-    <div class="card anx">
-      <div class="anx-head">
-        <div class="left">
-          <span class="pill ${pillCls}">${pillTxt}</span>
-          ${prob != null ? `<span class="anx-proba">(${prob}% proba)</span>` : ``}
-        </div>
-        ${dateLabel ? `<span class="anx-date muted">${dateLabel}</span>` : ``}
-      </div>
-
-      <div class="anx-kpis">
-        <div class="anx-kpi">
-          <div class="lbl">Volume</div>
-          <div class="val"><strong>${totalKm.toFixed(1)} km</strong><span class="sub">• ${minutesToHM(durMin)}</span></div>
-        </div>
-        <div class="anx-kpi">
-          <div class="lbl">Intensité</div>
-          <div class="val"><strong>${kmZ5.toFixed(1)} km</strong><span class="sub">• ${intPct}%</span></div>
-        </div>
-        <div class="anx-kpi">
-          <div class="lbl">Progression</div>
-          <div class="val">
-            <strong>x${Number(spike).toFixed(2)}</strong>
-            ${prevKm ? `<span class="sub ${evolVol>=0?'pos':'neg'}">${evolVol>0?'+':''}${evolVol}% vs S-1</span>` : ``}
-          </div>
-        </div>
-      </div>
-
-      <hr class="anx-sep"/>
-      <div class="anx-body">
-        ${W.analysis_text || ''}
-      </div>
-    </div>
-  `;
-} */
-
 const SHOW_SPARK = true; // passe à false pour masquer la sparkline
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -445,7 +368,8 @@ function renderAnalysisPanelFromStore(){
     : (tone==='risk'
        ? "Semaine en surcharge : volume et/ou intensité élevés. Réduis le volume de 20–30 %, conserve une seule séance technique courte et dors ≥7h30 2 nuits."
        : "Semaine maîtrisée : progression dans la zone sûre. Conserve 1 séance de qualité, stabilise le volume et ajoute du vélo Z2 si jambes lourdes.");
-
+      
+      const iaBrief = extractBriefText(cur.analysis_text || '', 220);
       // build GLANCE card — phrase IA (one-liner) pour combler l'espace
       const briefDefault = `${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km • ${hm(durMin)} • ${Math.round(shareInt*100)}% int. • ${pct(deltaVol,0)} vs ${prev ? 'S-1' : 'réf.'}`;
       const briefTxt = extractAiOneLiner(cur, briefDefault);
@@ -456,6 +380,7 @@ function renderAnalysisPanelFromStore(){
             <span class="ap-pill">${pill}</span>
             <span class="ap-oneliner clamp-1">${oneLiner}</span>
           </div>
+
           <div class="ap-kpis">
             <div class="ap-kpi">
               <div class="ap-kpi-label">Distance</div>
@@ -473,14 +398,11 @@ function renderAnalysisPanelFromStore(){
               <div class="ap-kpi-sub">${prevShareInt!=null ? pct((shareInt-prevShareInt)*100,0) : '+8%'}</div>
             </div>
           </div>
-          <!-- Micro-phrase d'analyse IA (1 ligne, ellipsée) -->
-          <div class="ap-brief muted" style="margin-top:8px;font-size:12px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-            ${briefTxt}
-          </div>
+
+          <!-- Résumé IA qui doit remplir l'espace jusqu'aux points -->
+          <p class="ap-brief muted">${iaBrief}</p>
         </div>
       `;
-
-
 
     // --- REASON (chips courts + sparkline optionnelle)
     const sleepHM = hm(slpMin).replace(' ', '');       // "7h21"
@@ -533,21 +455,30 @@ function renderAnalysisPanelFromStore(){
         <div class="ap-dots"><button class="dot active"></button><button class="dot"></button></div>
       </div>
     `;
+
     initApCarousel(mount.querySelector('.ap-carousel'));
     wireCoachSheet(longText, cur);
-    // Caler la phrase IA pour remplir exactement l'espace avant les points
-    const doFit = () => fitGlanceToDots(mount);
-    requestAnimationFrame(() => { 
-      doFit();           // 1er layout
-      setTimeout(doFit, 60);   // fonts / reflow
-      setTimeout(doFit, 240);  // sécurité
-    });
-    window.addEventListener('resize', doFit, { passive:true });
-    const ro = new ResizeObserver(doFit);
-    const carEl = mount.querySelector('.ap-carousel');
-    if (carEl) ro.observe(carEl);
 
+    // ---- égalisation hauteur + ajustement du brief (sans redéclarer) ----
+    const carHome = mount.querySelector('.ap-carousel');
+    if (carHome && !carHome.dataset.eqBound) {
+      const doEqualizeHome = () => equalizeCarouselHeight(carHome);
+      const doFitHome      = () => fitGlanceToDots(mount);
+
+      const schedule = () => {
+        requestAnimationFrame(() => { doEqualizeHome(); doFitHome(); });
+        setTimeout(() => { doEqualizeHome(); doFitHome(); }, 120);
+      };
+
+      schedule();                                // au montage
+      window.addEventListener('resize', schedule, { passive:true });
+
+      const roHome = new ResizeObserver(schedule);
+      roHome.observe(carHome);
+
+      carHome.dataset.eqBound = '1';            // évite multiples bindings
     }
+  }
 }
 
 function synthesizeTrend(cur, prev){
@@ -632,6 +563,28 @@ function buildMiniSparkline(values, current, prev){
   `;
 }
 
+// Récupère un bref résumé texte depuis l'analyse HTML longue
+function extractBriefText(html, maxChars = 220){
+  if (!html) return "";
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  const text = (div.textContent || '').replace(/\s+/g,' ').trim();
+  if (text.length <= maxChars) return text;
+  const cut = text.slice(0, maxChars);
+  const lastStop = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf(' • '), cut.lastIndexOf('; '));
+  return (lastStop > 120 ? cut.slice(0, lastStop+1) : cut.slice(0, maxChars-1) + '…');
+}
+
+// Donne la même hauteur à tous les slides du carrousel (= hauteur du plus grand)
+function equalizeCarouselHeight(car){
+  if (!car) return;
+  const slides = Array.from(car.querySelectorAll('.ap-track .ap-slide'));
+  if (!slides.length) return;
+  slides.forEach(s => s.style.minHeight = 'auto');                 // reset pour mesurer
+  const maxH = Math.max(...slides.map(s => s.scrollHeight || s.offsetHeight || 0));
+  car.style.setProperty('--ap-slide-h', `${maxH}px`);
+  slides.forEach(s => s.style.minHeight = `var(--ap-slide-h)`);    // verrouille la hauteur
+}
 // Remplit la phrase IA exactement jusqu'aux points du carrousel (sans dépasser)
 function fitGlanceToDots(mount){
   const car   = mount.querySelector('.ap-carousel');
