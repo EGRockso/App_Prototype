@@ -400,7 +400,7 @@ function renderAnalysisPanelFromStore(){
           </div>
 
           <!-- Résumé IA qui doit remplir l'espace jusqu'aux points -->
-          <p class="ap-brief muted">${iaBrief}</p>
+          <p class="ap-brief">${briefTxt}</p>
         </div>
       `;
 
@@ -431,7 +431,7 @@ function renderAnalysisPanelFromStore(){
         <button class="ap-slot" data-plan="int">⚡ <strong>Intensité</strong><br><span>${plan.int}</span></button>
         <button class="ap-slot" data-plan="sub">🚲 <strong>Substitution</strong><br><span>${plan.sub}</span></button>
       </div>
-      <button class="btn btn-primary ap-plan-cta" data-open-sheet>Appliquer au plan</button>
+      <button class="ap-plan-cta link-cta" data-open-sheet>Appliquer au plan</button>
     </div>
   `;
 
@@ -634,6 +634,47 @@ function ensureApDotsStyles(){
     .ap-dots .dot.active{ width:36px; height:8px; border-radius:999px; background:var(--dot-track,rgba(63,140,106,.18))}
     .ap-dots .dot.active .fill{ width:calc(var(--p,0)*100%); transition:width .12s linear }
     .ap-dots .dot:focus-visible{outline:2px solid rgba(0,0,0,.25); outline-offset:2px}
+  `;
+  document.head.appendChild(s);
+}
+
+function ensureAnalysisTypo(){
+  if (document.getElementById('ap-typography-style')) return;
+  const s = document.createElement('style');
+  s.id = 'ap-typography-style';
+  s.textContent = `
+    /* Phrase IA sous les 3 KPI du GLANCE */
+    .ap-hero .ap-brief{
+      margin-top:8px;
+      font-size:13px;          /* ~même taille que les chips Volume/Intensité/Substitution */
+      line-height:1.25;
+      color: var(--text-muted, rgba(0,0,0,.6));
+      display:block;
+      overflow:hidden;         /* clamp multi-ligne contrôlé par JS */
+    }
+
+    /* CTA "Appliquer au plan" en lien vert (pas de fond gris) */
+    .link-cta, .btn.link-cta, .ap-plan-cta{
+      background:transparent !important;
+      border:none !important;
+      box-shadow:none !important;
+      padding:0 !important;
+      color:#3F8C6A !important;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .link-cta:hover{ text-decoration:underline; }
+
+    /* Boutons de la page sync en style lien vert */
+    #sync-btn, #reset-demo{
+      background:transparent !important;
+      border:none !important;
+      box-shadow:none !important;
+      color:#3F8C6A !important;
+      font-weight:600;
+      padding:0 !important;
+      cursor:pointer;
+    }
   `;
   document.head.appendChild(s);
 }
@@ -1144,7 +1185,7 @@ function setupSyncAnimation(){
     gProg.style.display  = 'none';
     if (doneEl){
       doneEl.classList.remove('hidden');
-      doneEl.innerHTML = `✅ Rockso a déjà analysé l'entraînement. Consulte l'analyse sur <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`;
+      doneEl.innerHTML = `✅ Rockso a déjà analysé l'entraînement. Consulte l'analyse sur la page <a class="link-cta" href="./index.html">d’Accueil</a> ou <a class="link-cta" href="./training-entrainement.html">Training</a>.`;
     }
     const last = document.querySelector('[data-sync-last]') || document.getElementById('sync-last') || document.querySelector('.sync-row .sync-label + .sync-val');
     if(last){
@@ -1253,8 +1294,7 @@ function setupSyncAnimation(){
       await new Promise(r=>setTimeout(r, 2000));
       iaGear && iaGear.classList.add('hidden');
       doneEl && (doneEl.classList.remove('hidden'),
-                 doneEl.innerHTML = `✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a href="./index.html">Index</a> ou <a href="./training-entrainement.html">Training</a>.`);
-    } catch(e){
+                 doneEl.innerHTML = `✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a class="link-cta" href="./index.html">d’Accueil</a> ou <a class="link-cta" href="./training-entrainement.html">Training</a>.`;)
       console.error(e);
       status && (status.textContent = "Erreur de synchronisation.");
       textProgress && (textProgress.textContent = "La démo a un fallback intégré, recharge la page si le problème persiste.");
@@ -1288,6 +1328,7 @@ function bootHydrations(){
 
 document.addEventListener('DOMContentLoaded', ()=>{
   ensureBaselineS0();     // injecte S0 si nécessaire
+  ensureAnalysisTypo();
   bootHydrations();
   setupSyncAnimation();
 
