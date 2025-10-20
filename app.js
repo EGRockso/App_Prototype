@@ -297,6 +297,8 @@ const SHOW_SPARK = true; // passe à false pour masquer la sparkline
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  ANALYSE — GLANCE → REASON → PLAN
+//  • Home: 2-slide carousel (GLANCE first) + bottom-sheet CTA
+//  • Training/Entraînement: stacked sections (no carousel) + same sheet
 // ─────────────────────────────────────────────────────────────────────────────
 function renderAnalysisPanelFromStore(){
   const mount = document.getElementById("analysis-panel");
@@ -359,14 +361,14 @@ function renderAnalysisPanelFromStore(){
     sub: "1 sortie → vélo 60–75’ Z2"
   };
 
-  // long form (coach sheet)
+  // long form (coach sheet): use your existing analysis text if present, otherwise synthesize
   const longText = (cur.analysis_text?.trim())
     ? cur.analysis_text
     : (tone==='risk'
        ? "Semaine en surcharge : volume et/ou intensité élevés. Réduis le volume de 20–30 %, conserve une seule séance technique courte et dors ≥7h30 2 nuits."
        : "Semaine maîtrisée : progression dans la zone sûre. Conserve 1 séance de qualité, stabilise le volume et ajoute du vélo Z2 si jambes lourdes.");
 
-  // One-liners
+  // One-liners depuis analyse longue
   const iaBrief = extractBriefText(cur.analysis_text || '', 220);
   const briefDefault = `${km.toLocaleString('fr-FR',{maximumFractionDigits:1})} km • ${hm(durMin)} • ${Math.round(shareInt*100)}% int. • ${pct(deltaVol,0)} vs ${prev ? 'S-1' : 'réf.'}`;
   const briefTxt = extractAiOneLiner(cur, briefDefault);
@@ -402,7 +404,7 @@ function renderAnalysisPanelFromStore(){
   `;
 
   // --- REASON (chips courts + sparkline optionnelle)
-  const sleepHM = hm(slpMin).replace(' ', '');
+  const sleepHM = hm(slpMin).replace(' ', '');       // "7h21"
   const rpeTxt  = (rpe || 0).toFixed(1);
   const reason = `
     <div class="ap-card ap-reason">
@@ -483,6 +485,7 @@ function renderAnalysisPanelFromStore(){
 
 function synthesizeTrend(cur, prev){
   const start = prev > 0 ? prev : cur * 0.9;
+  // 6 points du S-5 à S0, progression lissée vers la valeur courante
   return Array.from({length:6}, (_,i)=> start + (cur - start) * (i/5));
 }
 
@@ -496,17 +499,22 @@ function extractAiOneLiner(cur, fallback){
   try{
     const raw = stripHtmlToText(cur.analysis_text);
     if (!raw) return fallback;
+    // Couper avant la section "Suggestion…" si présente
     const cutIdx = raw.toLowerCase().indexOf('suggestion');
     let s = (cutIdx > 0 ? raw.slice(0, cutIdx) : raw).trim();
+
+    // Prendre la 1ère phrase si elle est raisonnable, sinon couper à ~140c
     const dot = s.indexOf('.');
     if (dot > 40 && dot < 140) s = s.slice(0, dot + 1);
     if (s.length > 140) s = s.slice(0, 137).trimEnd() + '…';
+
     return s;
   } catch(_) { return fallback; }
 }
 
-// Série mini bar chart (S-5 → S0)
+// Série mini bar chart (S-5 → S0) avec couleur de la barre S0 selon delta volume (OK/AVERT/RISQUE)
 function buildMiniSparkline(values, current, prev){
+  // Série 6 semaines : vraie data si dispo, sinon synthèse cohérente
   let v = (values || []).map(n => Number(n)||0).filter(n => n>0);
   if (v.length < 6) {
     const need = 6 - v.length;
@@ -519,6 +527,7 @@ function buildMiniSparkline(values, current, prev){
     v = v.slice(-6);
   }
 
+  // Delta volume courant vs semaine précédente (pour la couleur)
   let deltaPct = -4;
   if (typeof prev === 'number' && prev > 0 && typeof current === 'number') {
     deltaPct = ((current - prev) / prev) * 100;
@@ -528,6 +537,7 @@ function buildMiniSparkline(values, current, prev){
   if (abs > EVOL_THRESH.ok && abs <= EVOL_THRESH.warn) lastFill = '#F2A65A'; // warn (orangé)
   else if (abs > EVOL_THRESH.warn) lastFill = '#D64545'; // risk (rouge)
 
+  // Dimensions compactes
   const max = Math.max(...v, 1);
   const w = 120, h = 56;
   const padX = 10, padY = 6;
@@ -536,6 +546,7 @@ function buildMiniSparkline(values, current, prev){
   const bw = Math.floor(chartW / 6) - 2;
   const baseY = padY + chartH;
 
+  // Barres (S-5→S0), S0 = dernière, couleur selon delta volume
   const bars = v.map((val, i) => {
     const x = padX + i * (chartW / 6) + 1;
     const hBar = Math.max(2, Math.round((val / max) * (chartH - 2)));
@@ -555,6 +566,7 @@ function buildMiniSparkline(values, current, prev){
   `;
 }
 
+// Récupère un bref résumé texte depuis l'analyse HTML longue
 function extractBriefText(html, maxChars = 220){
   if (!html) return "";
   const div = document.createElement('div');
@@ -566,17 +578,18 @@ function extractBriefText(html, maxChars = 220){
   return (lastStop > 120 ? cut.slice(0, lastStop+1) : cut.slice(0, maxChars-1) + '…');
 }
 
+// Donne la même hauteur à tous les slides du carrousel (= hauteur du plus grand)
 function equalizeCarouselHeight(car){
   if (!car) return;
   const slides = Array.from(car.querySelectorAll('.ap-track .ap-slide'));
   if (!slides.length) return;
-  slides.forEach(s => s.style.minHeight = 'auto');
+  slides.forEach(s => s.style.minHeight = 'auto');                 // reset pour mesurer
   const maxH = Math.max(...slides.map(s => s.scrollHeight || s.offsetHeight || 0));
   car.style.setProperty('--ap-slide-h', `${maxH}px`);
-  slides.forEach(s => s.style.minHeight = `var(--ap-slide-h)`);
+  slides.forEach(s => s.style.minHeight = `var(--ap-slide-h)`);    // verrouille la hauteur
 }
 
-// Remplit la phrase IA exactement jusqu'aux points du carrousel
+// Remplit la phrase IA exactement jusqu'aux points du carrousel (sans dépasser)
 function fitGlanceToDots(mount){
   const car   = mount.querySelector('.ap-carousel');
   if (!car) return;
@@ -584,10 +597,12 @@ function fitGlanceToDots(mount){
   const dots  = car.querySelector('.ap-dots');
   if (!brief || !dots) return;
 
+  // Espace disponible entre le TOP du brief et le TOP des points (petite marge de sécu)
   const br = brief.getBoundingClientRect();
   const dr = dots.getBoundingClientRect();
-  const cap = Math.max(0, Math.floor(dr.top - br.top - 12));
+  const cap = Math.max(0, Math.floor(dr.top - br.top - 12)); // 12 px de marge
 
+  // Line-height réel (fallback si 'normal')
   const cs = window.getComputedStyle(brief);
   let lh = parseFloat(cs.lineHeight);
   if (isNaN(lh)) {
@@ -595,8 +610,10 @@ function fitGlanceToDots(mount){
     lh = Math.round(fs * 1.3);
   }
 
+  // Nombre de lignes qui tiennent exactement
   const maxLines = Math.max(1, Math.floor(cap / lh));
 
+  // Clamp multi-ligne standard + webkit (et coupe stricte en max-height)
   brief.style.display = '-webkit-box';
   brief.style.webkitBoxOrient = 'vertical';
   brief.style.overflow = 'hidden';
@@ -605,6 +622,7 @@ function fitGlanceToDots(mount){
   brief.style.maxHeight = `${maxLines * lh}px`;
 }
 
+// styles des dots (injectés une seule fois)
 function ensureApDotsStyles(){
   if (document.getElementById('ap-dots-style')) return;
   const s = document.createElement('style');
@@ -613,6 +631,7 @@ function ensureApDotsStyles(){
     .ap-dots{display:flex;justify-content:center;gap:12px;margin-top:8px}
     .ap-dots .dot{position:relative; width:8px; height:8px; border:0; padding:0; border-radius:999px; background:var(--dot-inactive,rgba(0,0,0,.15))}
     .ap-dots .dot .fill{position:absolute; inset:0; width:0%; border-radius:inherit; background:var(--dot-fill,#3F8C6A)}
+    /* tiret actif (capsule) : même “rayon” que les points inactifs */
     .ap-dots .dot.active{ width:36px; height:8px; border-radius:999px; background:var(--dot-track,rgba(63,140,106,.18))}
     .ap-dots .dot.active .fill{ width:calc(var(--p,0)*100%); transition:width .12s linear }
     .ap-dots .dot:focus-visible{outline:2px solid rgba(0,0,0,.25); outline-offset:2px}
@@ -625,14 +644,17 @@ function ensureAnalysisTypo(){
   const s = document.createElement('style');
   s.id = 'ap-typography-style';
   s.textContent = `
+    /* Phrase IA sous les 3 KPI du GLANCE */
     .ap-hero .ap-brief{
       margin-top:8px;
-      font-size:13px;
+      font-size:13px;          /* ~même taille que les chips Volume/Intensité/Substitution */
       line-height:1.25;
       color: var(--text-muted, rgba(0,0,0,.6));
       display:block;
-      overflow:hidden;
+      overflow:hidden;         /* clamp multi-ligne contrôlé par JS */
     }
+
+    /* CTA "Appliquer au plan" en lien vert (pas de fond gris) */
     .link-cta, .btn.link-cta, .ap-plan-cta{
       background:transparent !important;
       border:none !important;
@@ -643,6 +665,8 @@ function ensureAnalysisTypo(){
       cursor:pointer;
     }
     .link-cta:hover{ text-decoration:underline; }
+
+    /* Boutons de la page sync en style lien vert */
     #sync-btn, #reset-demo{
       background:transparent !important;
       border:none !important;
@@ -666,11 +690,12 @@ function initApCarousel(node){
   const dots   = Array.from(node.querySelectorAll('.ap-dots .dot'));
   let idx = 0;
   let raf = null;
-  const dur = Number(node.dataset.auto || 9000);
+  const dur = Number(node.dataset.auto || 9000); // durée d'une slide
 
   function seedForDot(d){
+    // petit “noyau” visible au début ≈ taille d’un point
     const w = d.offsetWidth || 36, h = d.offsetHeight || 8;
-    return Math.min(0.40, Math.max(0.15, h / w));
+    return Math.min(0.40, Math.max(0.15, h / w)); // ~0.22 avec 36×8
   }
 
   function apply(){
@@ -678,11 +703,11 @@ function initApCarousel(node){
     dots.forEach((d,i)=>{
       d.classList.toggle('active', i===idx);
       d.setAttribute('aria-selected', i===idx ? 'true' : 'false');
-      d.style.removeProperty('--p');
+      d.style.removeProperty('--p'); // réinitialise le remplissage
     });
   }
 
-  let t0 = 0;
+  let t0 = 0;               // départ de la progression
   let paused = false;
 
   function loop(now){
@@ -692,7 +717,7 @@ function initApCarousel(node){
       const seed = seedForDot(d);
       const p = Math.min(1, seed + ((now - t0) / dur) * (1 - seed));
       d.style.setProperty('--p', p.toFixed(3));
-      if (p >= 1){ go(idx + 1); }
+      if (p >= 1){ go(idx + 1); }  // slide suivante quand plein
     }
     raf = requestAnimationFrame(loop);
   }
@@ -703,29 +728,32 @@ function initApCarousel(node){
   function go(i){
     idx = (i + slides.length) % slides.length;
     apply();
-    start();
+    start();                 // relance la progression avec le petit “noyau”
   }
 
+  // Interaction dots : va à la slide et “bloque” ⇒ plein instantané puis reprise
   dots.forEach((d,i)=>{
     d.addEventListener('click', ()=>{
       stop();
-      go(i);
-      dots[i].style.setProperty('--p', '1');
-      setTimeout(()=>{ start(); }, 1200);
+      go(i);                 // positionne + seed immédiat
+      dots[i].style.setProperty('--p', '1'); // plein instantané tant que c’est bloqué
+      setTimeout(()=>{ start(); }, 1200);    // reprise auto
     });
   });
 
+  // Pause/reprise au toucher (swipe déjà géré par le navigateur)
   node.addEventListener('pointerdown', stop);
   node.addEventListener('pointerup',   start);
   node.addEventListener('pointerleave',start);
 
+  // boot
   apply();
   start();
 }
 
 // ── Bottom-sheet (coach)
 function wireCoachSheet(longText, curWeek){
-  ensureCoachSheet();
+  ensureCoachSheet(); // injects if absent
   const openers = document.querySelectorAll('[data-open-sheet], .ap-slot');
   openers.forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -742,7 +770,9 @@ function ensureCoachSheet(){
       <div class="coach-backdrop" data-close-sheet></div>
       <div class="coach-panel" role="dialog" aria-modal="true" aria-label="Conseil Rockso">
         <div class="coach-grabber" aria-hidden="true"></div>
-        <div class="coach-content"></div>
+        <div class="coach-content">
+          <!-- filled dynamically -->
+        </div>
         <div class="coach-actions">
           <button class="btn" data-close-sheet>Fermer</button>
           <button class="btn btn-primary">Ajouter au plan</button>
@@ -756,6 +786,88 @@ function ensureCoachSheet(){
   });
 }
 
+// ─────────────────────────────────────────────────────────────
+// Modale légère pour la page Profil (réutilisable partout)
+// ─────────────────────────────────────────────────────────────
+function ensureInfoSheetStyles(){
+  if (document.getElementById('info-sheet-style')) return;
+  const s = document.createElement('style');
+  s.id = 'info-sheet-style';
+  s.textContent = `
+    #info-sheet{position:fixed; inset:0; z-index:999; display:none}
+    #info-sheet.open{display:block}
+    #info-sheet .info-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.35)}
+    #info-sheet .info-panel{
+      position:absolute; left:50%; transform:translateX(-50%);
+      top:calc(var(--header-h,56px) + 8px); bottom:calc(var(--tabbar-h,64px) + 8px);
+      width:min(100vw, var(--coach-w,420px)); background:#fff; border-radius:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.15); display:flex; flex-direction:column; overflow:hidden
+    }
+    #info-sheet .info-head{padding:12px 16px; border-bottom:1px solid var(--line,rgba(0,0,0,.08)); display:flex; align-items:center; justify-content:space-between}
+    #info-sheet .info-title{font-weight:700}
+    #info-sheet .info-body{padding:16px; overflow:auto; line-height:1.45}
+    #info-sheet .btn-close{background:transparent; border:0; font-size:18px; padding:6px; cursor:pointer}
+  `;
+  document.head.appendChild(s);
+}
+function ensureInfoSheet(){
+  if (document.getElementById('info-sheet')) return;
+  ensureInfoSheetStyles();
+  const el = document.createElement('div');
+  el.id = 'info-sheet';
+  el.innerHTML = `
+    <div class="info-backdrop" data-close-info></div>
+    <div class="info-panel" role="dialog" aria-modal="true">
+      <div class="info-head">
+        <div class="info-title"></div>
+        <button class="btn-close" aria-label="Fermer" data-close-info>✕</button>
+      </div>
+      <div class="info-body"></div>
+    </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click', (e)=>{ if (e.target.matches('[data-close-info]')) closeInfoSheet(); });
+}
+function openInfoSheet({ title='', html='' }){
+  ensureInfoSheet();
+  const sheet = document.getElementById('info-sheet');
+  sheet.querySelector('.info-title').textContent = title;
+  sheet.querySelector('.info-body').innerHTML = html;
+  sheet.classList.add('open');
+}
+function closeInfoSheet(){ document.getElementById('info-sheet')?.classList.remove('open'); }
+
+/** Attache les clics des boutons de la section profil (future→inspo) */
+function wireProfileInspoModals(){
+  const sec = document.querySelector('.section.future');
+  if (!sec) return;
+  ensureInfoSheet();
+
+  // Délégation : on écoute les boutons à l’intérieur de la section
+  sec.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-open="profile-info"]');
+    if (!btn) return;
+
+    const targetId = btn.dataset.target;               // ex: "inspo-pro-detail"
+    const title    = btn.dataset.title || btn.textContent.trim();
+    let html = '';
+
+    if (targetId){
+      const tpl = sec.querySelector(`#${targetId}`);
+      if (tpl){
+        // <template> ou <div hidden> — on récupère le HTML
+        html = tpl.tagName.toLowerCase()==='template'
+          ? (tpl.content?.firstElementChild ? tpl.content.firstElementChild.outerHTML : tpl.innerHTML)
+          : tpl.innerHTML;
+      }
+    } else if (btn.dataset.html) {
+      html = btn.dataset.html;
+    }
+
+    if (html) openInfoSheet({ title, html });
+  });
+}
+
+// Styles + frame pour que la sheet démarre sous le header et finisse au-dessus de la tabbar
 function ensureCoachFrameStyles(){
   if (document.getElementById('coach-frame-style')) return;
   const s = document.createElement('style');
@@ -812,15 +924,18 @@ function openCoachSheet(innerHTML){
   const sheet = document.getElementById('coach-sheet');
   if (!sheet) return;
 
+  // largeur = largeur du conteneur de l'app (ici le panel d'analyse)
   const host = document.getElementById('analysis-panel');
   const w = host ? host.getBoundingClientRect().width : Math.min(window.innerWidth, 430);
   document.documentElement.style.setProperty('--coach-w', `${Math.round(w)}px`);
 
+  // bornes entre header et tabbar
   computeCoachFrame();
 
   sheet.querySelector('.coach-content').innerHTML = innerHTML;
   sheet.classList.add('open');
 
+  // recalc au resize/orientation jusqu’à fermeture
   const onRsz = ()=> computeCoachFrame();
   window.addEventListener('resize', onRsz, { passive:true });
   const watcher = new MutationObserver(()=>{
@@ -861,6 +976,7 @@ function trendTag(delta, unit, upIsGoodTxt='↑ mieux'){
 function buildCoachTips(ctx){
   const { highRisk, volCur, intDelta, sesCur, sleepAvg, hrvAvg } = ctx;
 
+  // Cible de volume compacte (réduc si risque, +light sinon)
   const incSafe   = Math.min(.08, Math.max(0, .06 - Math.max(0,intDelta)));
   const targetVol = highRisk ? volCur * 0.75 : volCur * (1 + incSafe);
 
@@ -907,7 +1023,7 @@ function buildCoachTips(ctx){
   `;
 }
 
-// Carrousel minimal (non utilisé ici mais conservé)
+// Carrousel minimal (auto + dots progress + swipe + reprise quand visible) — (non utilisé ici mais conservé)
 function mountAnalysisCarousel(root, slides, { autoMs=8000 } = {}){
   const track = root.querySelector('.ac-track');
   const dots  = root.querySelector('.ac-dots');
@@ -952,12 +1068,14 @@ function mountAnalysisCarousel(root, slides, { autoMs=8000 } = {}){
     raf = requestAnimationFrame(tick);
   }
 
+  // interactions
   dots.addEventListener('click', e=>{
     const btn = e.target.closest('.ac-dot');
     if (!btn) return;
     i = Number(btn.dataset.i||0); prog=0; t0=performance.now(); apply();
   });
 
+  // swipe
   let sx=0, dx=0;
   track.addEventListener('pointerdown', e=>{ hold=true; sx=e.clientX; dx=0; track.setPointerCapture(e.pointerId); });
   track.addEventListener('pointermove', e=>{ if(!hold)return; dx=e.clientX - sx; track.style.setProperty('--drag', dx); });
@@ -968,6 +1086,7 @@ function mountAnalysisCarousel(root, slides, { autoMs=8000 } = {}){
     hold=false;
   });
 
+  // pause si hors écran / onglet
   const io = new IntersectionObserver(([ent])=>{
     const visible = ent?.isIntersecting;
     hold = !visible;
@@ -978,7 +1097,290 @@ function mountAnalysisCarousel(root, slides, { autoMs=8000 } = {}){
     hold = (document.visibilityState !== 'visible');
   });
 
+  // start
   apply(); t0 = performance.now(); raf = requestAnimationFrame(tick);
+}
+
+function hydrateActivities(){
+  const list = $('#activity-list');
+  if (!list) return;
+  const live = getLiveState();
+  const items = (live.activities||[]).slice().sort((a,b)=> new Date(b.dateISO)-new Date(a.dateISO));
+  list.innerHTML = items.map(a=>(
+    `<a class="row" href="./activity.html?id=${a.id}">
+      <div class="left">
+        <span class="icon">${Icons.Course}</span>
+        <div>
+          <div><strong>${a.type}</strong></div>
+          <div class="meta">${fmtDate(a.dateISO)}</div>
+        </div>
+      </div>
+      <div class="right">
+        <div style="text-align:right"><strong>${a.distanceKm ? a.distanceKm.toFixed(1)+' km' : ''}</strong><div class="meta">${fmtDurSec(a.durationSec||0)}</div></div>
+      </div>
+    </a>`
+  )).join('');
+}
+
+function hydrateActivity(){
+  if (!$('#type')) return;
+  const id = new URLSearchParams(location.search).get('id');
+  const live = getLiveState();
+  const a = (live.activities||[]).find(x=>x.id===id) || live.activities?.[live.activities.length-1];
+  if (!a) return;
+  $('#type').textContent = a.type;
+  $('#date').textContent = fmtDate(a.dateISO);
+  $('#distance').textContent = a.distanceKm ? a.distanceKm.toFixed(2)+' km' : '—';
+  $('#duration').textContent = fmtDurSec(a.durationSec||0);
+  $('#pace').textContent = fmtPace(a.paceSecPerKm);
+  $('#hr').textContent = a.hrAvg ? a.hrAvg+' bpm' : '—';
+  $('#elev') && ($('#elev').textContent = a.elevPos ? a.elevPos+' m' : '—');
+  $('#cal') && ($('#cal').textContent = a.calories ? a.calories+' kcal' : '—');
+}
+
+function hydrateTrainingEntr(){
+  const dEl = $('#trg-dist-7'); const tEl = $('#trg-dur-7'); const sEl = $('#trg-sessions');
+  if (!dEl && !tEl && !sEl) return;
+  const live = getLiveState();
+  if (dEl) dEl.textContent = formatKm(live.weekly.load);
+  if (tEl) tEl.textContent = fmtMinutesToHM(live.weekly.durationMin);
+  if (sEl) sEl.textContent = String(live.weekly.sessions);
+}
+
+/* --------- Quotidien (IDs alignés avec ton HTML) --------- */
+function hydrateTrainingQuotidien(){
+  // Ancre : on teste un ID qui existe sur ta page
+  const anchor = $('#dq-steps') || $('#qd-daily-list');
+  if (!anchor) return;
+
+  const live = getLiveState();
+  const days = live.daily || [];
+  const sortedDesc = days.slice().sort((a,b)=> new Date(b.date) - new Date(a.date));
+  const D = sortedDesc[0] || {};
+
+  // Cartes
+  $('#dq-steps')     && ($('#dq-steps').textContent     = (D.steps||0).toLocaleString('fr-FR'));
+  $('#dq-cal')       && ($('#dq-cal').textContent       = `${D.active_cal||0} kcal`);
+  $('#dq-resthr')    && ($('#dq-resthr').textContent    = D.rhr_bpm ? `${D.rhr_bpm} bpm` : '—');
+  $('#dq-resp')      && ($('#dq-resp').textContent      = D.resp_rpm ? `${D.resp_rpm} rpm` : '—'); // rpm = respirations/min
+  $('#dq-spo2')      && ($('#dq-spo2').textContent      = D.spo2_pct ? `${D.spo2_pct}%` : '—');
+  $('#dq-active-min')&& ($('#dq-active-min').textContent= D.act_min ? `${D.act_min} min` : '—');
+
+  // Récap récup (cartes hautes)
+  $('#dq-sleep-last')&& ($('#dq-sleep-last').textContent= D.sleep_min ? fmtMinutesToHM(D.sleep_min) : '—');
+  $('#dq-slp-avg')   && ($('#dq-slp-avg').textContent   = fmtMinutesToHM(avg(days,'sleep_min')));
+  $('#dq-hrv-avg')   && ($('#dq-hrv-avg').textContent   = `${Math.round(avg(days,'hrv_ms'))} ms`);
+  $('#dq-rpe-avg')   && ($('#dq-rpe-avg').textContent   = `${avg(days,'rpe').toFixed(1)}`);
+  $('#dq-rhr-avg')   && ($('#dq-rhr-avg').textContent   = `${Math.round(avg(days,'rhr_bpm'))} bpm`);
+
+  // Statut simple (OK / Attention)
+  const sleepAvgMin = avg(days,'sleep_min');
+  const hrvAvg      = avg(days,'hrv_ms');
+  const rpeAvg      = avg(days,'rpe');
+  const ok = (sleepAvgMin >= 7*60) && (hrvAvg >= 70) && (rpeAvg <= 5);
+  $('#qd-status-text') && ($('#qd-status-text').textContent = ok ? 'OK' : 'Attention');
+
+  // Journal quotidien (du + récent au + ancien)
+  const list = $('#qd-daily-list');
+  if (list){
+    list.innerHTML = sortedDesc.map(d => `
+      <div class="list row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)">
+        <div><div class="meta">${new Date(d.date).toLocaleDateString('fr-FR',{ weekday:'short', day:'2-digit', month:'short'})}</div><strong>${(d.steps||0).toLocaleString('fr-FR')} pas</strong></div>
+        <div><div class="meta">Sommeil</div><strong>${fmtMinutesToHM(d.sleep_min||0)}</strong></div>
+        <div><div class="meta">HRV</div><strong>${d.hrv_ms||'—'} ms</strong></div>
+      </div>
+    `).join('');
+  }
+
+  // Récap “bas de page” (sum-sleep / sum-hrv / sum-rpe / statut)
+  $('#sum-sleep')      && ($('#sum-sleep').textContent   = fmtMinutesToHM(sleepAvgMin));
+  $('#sum-hrv')        && ($('#sum-hrv').textContent     = `${Math.round(hrvAvg)} ms`);
+  $('#sum-rpe')        && ($('#sum-rpe').textContent     = `${rpeAvg.toFixed(1)}`);
+  const dot = $('#sum-status-dot'), stx = $('#sum-status-text'), note = $('#sum-note');
+  if (dot && stx && note) {
+    dot.className = 'dot ' + (ok ? 'dot--ok' : 'dot--warn');
+    stx.textContent = ok ? 'OK' : 'Attention';
+    note.textContent = ok
+      ? "Sommeil et variabilité cardiaque dans la cible sur 7 jours. Poursuivre la progression contrôlée."
+      : "Signes de charge/fatigue : surveiller le sommeil et réduire légèrement l’intensité si besoin.";
+  }
+}
+
+function hydrateProfile(){
+  const pLoad = $('#p-load');
+  if (!pLoad) return;
+
+  const live = getLiveState();
+  pLoad.textContent = formatKm(live.weekly.load);
+
+  const durMin = typeof live.weekly.durationMin === 'number'
+    ? live.weekly.durationMin
+    : (typeof live.weekly.hours === 'number' ? live.weekly.hours * 60 : 0);
+  const hEl = $('#p-hours');
+  if (hEl) hEl.textContent = fmtMinutesToHM(durMin);
+
+  const restEl = $('#p-rest');
+  if (restEl) {
+    const st = getStore();
+    const weeks = st.weeks || [];
+    const lastW = weeks[weeks.length - 1];
+    restEl.textContent = (lastW?.ml?.predicted_label ? 'Attention' : 'OK');
+  }
+}
+
+
+/* --------- Récupération --------- */
+function hydrateTrainingRecuperation(){
+  const root = $('#rec-sleep-last') || $('#rec-tsb-text') || $('#rec-rpe-7d-text');
+  if (!root) return;
+  const st = getStore();
+  const live = getLiveState();
+  const days = live.daily || [];
+  const sortedDesc = days.slice().sort((a,b)=> new Date(b.date)-new Date(a.date));
+  const D = sortedDesc[0] || {};
+
+  // Sommeil
+  $('#rec-sleep-last') && ($('#rec-sleep-last').textContent = D.sleep_min ? fmtMinutesToHM(D.sleep_min) : '—');
+  $('#rec-sleep-avg')  && ($('#rec-sleep-avg').textContent  = fmtMinutesToHM(avg(days,'sleep_min')));
+
+  // RPE 7j
+  $('#rec-rpe-7d-text') && ($('#rec-rpe-7d-text').textContent = avg(days,'rpe').toFixed(1));
+
+  // TSB simple : CTL(τ=7) - ATL(τ=2) calculés sur les semaines connues à partir du volume (proxy TSS)
+  const vols = (st.weeks||[]).map(w=> w.summary?.total_km || 0);
+  function ema(arr, alpha){
+    let v = arr[0] || 0;
+    for (let i=1;i<arr.length;i++) v = alpha*arr[i] + (1-alpha)*v;
+    return v;
+  }
+  const ctl = ema(vols, 1/7);
+  const atl = ema(vols, 1/2);
+  const tsb = ctl - atl;
+  const tsbTxt = `${tsb>=0?'+':''}${Math.round(tsb)}`;
+  $('#rec-tsb-text') && ($('#rec-tsb-text').textContent = tsbTxt);
+}
+
+/* --------- Tendance (VO2 & CTL/ATL) --------- */
+function miniLine(containerId, seriesList, opts={}){
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const w = opts.w||320, h = opts.h||120, pad = 16;
+  // seriesList: [{data:[...], color:'#...', label:'...'}, ...]
+  const all = seriesList.flatMap(s=>s.data);
+  const min = Math.min(...all), max = Math.max(...all);
+  const sx = (i, N)=> pad + (w-2*pad) * (N<=1 ? 0.5 : (i/(N-1)));
+  const sy = (v)=> pad + (h-2*pad) * (1 - ( (v-min)/(max-min || 1) ));
+  const svgs = seriesList.map(s=>{
+    const pts = s.data.map((v,i)=> `${sx(i,s.data.length)},${sy(v)}`).join(' ');
+    return `<polyline points="${pts}" fill="none" stroke="${s.color||'#2E6E55'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }).join('');
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${svgs}</svg>`;
+}
+
+function hydrateTrainingTendance(){
+  const needle = $('#trend-needle') || $('#trend-vo2') || $('#trend-ctl-atl');
+  if (!needle) return;
+
+  const st = getStore();
+  const weeks = st.weeks || [];
+  // Proxy VO2max relatif (stable S0→S1, léger retrait S2)
+  const vo2 = [51.8, 52.0, 52.2, 52.1, 52.5, 52.2]; // 6 semaines fictives
+  miniLine('trend-vo2', [{ data: vo2, color:'#3F8C6A' }]);
+
+  // CTL/ATL depuis volumes des semaines dispo + 3 semaines “historique” stables
+  const volsKnown = weeks.map(w=> w.summary?.total_km || 0);
+  const seed = volsKnown.length ? volsKnown[0] : 44;
+  const vols = [seed*0.95, seed*0.98, seed].concat(volsKnown); // 3 semaines avant S0, puis S0..Sn
+  function emaSeries(arr, alpha){
+    const out=[arr[0]||0]; for(let i=1;i<arr.length;i++){ out.push(alpha*arr[i] + (1-alpha)*out[i-1]); } return out;
+  }
+  const CTL = emaSeries(vols, 1/7);
+  const ATL = emaSeries(vols, 1/2);
+  miniLine('trend-ctl-atl', [
+    { data: CTL.slice(-6), color:'#2E6E55' },
+    { data: ATL.slice(-6), color:'#F2A65A' }
+  ]);
+
+  // Aiguille “modif condition physique” : delta CTL 3 dernières vs 3 précédentes
+  const last3 = CTL.slice(-3).reduce((a,b)=>a+b,0)/3;
+  const prev3 = CTL.slice(-6,-3).reduce((a,b)=>a+b,0)/3;
+  // scale -10..+10 → 0..100 %
+  const delta = clamp(last3 - prev3, -10, 10);
+  const pos = Math.round((delta + 10) * 5); // 0..100
+  const n = $('#trend-needle'); if (n) n.style.left = `${pos}%`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Pop-up légère pour la page Profil
+// ─────────────────────────────────────────────────────────────
+function ensureInfoSheetStyles(){
+  if (document.getElementById('info-sheet-style')) return;
+  const s = document.createElement('style');
+  s.id = 'info-sheet-style';
+  s.textContent = `
+    #info-sheet{position:fixed; inset:0; z-index:999; display:none}
+    #info-sheet.open{display:block}
+    #info-sheet .info-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.35)}
+    #info-sheet .info-panel{
+      position:absolute; left:50%; transform:translateX(-50%);
+      top:calc(var(--header-h,56px) + 8px); bottom:calc(var(--tabbar-h,64px) + 8px);
+      width:min(100vw, var(--coach-w,420px)); background:#fff; border-radius:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.15); display:flex; flex-direction:column; overflow:hidden
+    }
+    #info-sheet .info-head{padding:12px 16px; border-bottom:1px solid var(--line,rgba(0,0,0,.08)); display:flex; align-items:center; justify-content:space-between}
+    #info-sheet .info-title{font-weight:700}
+    #info-sheet .info-body{padding:16px; overflow:auto; line-height:1.45}
+    #info-sheet .btn-close{background:transparent; border:0; font-size:18px; padding:6px; cursor:pointer}
+  `;
+  document.head.appendChild(s);
+}
+function ensureInfoSheet(){
+  if (document.getElementById('info-sheet')) return;
+  ensureInfoSheetStyles();
+  const el = document.createElement('div');
+  el.id = 'info-sheet';
+  el.innerHTML = `
+    <div class="info-backdrop" data-close-info></div>
+    <div class="info-panel" role="dialog" aria-modal="true">
+      <div class="info-head">
+        <div class="info-title"></div>
+        <button class="btn-close" aria-label="Fermer" data-close-info>✕</button>
+      </div>
+      <div class="info-body"></div>
+    </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click', (e)=>{ if (e.target.matches('[data-close-info]')) closeInfoSheet(); });
+}
+function openInfoSheet({ title='', html='' }){
+  ensureInfoSheet();
+  const sheet = document.getElementById('info-sheet');
+  sheet.querySelector('.info-title').textContent = title;
+  sheet.querySelector('.info-body').innerHTML = html;
+  sheet.classList.add('open');
+}
+function closeInfoSheet(){ document.getElementById('info-sheet')?.classList.remove('open'); }
+
+/** Active les pop-ups de la section Profil */
+function wireProfileInspoModals(){
+  const sec = document.getElementById('profile-inspo');
+  if (!sec) return;
+  ensureInfoSheet();
+  sec.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-open="profile-info"]');
+    if (!btn) return;
+    const tplId = btn.dataset.target;                 // ex. "inspo-pro-detail"
+    const title = btn.dataset.title || btn.textContent.trim();
+    let html = '';
+    if (tplId){
+      const tpl = sec.querySelector(`#${tplId}`);
+      if (tpl){
+        html = tpl.tagName.toLowerCase()==='template'
+          ? (tpl.content?.firstElementChild ? tpl.content.firstElementChild.outerHTML : tpl.innerHTML)
+          : tpl.innerHTML;
+      }
+    }
+    if (html) openInfoSheet({ title, html });
+  });
 }
 
 /* -------------------------------------------------------------------- *
@@ -998,6 +1400,7 @@ function setupSyncAnimation(){
 
   if(!btn || !bar || !gProg || !gCheck) return;
 
+  // Reflète l'état si déjà synchronisé
   const persisted = getStore();
   if ((persisted.synced || 0) > 0) {
     gCheck.style.display = 'block';
@@ -1013,6 +1416,7 @@ function setupSyncAnimation(){
     }
   }
 
+  // Reset démo → réinjecte S0 et recharge la page (retour état initial visible)
   if (resetBtn) {
     resetBtn.addEventListener('click', ()=>{
       localStorage.removeItem(STORE_KEY);
@@ -1113,7 +1517,7 @@ function setupSyncAnimation(){
       await new Promise(r=>setTimeout(r, 2000));
       iaGear && iaGear.classList.add('hidden');
 
-      // Message final
+      // Message final (liens verts + "d’Accueil")
       if (doneEl){
         doneEl.classList.remove('hidden');
         doneEl.innerHTML = `✅ Rockso a analysé l'entraînement. Consulte l'analyse sur la page <a class="link-cta" href="./index.html">d’Accueil</a> ou <a class="link-cta" href="./training-entrainement.html">Training</a>.`;
@@ -1128,6 +1532,7 @@ function setupSyncAnimation(){
     }
   }
 
+  // État initial
   gCheck.style.display = 'block';
   gProg.style.display  = 'none';
   if (gPulsar){ gPulsar.classList.remove('animate'); gPulsar.style.display='none'; }
@@ -1137,8 +1542,10 @@ function setupSyncAnimation(){
 
 /* -------------------------------------------------------------------- *
  * PROFILE — 1 stat fun + 1 article court (seulement pour la semaine courante)
+ * Remplace au runtime la section .section.future du profil.
  * -------------------------------------------------------------------- */
 
+// Liens vers sources publiques (pro & recherche)
 const ROCKSO_SOURCES = {
   kipchogeWeek: {
     label: "Kipchoge ~130 miles/sem (~209 km)",
@@ -1162,6 +1569,7 @@ const ROCKSO_SOURCES = {
   }
 };
 
+// Styles très légers (titres, lignes, liens)
 function ensureProfileInspoStyles(){
   if (document.getElementById('profile-inspo-style')) return;
   const s = document.createElement('style');
@@ -1176,24 +1584,29 @@ function ensureProfileInspoStyles(){
   `;
   document.head.appendChild(s);
 }
+
+// Outils locaux
 function pctStr(x){ const s = Math.round(x); return `${s>0?'+':''}${s}%`; }
 function kmStr(x){ return `${Number(x||0).toLocaleString('fr-FR',{maximumFractionDigits:1})} km`; }
 function safe(a){ return a==null?0:Number(a); }
 
+// Choisit 1 “stat fun” + 1 “papier” en fonction de la semaine courante
 function pickWeeklyInspo(curWeek, prevWeek){
   const km     = safe(curWeek?.summary?.total_km);
   const kmInt  = safe(curWeek?.summary?.km_z5t);
-  const share  = km>0 ? kmInt/km : 0;
+  const share  = km>0 ? kmInt/km : 0;                   // 0..1
   const prevKm = safe(prevWeek?.summary?.total_km);
   const deltaV = prevKm>0 ? ((km - prevKm)/prevKm)*100 : -4;
   const spike  = safe(curWeek?.summary?.load_spike_rel_w1_w2)|| (prevKm>0? km/prevKm : 1);
 
+  // Catégorisation simple
   const isRisk = (spike >= 1.30) || (share >= 0.18);
   const isWarn = !isRisk && (Math.abs(deltaV) > 15 || share >= 0.12);
 
   let fun, paper;
 
   if (isRisk){
+    // FUN — “grosse charge” contextualisée
     fun = {
       title: "Ouh là, charge relevée",
       line: `Tu as bouclé ${kmStr(km)} cette semaine (∆ ${pctStr(deltaV)}) — belle énergie, mais garde un œil sur la récupération.`,
@@ -1211,6 +1624,7 @@ function pickWeeklyInspo(curWeek, prevWeek){
       `
     };
   } else if (isWarn){
+    // FUN — rapprochement léger vers 80/20
     fun = {
       title: "Tu te rapproches d’un mix “pro”",
       line: `Part d’intensité ≈ ${Math.round(share*100)}% — on se rapproche du fameux 80/20 (sans dépasser !).`,
@@ -1228,7 +1642,8 @@ function pickWeeklyInspo(curWeek, prevWeek){
       `
     };
   } else {
-    const refKm = 209;
+    // FUN — volume vs Kipchoge (référence motivante)
+    const refKm = 209; // ~130 miles
     const part  = Math.round((km/refKm)*100);
     fun = {
       title: "Comparo fun",
@@ -1251,9 +1666,10 @@ function pickWeeklyInspo(curWeek, prevWeek){
   return { fun, paper };
 }
 
+// Rendu sur la page Profil (remplace .section.future)
 function renderProfileInspoLatest(){
   const host = document.querySelector('.section.future');
-  if (!host) return;
+  if (!host) return; // seulement sur profil
   ensureProfileInspoStyles();
 
   const st = getStore();
@@ -1280,9 +1696,7 @@ function renderProfileInspoLatest(){
     </div>
   `;
 
-  // >>> Assure l'existence du bottom-sheet avant d'ouvrir
-  ensureCoachSheet();
-
+  // Ouvre un bottom-sheet réutilisant ton UI “coach”
   host.querySelector('[data-inspo="fun"]')?.addEventListener('click', ()=>{
     openCoachSheet(`
       <div class="coach-head"><div class="coach-title">${fun.title}</div></div>
@@ -1311,13 +1725,15 @@ function bootHydrations(){
   hydrateTrainingTendance();
   renderAnalysisPanelFromStore();
   renderProfileInspoLatest();
+
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  ensureBaselineS0();
+  ensureBaselineS0();     // injecte S0 si nécessaire
   ensureAnalysisTypo();
   bootHydrations();
   setupSyncAnimation();
+  wireProfileInspoModals();
 
   window.addEventListener('rockso:storeUpdated', bootHydrations);
 
