@@ -786,6 +786,87 @@ function ensureCoachSheet(){
   });
 }
 
+// ─────────────────────────────────────────────────────────────
+// Modale légère pour la page Profil (réutilisable partout)
+// ─────────────────────────────────────────────────────────────
+function ensureInfoSheetStyles(){
+  if (document.getElementById('info-sheet-style')) return;
+  const s = document.createElement('style');
+  s.id = 'info-sheet-style';
+  s.textContent = `
+    #info-sheet{position:fixed; inset:0; z-index:999; display:none}
+    #info-sheet.open{display:block}
+    #info-sheet .info-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.35)}
+    #info-sheet .info-panel{
+      position:absolute; left:50%; transform:translateX(-50%);
+      top:calc(var(--header-h,56px) + 8px); bottom:calc(var(--tabbar-h,64px) + 8px);
+      width:min(100vw, var(--coach-w,420px)); background:#fff; border-radius:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.15); display:flex; flex-direction:column; overflow:hidden
+    }
+    #info-sheet .info-head{padding:12px 16px; border-bottom:1px solid var(--line,rgba(0,0,0,.08)); display:flex; align-items:center; justify-content:space-between}
+    #info-sheet .info-title{font-weight:700}
+    #info-sheet .info-body{padding:16px; overflow:auto; line-height:1.45}
+    #info-sheet .btn-close{background:transparent; border:0; font-size:18px; padding:6px; cursor:pointer}
+  `;
+  document.head.appendChild(s);
+}
+function ensureInfoSheet(){
+  if (document.getElementById('info-sheet')) return;
+  ensureInfoSheetStyles();
+  const el = document.createElement('div');
+  el.id = 'info-sheet';
+  el.innerHTML = `
+    <div class="info-backdrop" data-close-info></div>
+    <div class="info-panel" role="dialog" aria-modal="true">
+      <div class="info-head">
+        <div class="info-title"></div>
+        <button class="btn-close" aria-label="Fermer" data-close-info>✕</button>
+      </div>
+      <div class="info-body"></div>
+    </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click', (e)=>{ if (e.target.matches('[data-close-info]')) closeInfoSheet(); });
+}
+function openInfoSheet({ title='', html='' }){
+  ensureInfoSheet();
+  const sheet = document.getElementById('info-sheet');
+  sheet.querySelector('.info-title').textContent = title;
+  sheet.querySelector('.info-body').innerHTML = html;
+  sheet.classList.add('open');
+}
+function closeInfoSheet(){ document.getElementById('info-sheet')?.classList.remove('open'); }
+
+/** Attache les clics des boutons de la section profil (future→inspo) */
+function wireProfileInspoModals(){
+  const sec = document.querySelector('.section.future');
+  if (!sec) return;
+  ensureInfoSheet();
+
+  // Délégation : on écoute les boutons à l’intérieur de la section
+  sec.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-open="profile-info"]');
+    if (!btn) return;
+
+    const targetId = btn.dataset.target;               // ex: "inspo-pro-detail"
+    const title    = btn.dataset.title || btn.textContent.trim();
+    let html = '';
+
+    if (targetId){
+      const tpl = sec.querySelector(`#${targetId}`);
+      if (tpl){
+        // <template> ou <div hidden> — on récupère le HTML
+        html = tpl.tagName.toLowerCase()==='template'
+          ? (tpl.content?.firstElementChild ? tpl.content.firstElementChild.outerHTML : tpl.innerHTML)
+          : tpl.innerHTML;
+      }
+    } else if (btn.dataset.html) {
+      html = btn.dataset.html;
+    }
+
+    if (html) openInfoSheet({ title, html });
+  });
+}
+
 // Styles + frame pour que la sheet démarre sous le header et finisse au-dessus de la tabbar
 function ensureCoachFrameStyles(){
   if (document.getElementById('coach-frame-style')) return;
@@ -1229,6 +1310,79 @@ function hydrateTrainingTendance(){
   const n = $('#trend-needle'); if (n) n.style.left = `${pos}%`;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Pop-up légère pour la page Profil
+// ─────────────────────────────────────────────────────────────
+function ensureInfoSheetStyles(){
+  if (document.getElementById('info-sheet-style')) return;
+  const s = document.createElement('style');
+  s.id = 'info-sheet-style';
+  s.textContent = `
+    #info-sheet{position:fixed; inset:0; z-index:999; display:none}
+    #info-sheet.open{display:block}
+    #info-sheet .info-backdrop{position:absolute; inset:0; background:rgba(0,0,0,.35)}
+    #info-sheet .info-panel{
+      position:absolute; left:50%; transform:translateX(-50%);
+      top:calc(var(--header-h,56px) + 8px); bottom:calc(var(--tabbar-h,64px) + 8px);
+      width:min(100vw, var(--coach-w,420px)); background:#fff; border-radius:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.15); display:flex; flex-direction:column; overflow:hidden
+    }
+    #info-sheet .info-head{padding:12px 16px; border-bottom:1px solid var(--line,rgba(0,0,0,.08)); display:flex; align-items:center; justify-content:space-between}
+    #info-sheet .info-title{font-weight:700}
+    #info-sheet .info-body{padding:16px; overflow:auto; line-height:1.45}
+    #info-sheet .btn-close{background:transparent; border:0; font-size:18px; padding:6px; cursor:pointer}
+  `;
+  document.head.appendChild(s);
+}
+function ensureInfoSheet(){
+  if (document.getElementById('info-sheet')) return;
+  ensureInfoSheetStyles();
+  const el = document.createElement('div');
+  el.id = 'info-sheet';
+  el.innerHTML = `
+    <div class="info-backdrop" data-close-info></div>
+    <div class="info-panel" role="dialog" aria-modal="true">
+      <div class="info-head">
+        <div class="info-title"></div>
+        <button class="btn-close" aria-label="Fermer" data-close-info>✕</button>
+      </div>
+      <div class="info-body"></div>
+    </div>`;
+  document.body.appendChild(el);
+  el.addEventListener('click', (e)=>{ if (e.target.matches('[data-close-info]')) closeInfoSheet(); });
+}
+function openInfoSheet({ title='', html='' }){
+  ensureInfoSheet();
+  const sheet = document.getElementById('info-sheet');
+  sheet.querySelector('.info-title').textContent = title;
+  sheet.querySelector('.info-body').innerHTML = html;
+  sheet.classList.add('open');
+}
+function closeInfoSheet(){ document.getElementById('info-sheet')?.classList.remove('open'); }
+
+/** Active les pop-ups de la section Profil */
+function wireProfileInspoModals(){
+  const sec = document.getElementById('profile-inspo');
+  if (!sec) return;
+  ensureInfoSheet();
+  sec.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-open="profile-info"]');
+    if (!btn) return;
+    const tplId = btn.dataset.target;                 // ex. "inspo-pro-detail"
+    const title = btn.dataset.title || btn.textContent.trim();
+    let html = '';
+    if (tplId){
+      const tpl = sec.querySelector(`#${tplId}`);
+      if (tpl){
+        html = tpl.tagName.toLowerCase()==='template'
+          ? (tpl.content?.firstElementChild ? tpl.content.firstElementChild.outerHTML : tpl.innerHTML)
+          : tpl.innerHTML;
+      }
+    }
+    if (html) openInfoSheet({ title, html });
+  });
+}
+
 /* -------------------------------------------------------------------- *
  * 7) Synchronisation (UI + merge + IA)
  * -------------------------------------------------------------------- */
@@ -1579,6 +1733,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   ensureAnalysisTypo();
   bootHydrations();
   setupSyncAnimation();
+  wireProfileInspoModals();
 
   window.addEventListener('rockso:storeUpdated', bootHydrations);
 

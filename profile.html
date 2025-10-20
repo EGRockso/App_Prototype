@@ -40,12 +40,42 @@
           </div>
         </div>
 
-        <div class="section future">
-          <h2 class="section-title">Actions (plus tard)</h2>
+        <div class="section future" id="profile-inspo">
+          <h2 class="section-title">Inspiration</h2>
           <div class="card">
-            <span class="badge outline">Importer des données</span>
-            <span class="badge outline">Lancer la prédiction</span>
+            <!-- Texte court déjà visible sur la page (tu peux garder le tien si tu l’as) -->
+            <p id="inspo-text">Ta phrase d’inspiration / la stat marrante du moment…</p>
+
+            <div style="display:flex; gap:16px; flex-wrap:wrap">
+              <button class="link-cta" data-open="profile-info"
+                      data-target="inspo-pro-detail"
+                      data-title="La stat du pro — détails">En savoir plus</button>
+
+              <button class="link-cta" data-open="profile-info"
+                      data-target="inspo-paper-detail"
+                      data-title="Pourquoi c’est intéressant ?">Résumé</button>
+            </div>
           </div>
+
+          <!-- Contenu de la pop-up “pro” -->
+          <template id="inspo-pro-detail">
+            <div>
+              <h3 style="margin:0 0 8px 0">Contexte de la comparaison</h3>
+              <p>Place ici ton texte long (histoire du record, anecdotes, mini-bio…).</p>
+            </div>
+          </template>
+
+          <!-- Contenu de la pop-up “article / recherche” -->
+          <template id="inspo-paper-detail">
+            <div>
+              <h3 style="margin:0 0 8px 0">À retenir</h3>
+              <ul style="margin:0 0 8px 16px">
+                <li>Point 1…</li>
+                <li>Point 2…</li>
+              </ul>
+              <p class="muted">Ce résumé met en perspective la recherche avec l’entraînement du moment.</p>
+            </div>
+          </template>
         </div>
       </section>
 
