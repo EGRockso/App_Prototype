@@ -1387,6 +1387,177 @@ function setupSyncAnimation(){
 }
 
 /* -------------------------------------------------------------------- *
+ * PROFILE — 1 stat fun + 1 article court (seulement pour la semaine courante)
+ * Remplace au runtime la section .section.future du profil.
+ * -------------------------------------------------------------------- */
+
+// Liens vers sources publiques (pro & recherche)
+const ROCKSO_SOURCES = {
+  kipchogeWeek: {
+    label: "Kipchoge ~130 miles/sem (~209 km)",
+    url: "https://www.gq.com/story/inside-eliud-kipchoge-kenya-training-compound"
+  },
+  chepngetichWR: {
+    label: "Ruth Chepngetich — 2:09:56 (Chicago 2024)",
+    url: "https://www.theguardian.com/sport/2024/oct/13/chicago-marathon-2024-usa-womens-world-record"
+  },
+  polarized: {
+    label: "Polarized vs autres répartitions (Stöggl & Sperlich, 2015)",
+    url: "https://www.frontiersin.org/articles/10.3389/fphys.2015.00295/full"
+  },
+  hrvMeta: {
+    label: "Entraînement guidé par la HRV — synthèse 2020",
+    url: "https://www.mdpi.com/2076-3417/10/21/7791"
+  },
+  gabbett: {
+    label: "Training-injury paradox (Gabbett, 2016)",
+    url: "https://bjsm.bmj.com/content/50/5/273"
+  }
+};
+
+// Styles très légers (titres, lignes, liens)
+function ensureProfileInspoStyles(){
+  if (document.getElementById('profile-inspo-style')) return;
+  const s = document.createElement('style');
+  s.id = 'profile-inspo-style';
+  s.textContent = `
+    .inspo-card{padding:12px 14px;border-radius:12px;border:1px solid var(--line,#e6e6e6);background:#fff}
+    .inspo-row{display:grid;gap:12px}
+    .inspo-item .k{font-size:12px;color:rgba(0,0,0,.55);margin-bottom:2px}
+    .inspo-item .v{font-size:14px;line-height:1.35}
+    .inspo-item .v .link-cta{font-weight:600;color:#3F8C6A;cursor:pointer;background:none;border:0;padding:0;margin-left:6px}
+    .inspo-item .v .link-cta:hover{text-decoration:underline}
+  `;
+  document.head.appendChild(s);
+}
+
+// Outils locaux
+function pctStr(x){ const s = Math.round(x); return `${s>0?'+':''}${s}%`; }
+function kmStr(x){ return `${Number(x||0).toLocaleString('fr-FR',{maximumFractionDigits:1})} km`; }
+function safe(a){ return a==null?0:Number(a); }
+
+// Choisit 1 “stat fun” + 1 “papier” en fonction de la semaine courante
+function pickWeeklyInspo(curWeek, prevWeek){
+  const km     = safe(curWeek?.summary?.total_km);
+  const kmInt  = safe(curWeek?.summary?.km_z5t);
+  const share  = km>0 ? kmInt/km : 0;                   // 0..1
+  const prevKm = safe(prevWeek?.summary?.total_km);
+  const deltaV = prevKm>0 ? ((km - prevKm)/prevKm)*100 : -4;
+  const spike  = safe(curWeek?.summary?.load_spike_rel_w1_w2)|| (prevKm>0? km/prevKm : 1);
+
+  // Catégorisation simple
+  const isRisk = (spike >= 1.30) || (share >= 0.18);
+  const isWarn = !isRisk && (Math.abs(deltaV) > 15 || share >= 0.12);
+
+  let fun, paper;
+
+  if (isRisk){
+    // FUN — “grosse charge” contextualisée
+    fun = {
+      title: "Ouh là, charge relevée",
+      line: `Tu as bouclé ${kmStr(km)} cette semaine (∆ ${pctStr(deltaV)}) — belle énergie, mais garde un œil sur la récupération.`,
+      detail: `
+        <p><strong>Pourquoi on te le dit :</strong> les hausses rapides de charge sont associées à davantage de pépins chez les athlètes.</p>
+        <p>Astuce pratique : réduis le volume de 20–30% la semaine suivante, garde une seule séance “qualité” courte et vise ≥2 nuits de ≥7h30.</p>
+      `
+    };
+    paper = {
+      title: "Charge & risque de blessure",
+      teaser: `Des hausses rapides de charge sont liées à plus de blessures — mieux vaut “intelligent ET dur”.`,
+      detail: `
+        <p>Résumé express : le paradoxe “<em>training-injury prevention</em>” montre qu’un <strong>travail soutenu mais progressif</strong> protège mieux qu’un “yoyo” de charge.</p>
+        <p><a href="${ROCKSO_SOURCES.gabbett.url}" target="_blank" rel="noopener">Gabbett 2016 (Br J Sports Med)</a></p>
+      `
+    };
+  } else if (isWarn){
+    // FUN — rapprochement léger vers 80/20
+    fun = {
+      title: "Tu te rapproches d’un mix “pro”",
+      line: `Part d’intensité ≈ ${Math.round(share*100)}% — on se rapproche du fameux 80/20 (sans dépasser !).`,
+      detail: `
+        <p>Garde 1 séance de qualité + 1 long facile. Tu capitalises sans brûler d’étapes.</p>
+        <p><a href="${ROCKSO_SOURCES.polarized.url}" target="_blank" rel="noopener">Voir l’évidence “polarized”</a></p>
+      `
+    };
+    paper = {
+      title: "Répartition d’intensité (80/20)",
+      teaser: `Chez les élites, beaucoup de volume facile et un petit bloc d’intensité bien placé.`,
+      detail: `
+        <p>Synthèse : les études comparent les répartitions (seuil, polarisée, etc.). La <strong>polarisée</strong> donne souvent de meilleurs gains sur le long terme pour les sports d’endurance.</p>
+        <p><a href="${ROCKSO_SOURCES.polarized.url}" target="_blank" rel="noopener">Stöggl & Sperlich 2015 (Frontiers in Physiology)</a></p>
+      `
+    };
+  } else {
+    // FUN — volume vs Kipchoge (référence motivante)
+    const refKm = 209; // ~130 miles
+    const part  = Math.round((km/refKm)*100);
+    fun = {
+      title: "Comparo fun",
+      line: `${kmStr(km)} cette semaine — soit ~${part}% d’une semaine type d’<strong>Eliud Kipchoge</strong>. Solide 💪`,
+      detail: `
+        <p>Repère : les semaines “camp” d’Eliud tournent ~130 miles (≈209 km).</p>
+        <p><a href="${ROCKSO_SOURCES.kipchogeWeek.url}" target="_blank" rel="noopener">Source (GQ – inside training camp)</a></p>
+      `
+    };
+    paper = {
+      title: "HRV pour piloter l’entraînement",
+      teaser: `Ta HRV & ton sommeil sont stables : la littérature montre l’intérêt d’<strong>ajuster la charge</strong> avec ces marqueurs.`,
+      detail: `
+        <p>Idée : garder la semaine “verte” quand la HRV est bonne et lever un peu le pied quand elle chute.</p>
+        <p><a href="${ROCKSO_SOURCES.hrvMeta.url}" target="_blank" rel="noopener">Revue 2020 (HRV-guided training)</a></p>
+      `
+    };
+  }
+
+  return { fun, paper };
+}
+
+// Rendu sur la page Profil (remplace .section.future)
+function renderProfileInspoLatest(){
+  const host = document.querySelector('.section.future');
+  if (!host) return; // seulement sur profil
+  ensureProfileInspoStyles();
+
+  const st = getStore();
+  const weeks = st.weeks || [];
+  const cur = weeks[weeks.length-1];
+  const prev = weeks[weeks.length-2];
+  if (!cur){ return; }
+
+  const { fun, paper } = pickWeeklyInspo(cur, prev);
+
+  host.innerHTML = `
+    <h2 class="section-title">Inspiration de la semaine</h2>
+    <div class="inspo-card">
+      <div class="inspo-row">
+        <div class="inspo-item">
+          <div class="k">Stat marrante</div>
+          <div class="v">${fun.line}<button class="link-cta" data-inspo="fun">En savoir plus</button></div>
+        </div>
+        <div class="inspo-item">
+          <div class="k">Lecture rapide</div>
+          <div class="v">${paper.teaser}<button class="link-cta" data-inspo="paper">Résumé</button></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Ouvre un bottom-sheet réutilisant ton UI “coach”
+  host.querySelector('[data-inspo="fun"]')?.addEventListener('click', ()=>{
+    openCoachSheet(`
+      <div class="coach-head"><div class="coach-title">${fun.title}</div></div>
+      <div class="coach-body">${fun.detail}</div>
+    `);
+  });
+  host.querySelector('[data-inspo="paper"]')?.addEventListener('click', ()=>{
+    openCoachSheet(`
+      <div class="coach-head"><div class="coach-title">${paper.title}</div></div>
+      <div class="coach-body">${paper.detail}</div>
+    `);
+  });
+}
+
+/* -------------------------------------------------------------------- *
  * 8) Boot + écoute des mises à jour
  * -------------------------------------------------------------------- */
 function bootHydrations(){
@@ -1399,6 +1570,8 @@ function bootHydrations(){
   hydrateTrainingRecuperation();
   hydrateTrainingTendance();
   renderAnalysisPanelFromStore();
+  renderProfileInspoLatest();
+
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
