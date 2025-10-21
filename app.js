@@ -1668,8 +1668,8 @@ function pickWeeklyInspo(curWeek, prevWeek){
 
 // Rendu sur la page Profil (remplace .section.future)
 function renderProfileInspoLatest(){
-  const host = document.querySelector('.section.future');
-  if (!host) return; // seulement sur profil
+  const host = document.getElementById('profile-inspo');   // ← ciblage sûr
+  if (!host) return;
   ensureProfileInspoStyles();
 
   const st = getStore();
@@ -1686,17 +1686,23 @@ function renderProfileInspoLatest(){
       <div class="inspo-row">
         <div class="inspo-item">
           <div class="k">Stat marrante</div>
-          <div class="v">${fun.line}<button class="link-cta" data-inspo="fun">En savoir plus</button></div>
+          <div class="v">${fun.line}
+            <button class="link-cta" data-inspo="fun">En savoir plus</button>
+          </div>
         </div>
         <div class="inspo-item">
           <div class="k">Lecture rapide</div>
-          <div class="v">${paper.teaser}<button class="link-cta" data-inspo="paper">Résumé</button></div>
+          <div class="v">${paper.teaser}
+            <button class="link-cta" data-inspo="paper">Résumé</button>
+          </div>
         </div>
       </div>
     </div>
   `;
 
-  // Ouvre un bottom-sheet réutilisant ton UI “coach”
+  // s’assure que le bottom-sheet existe
+  ensureCoachSheet();
+
   host.querySelector('[data-inspo="fun"]')?.addEventListener('click', ()=>{
     openCoachSheet(`
       <div class="coach-head"><div class="coach-title">${fun.title}</div></div>
@@ -1731,6 +1737,7 @@ function bootHydrations(){
 document.addEventListener('DOMContentLoaded', ()=>{
   ensureBaselineS0();     // injecte S0 si nécessaire
   ensureAnalysisTypo();
+  ensureCoachSheet();
   bootHydrations();
   setupSyncAnimation();
   wireProfileInspoModals();
