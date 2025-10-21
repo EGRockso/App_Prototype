@@ -676,6 +676,26 @@ function ensureAnalysisTypo(){
       padding:0 !important;
       cursor:pointer;
     }
+
+    /* Barre d'actions du bottom-sheet (coach) */
+    #coach-sheet .coach-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:16px;
+      padding:12px 16px;
+      border-top:1px solid var(--line,rgba(0,0,0,.08));
+      background:#fff;
+    }
+    #coach-sheet .coach-actions .btn{
+      background:transparent !important;
+      border:none !important;
+      box-shadow:none !important;
+      padding:0 !important;
+      color:#3F8C6A !important;
+      font-weight:600;
+      cursor:pointer;
+    }
+    #coach-sheet .coach-actions .btn:hover{ text-decoration:underline; }
   `;
   document.head.appendChild(s);
 }
@@ -924,12 +944,22 @@ function openCoachSheet(innerHTML){
   const sheet = document.getElementById('coach-sheet');
   if (!sheet) return;
 
-  // largeur = largeur du conteneur de l'app (ici le panel d'analyse)
-  const host = document.getElementById('analysis-panel');
-  const w = host ? host.getBoundingClientRect().width : Math.min(window.innerWidth, 430);
+  // Choix du "host" de référence pour la largeur :
+  // 1) #analysis-panel (pages Accueil/Training)
+  // 2) la carte d'inspiration du Profil
+  // 3) fallback sur .content
+  const host =
+    document.getElementById('analysis-panel') ||
+    document.querySelector('.section.future .inspo-card') ||
+    document.querySelector('.section.future .card') ||
+    document.querySelector('.content');
+
+  const rawW = host ? host.getBoundingClientRect().width : Math.min(window.innerWidth, 430);
+  // bornes de confort pour éviter tout débordement
+  const w = Math.max(300, Math.min(rawW, 430));
   document.documentElement.style.setProperty('--coach-w', `${Math.round(w)}px`);
 
-  // bornes entre header et tabbar
+  // bornes verticales : entre header et tabbar
   computeCoachFrame();
 
   sheet.querySelector('.coach-content').innerHTML = innerHTML;
