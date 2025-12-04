@@ -71,11 +71,6 @@
       font-size: 0.8rem;
       color: #b91c1c;
     }
-    .login-success {
-      margin-top: 0.5rem;
-      font-size: 0.8rem;
-      color: var(--color-primary);
-    }
   </style>
 </head>
 <body>
@@ -112,7 +107,7 @@
           <button type="submit" class="btn btn-primary">Entrer dans la démo</button>
           <a href="/" class="btn btn-ghost">Retour</a>
         </div>
-        <div id="login-message" class="login-meta"></div>
+        <div id="login-meta" class="login-meta"></div>
         <div id="login-error" class="login-error"></div>
       </form>
 
@@ -139,64 +134,93 @@
   <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
-    // ⚠️ À REMPLACER par tes valeurs Supabase
+    // ⚠️ REMPLACE ces deux lignes par TES vraies valeurs
     const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYs";
 
-    const sb = supabase.createClient(supabaseUrl, supabaseAnonKey);
+    window.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("login-form");
+      const metaEl = document.getElementById("login-meta");
+      const errEl = document.getElementById("login-error");
 
-    const form = document.getElementById("login-form");
-    const msg = document.getElementById("login-message");
-    const err = document.getElementById("login-error");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      err.textContent = "";
-      msg.textContent = "Connexion en cours…";
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      try {
-        // 1. Essayer de se connecter
-        let { data, error } = await sb.auth.signInWithPassword({ email, password });
-
-        if (error && error.name === "AuthApiError") {
-          // 2. Si l’utilisateur n’existe pas : on le crée
-          msg.textContent = "Création d’un accès démo…";
-          const { data: signupData, error: signupError } = await sb.auth.signUp({
-            email,
-            password,
-          });
-
-          if (signupError) {
-            throw signupError;
-          }
-
-          // 3. Enregistrer le prospect
-          await sb.from("prospects").insert({
-            email: email,
-            source: "demo_site",
-          });
-
-          msg.textContent = "Compte démo créé, redirection…";
-          setTimeout(() => {
-            window.location.href = "/demo/";
-          }, 700);
-        } else if (error) {
-          throw error;
-        } else {
-          msg.textContent = "Connexion réussie, redirection…";
-          setTimeout(() => {
-            window.location.href = "/demo/";
-          }, 700);
-        }
-      } catch (e) {
-        console.error(e);
-        msg.textContent = "";
-        err.textContent =
-          "Impossible de vous connecter pour le moment. Vérifiez vos identifiants ou réessayez plus tard.";
+      if (!form) {
+        console.error("Formulaire #login-form introuvable");
+        return;
       }
+
+      if (!supabaseUrl || !supabaseAnonKey) {
+        console.error("Supabase URL ou anon key manquants");
+        errEl.textContent = "Configuration serveur incomplète.";
+        return;
+      }
+
+      const sb = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errEl.textContent = "";
+        metaEl.textContent = "Connexion en cours…";
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        // Petit check côté front pour éviter les cas "toto"
+        if (password.length < 8) {
+          metaEl.textContent = "";
+          errEl.textContent = "Mot de passe trop court (min. 8 caractères).";
+          return;
+        }
+
+        try {
+          // 1) tentative de login
+          let { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+          if (error) {
+            // 2) si échec → on tente la création de compte
+            metaEl.textContent = "Création d’un accès démo…";
+
+            const { data: signupData, error: signupError } = await sb.auth.signUp({
+              email,
+              password,
+            });
+
+            if (signupError) {
+              console.error("Erreur signup:", signupError);
+              metaEl.textContent = "";
+              errEl.textContent =
+                signupError.message ||
+                "Impossible de créer le compte (mot de passe trop faible ou configuration).";
+              return;
+            }
+
+            // 3) enregistrer le prospect
+            const { error: insertError } = await sb.from("prospects").insert({
+              email: email,
+              source: "demo_site",
+            });
+
+            if (insertError) {
+              console.error("Erreur insert prospect:", insertError);
+            }
+
+            metaEl.textContent = "Compte démo créé, redirection…";
+            setTimeout(() => {
+              window.location.href = "/demo/";
+            }, 700);
+          } else {
+            // login OK
+            metaEl.textContent = "Connexion réussie, redirection…";
+            setTimeout(() => {
+              window.location.href = "/demo/";
+            }, 700);
+          }
+        } catch (e) {
+          console.error("Erreur globale login:", e);
+          metaEl.textContent = "";
+          errEl.textContent =
+            "Impossible de vous connecter pour le moment. Vérifiez vos identifiants ou réessayez plus tard.";
+        }
+      });
     });
   </script>
 </body>
