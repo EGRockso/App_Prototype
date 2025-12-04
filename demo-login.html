@@ -4,7 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Accès démonstrateur Rockso</title>
+
+  <!-- Styles globaux du site -->
   <link rel="stylesheet" href="assets/styles.css" />
+
   <style>
     .login-wrapper {
       min-height: calc(100vh - 80px);
@@ -49,6 +52,7 @@
       border: 1px solid var(--color-border);
       font-size: 0.9rem;
       font-family: inherit;
+      background: #fff;
     }
     .field input:focus {
       outline: none;
@@ -74,6 +78,7 @@
   </style>
 </head>
 <body>
+  <!-- Header du site, même style que la landing -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="/" class="brand">
@@ -90,8 +95,9 @@
     <div class="login-card">
       <h1>Accès au démonstrateur Rockso</h1>
       <p>
-        Espace réservé. Saisissez votre adresse e-mail et un mot de passe. Si vous n’avez
-        pas encore de compte démo, il sera créé automatiquement.
+        Espace réservé. Saisissez votre adresse e-mail et un mot de passe.
+        Si vous n’avez pas encore de compte démo, nous enverrons un e-mail de confirmation
+        pour activer votre accès.
       </p>
 
       <form id="login-form">
@@ -131,12 +137,13 @@
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 
-  <!-- Supabase SDK -->
+  <!-- Supabase JS depuis CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ⚠️ Mets tes vraies valeurs ici
+
     const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYs";
+
 
     const form = document.getElementById("login-form");
     const metaEl = document.getElementById("login-meta");
@@ -150,10 +157,12 @@
       console.error("Supabase SDK non chargé");
       errEl.textContent = "Erreur technique : impossible de charger le module d'accès.";
     } else {
+      // 2) Création du client Supabase
       const sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
+      // 3) Gestion du formulaire
       form.addEventListener("submit", async (e) => {
-        e.preventDefault(); // évite le reload → pas de vidage des champs
+        e.preventDefault();
         errEl.textContent = "";
         metaEl.textContent = "Connexion en cours…";
 
@@ -161,16 +170,32 @@
         const password = passwordInput.value;
 
         try {
-          // 1) tentative de login
+          // --- Étape A : tentative de login (email + mdp) ---
           let { data, error } = await sb.auth.signInWithPassword({ email, password });
 
           if (error) {
-            // 2) si login échoue → tentative de création de compte
-            metaEl.textContent = "Création d’un accès démo…";
+            const msg = (error.message || "").toLowerCase();
+
+            // Cas A.1 : email non confirmé
+            if (msg.includes("email not confirmed") || msg.includes("email not verified")) {
+              metaEl.textContent = "";
+              errEl.textContent =
+                "Votre adresse e-mail n'est pas encore confirmée. " +
+                "Cliquez sur le lien reçu par e-mail pour activer votre accès, puis revenez vous connecter.";
+              return;
+            }
+
+            // Cas A.2 : autre erreur de login → on tente la création de compte démo
+            metaEl.textContent =
+              "Création d’un accès démo et envoi d’un e-mail de confirmation…";
 
             const { data: signupData, error: signupError } = await sb.auth.signUp({
               email,
               password,
+              options: {
+                // ⚠️ 3) URL de redirection après clic sur le mail de confirmation
+                emailRedirectTo: "https://rockso.app/demo-login.html?confirmed=1",
+              },
             });
 
             if (signupError) {
@@ -178,12 +203,11 @@
               metaEl.textContent = "";
               errEl.textContent =
                 signupError.message ||
-                "Impossible de créer le compte (mot de passe trop faible ou configuration).";
-              // On ne vide JAMAIS les champs → l’utilisateur peut corriger
+                "Impossible de créer le compte (adresse e-mail ou mot de passe non valides).";
               return;
             }
 
-            // 3) on insère le prospect (si ça échoue ce n’est pas bloquant)
+            // Cas A.3 : on enregistre le prospect (non bloquant si ça échoue)
             const { error: insertError } = await sb.from("prospects").insert({
               email: email,
               source: "demo_site",
@@ -192,16 +216,18 @@
               console.error("Erreur insert prospect:", insertError);
             }
 
-            metaEl.textContent = "Compte démo créé, redirection…";
-            setTimeout(() => {
-              window.location.href = "/demo/";
-            }, 700);
-          } else {
-            metaEl.textContent = "Connexion réussie, redirection…";
-            setTimeout(() => {
-              window.location.href = "/demo/";
-            }, 700);
+            metaEl.textContent =
+              "Un e-mail de confirmation vient d'être envoyé à " +
+              email +
+              ". Merci de cliquer sur le lien pour activer votre accès, puis revenir vous connecter ici.";
+            return; // on NE redirige PAS automatiquement → confirmation d'abord
           }
+
+          // --- Étape B : login réussi (email déjà confirmé) ---
+          metaEl.textContent = "Connexion réussie, redirection…";
+          setTimeout(() => {
+            window.location.href = "/demo/";
+          }, 700);
         } catch (e) {
           console.error("Erreur globale login:", e);
           metaEl.textContent = "";
