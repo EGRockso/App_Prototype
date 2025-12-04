@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Accès démonstrateur Rockso</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    .login-wrapper {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+    .login-card {
+      max-width: 420px;
+      width: 100%;
+      background: var(--color-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-soft);
+      padding: 1.8rem 1.6rem;
+    }
+    .login-card h1 {
+      margin-top: 0;
+      margin-bottom: 0.6rem;
+      font-size: 1.3rem;
+    }
+    .login-card p {
+      margin-top: 0;
+      margin-bottom: 1.2rem;
+      font-size: 0.92rem;
+      color: var(--color-muted);
+    }
+    .field {
+      margin-bottom: 0.9rem;
+    }
+    .field label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+      color: #374151;
+    }
+    .field input {
+      width: 100%;
+      padding: 0.5rem 0.6rem;
+      border-radius: 0.6rem;
+      border: 1px solid var(--color-border);
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+    .field input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px rgba(31, 157, 106, 0.25);
+    }
+    .login-actions {
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .login-meta {
+      margin-top: 0.8rem;
+      font-size: 0.8rem;
+      color: var(--color-muted);
+    }
+    .login-error {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: #b91c1c;
+    }
+    .login-success {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--color-primary);
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">
+        <div class="brand-icon">R</div>
+        <span class="brand-name">Rockso</span>
+      </a>
+      <nav class="main-nav">
+        <a href="/">Retour au site</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="login-wrapper">
+    <div class="login-card">
+      <h1>Accès au démonstrateur Rockso</h1>
+      <p>
+        Espace réservé. Saisissez votre adresse e-mail et un mot de passe. Si vous n’avez
+        pas encore de compte démo, il sera créé automatiquement.
+      </p>
+
+      <form id="login-form">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="password">Mot de passe</label>
+          <input id="password" type="password" required autocomplete="current-password" />
+        </div>
+        <div class="login-actions">
+          <button type="submit" class="btn btn-primary">Entrer dans la démo</button>
+          <a href="/" class="btn btn-ghost">Retour</a>
+        </div>
+        <div id="login-message" class="login-meta"></div>
+        <div id="login-error" class="login-error"></div>
+      </form>
+
+      <p class="login-meta">
+        Chaque accès au démonstrateur est enregistré comme prospect. Cela nous aide à
+        prioriser les retours et à vous tenir informé des évolutions.
+      </p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> Rockso. Tous droits réservés.</p>
+      <div class="footer-links">
+        <a href="privacy.html">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+
+  <!-- Supabase SDK -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    // ⚠️ À REMPLACER par tes valeurs Supabase
+    const supabaseUrl = "https://TON-PROJET.supabase.co";
+    const supabaseAnonKey = "TON_ANON_PUBLIC_KEY";
+
+    const sb = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+    const form = document.getElementById("login-form");
+    const msg = document.getElementById("login-message");
+    const err = document.getElementById("login-error");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      err.textContent = "";
+      msg.textContent = "Connexion en cours…";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      try {
+        // 1. Essayer de se connecter
+        let { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+        if (error && error.name === "AuthApiError") {
+          // 2. Si l’utilisateur n’existe pas : on le crée
+          msg.textContent = "Création d’un accès démo…";
+          const { data: signupData, error: signupError } = await sb.auth.signUp({
+            email,
+            password,
+          });
+
+          if (signupError) {
+            throw signupError;
+          }
+
+          // 3. Enregistrer le prospect
+          await sb.from("prospects").insert({
+            email: email,
+            source: "demo_site",
+          });
+
+          msg.textContent = "Compte démo créé, redirection…";
+          setTimeout(() => {
+            window.location.href = "/demo/";
+          }, 700);
+        } else if (error) {
+          throw error;
+        } else {
+          msg.textContent = "Connexion réussie, redirection…";
+          setTimeout(() => {
+            window.location.href = "/demo/";
+          }, 700);
+        }
+      } catch (e) {
+        console.error(e);
+        msg.textContent = "";
+        err.textContent =
+          "Impossible de vous connecter pour le moment. Vérifiez vos identifiants ou réessayez plus tard.";
+      }
+    });
+  </script>
+</body>
+</html>
