@@ -131,17 +131,20 @@
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 
-  <!-- Supabase SDK -->
+    <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
     // ⚠️ REMPLACE ces deux lignes par TES vraies valeurs
     const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYs";
 
+    // Ce code se lance quand tout le DOM est prêt
     window.addEventListener("DOMContentLoaded", () => {
       const form = document.getElementById("login-form");
       const metaEl = document.getElementById("login-meta");
       const errEl = document.getElementById("login-error");
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
 
       if (!form) {
         console.error("Formulaire #login-form introuvable");
@@ -157,26 +160,22 @@
       const sb = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
       form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // on empêche le rechargement de la page
         errEl.textContent = "";
         metaEl.textContent = "Connexion en cours…";
 
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-
-        // Petit check côté front pour éviter les cas "toto"
-        if (password.length < 8) {
-          metaEl.textContent = "";
-          errEl.textContent = "Mot de passe trop court (min. 8 caractères).";
-          return;
-        }
+        const email = emailInput.value.trim();
+        const password = passwordInput.value; // on ne modifie pas le mdp
 
         try {
-          // 1) tentative de login
-          let { data, error } = await sb.auth.signInWithPassword({ email, password });
+          // 1) On essaie d'abord de se connecter
+          let { data, error } = await sb.auth.signInWithPassword({
+            email,
+            password,
+          });
 
           if (error) {
-            // 2) si échec → on tente la création de compte
+            // 2) Échec de login → on tente la création de compte démo
             metaEl.textContent = "Création d’un accès démo…";
 
             const { data: signupData, error: signupError } = await sb.auth.signUp({
@@ -187,13 +186,15 @@
             if (signupError) {
               console.error("Erreur signup:", signupError);
               metaEl.textContent = "";
+              // On affiche clairement la raison (mdp trop faible, etc.)
               errEl.textContent =
                 signupError.message ||
                 "Impossible de créer le compte (mot de passe trop faible ou configuration).";
+              // IMPORTANT : on ne touche pas aux champs → l’utilisateur peut corriger
               return;
             }
 
-            // 3) enregistrer le prospect
+            // 3) Compte créé → on enregistre le prospect (si ça échoue ce n’est pas bloquant)
             const { error: insertError } = await sb.from("prospects").insert({
               email: email,
               source: "demo_site",
@@ -208,7 +209,7 @@
               window.location.href = "/demo/";
             }, 700);
           } else {
-            // login OK
+            // Login OK
             metaEl.textContent = "Connexion réussie, redirection…";
             setTimeout(() => {
               window.location.href = "/demo/";
