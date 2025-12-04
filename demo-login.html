@@ -207,13 +207,28 @@
               return;
             }
 
-            // Cas A.3 : on enregistre le prospect (non bloquant si ça échoue)
-            const { error: insertError } = await sb.from("prospects").insert({
-              email: email,
-              source: "demo_site",
-            });
-            if (insertError) {
-              console.error("Erreur insert prospect:", insertError);
+            // On log le prospect UNIQUEMENT s'il n'existe pas déjà
+            try {
+              const { data: existing, error: existingError } = await sb
+                .from("prospects")
+                .select("id")
+                .eq("email", email)
+                .maybeSingle(); // supabase-js v2
+
+              if (!existing && !existingError) {
+                const { error: insertError } = await sb
+                  .from("prospects")
+                  .insert({
+                    email: email,
+                    source: "demo_site",
+                  });
+
+                if (insertError) {
+                  console.error("Erreur insert prospect:", insertError);
+                }
+              }
+            } catch (e) {
+              console.error("Erreur lors de la vérification/insert prospect:", e);
             }
 
             metaEl.textContent =
