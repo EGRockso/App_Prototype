@@ -16,17 +16,25 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
   const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
-  const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYsY";
+  const supabaseAnonKey = "TA_CLÉ_ANON_PUBLIC";
 
-  const sbDemo = supabase.createClient(supabaseUrl, supabaseAnonKey);
+  const sbDemo = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
   (async () => {
-    const { data, error } = await sbDemo.auth.getUser();
-    if (error || !data.user) {
+    try {
+      const { data, error } = await sbDemo.auth.getUser();
+      if (error || !data.user) {
+        window.location.href = "/demo-login.html";
+      }
+    } catch (e) {
+      console.error("Erreur vérification session démo:", e);
       window.location.href = "/demo-login.html";
     }
   })();
 </script>
+</body>
+</html>
+
 
 
 <body class="theme-rockso">
