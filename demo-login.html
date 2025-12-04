@@ -112,7 +112,7 @@
       </form>
 
       <p class="login-meta">
-        Chaque accès au démonstrateur est enregistré. Cela nous aide à
+        Chaque accès au démonstrateur est enregistré comme prospect. Cela nous aide à
         prioriser les retours et à vous tenir informé des évolutions.
       </p>
     </div>
@@ -134,11 +134,10 @@
   <!-- Supabase SDK -->
   <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
-    // ⚠️ REMPLACE ces deux lignes par TES vraies valeurs (déjà faites chez toi normalement)
+    // ⚠️ Mets tes vraies valeurs ici
     const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYs";
 
-    // On récupère les éléments du formulaire (le script est APRES le HTML donc pas besoin de DOMContentLoaded)
     const form = document.getElementById("login-form");
     const metaEl = document.getElementById("login-meta");
     const errEl = document.getElementById("login-error");
@@ -150,14 +149,11 @@
     } else if (!window.supabase) {
       console.error("Supabase SDK non chargé");
       errEl.textContent = "Erreur technique : impossible de charger le module d'accès.";
-    } else if (!supabaseUrl || !supabaseAnonKey) {
-      console.error("Supabase URL ou anon key manquants");
-      errEl.textContent = "Configuration serveur incomplète.";
     } else {
       const sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
       form.addEventListener("submit", async (e) => {
-        e.preventDefault(); // on empêche le reload de la page
+        e.preventDefault(); // évite le reload → pas de vidage des champs
         errEl.textContent = "";
         metaEl.textContent = "Connexion en cours…";
 
@@ -166,13 +162,10 @@
 
         try {
           // 1) tentative de login
-          let { data, error } = await sb.auth.signInWithPassword({
-            email,
-            password,
-          });
+          let { data, error } = await sb.auth.signInWithPassword({ email, password });
 
           if (error) {
-            // 2) si login échoue → on tente l'inscription
+            // 2) si login échoue → tentative de création de compte
             metaEl.textContent = "Création d’un accès démo…";
 
             const { data: signupData, error: signupError } = await sb.auth.signUp({
@@ -183,15 +176,14 @@
             if (signupError) {
               console.error("Erreur signup:", signupError);
               metaEl.textContent = "";
-              // On affiche clairement le message Supabase (mot de passe trop faible, etc.)
               errEl.textContent =
                 signupError.message ||
                 "Impossible de créer le compte (mot de passe trop faible ou configuration).";
-              // On NE VIDE PAS les champs → l'utilisateur peut corriger
+              // On ne vide JAMAIS les champs → l’utilisateur peut corriger
               return;
             }
 
-            // 3) on enregistre le prospect (si ça plante ce n’est pas bloquant)
+            // 3) on insère le prospect (si ça échoue ce n’est pas bloquant)
             const { error: insertError } = await sb.from("prospects").insert({
               email: email,
               source: "demo_site",
@@ -205,7 +197,6 @@
               window.location.href = "/demo/";
             }, 700);
           } else {
-            // login OK
             metaEl.textContent = "Connexion réussie, redirection…";
             setTimeout(() => {
               window.location.href = "/demo/";
