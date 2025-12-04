@@ -13,6 +13,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
+  const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYsY";
+
+  const sbDemo = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+  (async () => {
+    const { data, error } = await sbDemo.auth.getUser();
+    if (error || !data.user) {
+      window.location.href = "/demo-login.html";
+    }
+  })();
+</script>
+
+
 <body class="theme-rockso">
   <main class="viewport">
     <div class="device">
