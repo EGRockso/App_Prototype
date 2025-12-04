@@ -6,238 +6,277 @@
   <title>Rockso – Mettez vos données sportives au service de la performance</title>
   <meta
     name="description"
-    content="Rockso transforme les données des athlètes en décisions d'entraînement actionnables, grâce à l'IA et à la physiologie du sport."
+    content="Rockso met la science du sport et l’IA au service des athlètes, coachs et structures pour mieux suivre la charge, la fatigue et le risque de blessure."
   />
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@500;600;700&display=swap"
-    rel="stylesheet"
-  />
-
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
+  <!-- HEADER -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="/" class="brand">
-        <img src="assets/img/rockso-logo.svg" alt="Logo Rockso" class="brand-logo" />
+      <a href="#top" class="brand">
+        <div class="brand-icon">R</div>
         <span class="brand-name">Rockso</span>
       </a>
-
       <nav class="main-nav">
         <a href="#features">Fonctionnalités</a>
-        <a href="#audience">Pour qui ?</a>
+        <a href="#for-whom">Pour qui ?</a>
         <a href="#science">Science</a>
-        <a href="#data">Données & confidentialité</a>
+        <a href="#data">Données &amp; confidentialité</a>
         <a href="privacy.html">Privacy</a>
       </nav>
     </div>
   </header>
 
-  <main>
-    <!-- HERO -->
+  <!-- HERO -->
+  <main id="top">
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-text">
           <h1>Vos données d’entraînement, enfin exploitables.</h1>
-          <p class="hero-subtitle">
+          <p class="hero-lead">
             Rockso met la recherche en physiologie du sport et l’IA entre les mains des
-            athlètes, coachs et structures. Centralisez vos données, pilotez la charge,
+            athlètes, coachs et structures. Centralisez vos données, suivez la charge,
             anticipez la fatigue et préservez la santé de vos athlètes.
           </p>
-          <div class="hero-cta">
-            <a href="mailto:contact@rockso.app?subject=Demande%20d%27acc%C3%A8s%20Rockso"
-               class="btn btn-primary">
+          <div class="hero-badges">
+            <span class="badge">Multisport</span>
+            <span class="badge">Prévention des blessures</span>
+            <span class="badge">IA explicable</span>
+          </div>
+          <div class="hero-actions">
+            <a href="mailto:hello@rockso.app?subject=Demande%20d%27accès%20Rockso" class="btn btn-primary">
               Demander un accès
             </a>
-            <button class="btn btn-ghost" type="button" disabled>
+            <a href="/demo/" class="btn btn-ghost">
               Démonstrateur (accès privé)
-            </button>
+            </a>
           </div>
           <p class="hero-note">
-            Rockso est en développement. Nous cherchons des équipes et coachs pilotes
+            Rockso est en développement. Nous recherchons des équipes et coachs pilotes
             pour co-construire la prochaine génération d’outils de monitoring.
           </p>
         </div>
 
-        <div class="hero-visual">
-          <div class="device-frame">
-            <div class="device-bar">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </div>
-            <div class="device-screen">
-              <img
-                src="assets/img/screenshot-dashboard.png"
-                alt="Capture d’écran du tableau de bord Rockso"
-              />
-            </div>
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span class="pill">Aperçu produit</span>
+            <span class="pill pill-soft">Maquette non cliquable</span>
           </div>
-          <p class="hero-caption">
-            Exemple de tableau de bord Rockso : charge d’entraînement, fatigue et risques
-            de blessure sur plusieurs semaines.
-          </p>
+          <div class="hero-card-body">
+            <div class="fake-screen fake-screen-main">
+              <div class="fake-screen-header">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+              <div class="fake-metric-row">
+                <div>
+                  <div class="fake-label">Charge hebdo</div>
+                  <div class="fake-number">+18%</div>
+                </div>
+                <div>
+                  <div class="fake-label">Risque blessure</div>
+                  <div class="fake-chip danger">Élevé</div>
+                </div>
+              </div>
+              <div class="fake-chart-bar">
+                <span class="bar bar-low"></span>
+                <span class="bar bar-med"></span>
+                <span class="bar bar-high"></span>
+                <span class="bar bar-med"></span>
+                <span class="bar bar-low"></span>
+              </div>
+              <div class="fake-list">
+                <div class="fake-list-item">
+                  <span>Micro-cycle actuel</span>
+                  <span class="fake-chip">Sur-sollicitation</span>
+                </div>
+                <div class="fake-list-item">
+                  <span>Sommeil &amp; récupération</span>
+                  <span class="fake-chip">Fragile</span>
+                </div>
+                <div class="fake-list-item">
+                  <span>Disponibilité athlète</span>
+                  <span class="fake-chip">À surveiller</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fake-screen fake-screen-phone">
+              <div class="fake-phone-header">
+                <span class="fake-phone-title">Aujourd’hui</span>
+                <span class="fake-dot green"></span>
+              </div>
+              <div class="fake-phone-block">
+                <div class="fake-phone-label">Séance course</div>
+                <div class="fake-phone-meta">Zone 3 • 45 min</div>
+              </div>
+              <div class="fake-phone-block">
+                <div class="fake-phone-label">Ressenti</div>
+                <div class="fake-phone-meta">RPE 7/10 • jambes lourdes</div>
+              </div>
+              <div class="fake-phone-block">
+                <div class="fake-phone-label">Conseil IA</div>
+                <div class="fake-phone-meta">
+                  «&nbsp;Réduire le volume demain, renforcer la récupération.&nbsp;»
+                </div>
+              </div>
+            </div>
+
+            <p class="hero-card-note">
+              Les écrans présentés sont des maquettes marketing non cliquables, illustrant
+              la vision du produit.
+            </p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- FONCTIONNALITÉS -->
+    <!-- SECTION: FEATURES -->
     <section id="features" class="section">
       <div class="container">
-        <h2>Ce que Rockso apporte à votre structure</h2>
+        <h2 class="section-title">Ce que Rockso apporte à votre structure</h2>
         <div class="grid grid-3">
           <article class="card">
             <h3>Vue 360° de la charge</h3>
             <p>
-              Intégrez données terrain, GPS, RPE, séance par séance, cross-training et
-              contraintes extra-sportives pour suivre réellement la charge globale.
+              Intégrez données terrain, GPS, RPE, séances, cross-training et contraintes
+              extra-sportives pour suivre réellement la charge globale et non pas seulement
+              le kilométrage.
             </p>
           </article>
+
           <article class="card">
             <h3>IA au service de la santé</h3>
             <p>
               Des modèles de machine learning, nourris par la littérature scientifique,
-              détectent les profils de risque et mettent en avant les signaux faibles.
+              détectent les profils de risque et mettent en avant les signaux faibles liés
+              au stress, à la fatigue ou au manque de récupération.
             </p>
           </article>
+
           <article class="card">
             <h3>Coaching augmenté</h3>
             <p>
-              Rockso ne remplace pas le coach : il lui donne des alertes, des priorités
-              et des scénarios, tout en restant transparent sur les données utilisées.
+              Rockso ne remplace pas le coach. Il lui propose des alertes, des priorités
+              et des scénarios d’ajustement tout en restant transparent sur les données
+              utilisées pour chaque recommandation.
             </p>
           </article>
-        </div>
-
-        <div class="marketing-screens">
-          <div class="device-frame device-small">
-            <div class="device-bar">
-              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            </div>
-            <div class="device-screen">
-              <img
-                src="assets/img/screenshot-analytics.png"
-                alt="Rapports analytiques Rockso"
-              />
-            </div>
-          </div>
-
-          <div class="device-frame device-small">
-            <div class="device-bar">
-              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            </div>
-            <div class="device-screen">
-              <img
-                src="assets/img/screenshot-mobile.png"
-                alt="Vue mobile Rockso pour les athlètes"
-              />
-            </div>
-          </div>
-
-          <p class="screens-note">
-            Les écrans présentés sont des maquettes marketing non cliquables, fournies à
-            titre d’illustration du produit.
-          </p>
         </div>
       </div>
     </section>
 
-    <!-- POUR QUI ? -->
-    <section id="audience" class="section section-alt">
+    <!-- SECTION: FOR WHOM -->
+    <section id="for-whom" class="section section-alt">
       <div class="container">
-        <h2>Pour les athlètes, coachs et structures exigeantes</h2>
+        <h2 class="section-title">Pour les athlètes, coachs et structures exigeantes</h2>
         <div class="grid grid-3">
-          <article class="card card-border">
-            <h3>Athlètes & amateurs éclairés</h3>
+          <article class="card card-soft">
+            <h3>Athlètes &amp; amateurs éclairés</h3>
             <p>
               Comprenez comment vos cycles de charge, votre sommeil et votre quotidien
-              impactent vos performances, vos sensations et vos blessures.
+              influencent vos sensations, vos performances et vos blessures. Objectivez
+              ce que vous ressentez.
             </p>
           </article>
-          <article class="card card-border">
-            <h3>Coachs & préparateurs</h3>
+
+          <article class="card card-soft">
+            <h3>Coachs &amp; préparateurs</h3>
             <p>
-              Gagnez du temps sur le suivi, visualisez la dynamique des charges et
-              ajustez les séances en quelques clics, selon l’état de forme réel.
+              Gagnez du temps sur le suivi, visualisez la dynamique des charges et ajustez
+              les séances en quelques clics, selon l’état de forme réel de chaque athlète.
             </p>
           </article>
-          <article class="card card-border">
-            <h3>Clubs, académies & staffs médicaux</h3>
+
+          <article class="card card-soft">
+            <h3>Clubs, académies &amp; staffs</h3>
             <p>
-              Centralisez les données de vos athlètes, suivez les volumes par équipe,
-              et outillez la discussion entre coach, prépa et médical.
+              Centralisez les données de vos effectifs, comparez les volumes par équipe
+              et facilitez le dialogue entre coachs, préparation physique et staff médical.
             </p>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- SCIENCE -->
+    <!-- SECTION: SCIENCE -->
     <section id="science" class="section">
       <div class="container">
-        <h2>Une approche ancrée dans la recherche</h2>
-        <div class="science-layout">
-          <p>
-            Rockso s’appuie sur la littérature en physiologie de l’exercice, en
-            prévention des blessures et en sciences des données. L’objectif n’est pas de
-            “prédire” l’avenir, mais de donner une lecture robuste et actionnable de la
-            charge, du stress et de la fatigue.
-          </p>
-          <ul class="bullet-list">
-            <li>Modèles entraînés sur des données longitudinales d’athlètes.</li>
-            <li>Prise en compte de la multi-pratique (course, vélo, sports co, etc.).</li>
-            <li>Explicabilité : ce qui déclenche une alerte est visible et compréhensible.</li>
-          </ul>
+        <h2 class="section-title">Une approche ancrée dans la recherche</h2>
+        <div class="columns-2">
+          <div>
+            <p>
+              Rockso s’appuie sur la littérature en physiologie de l’exercice, en
+              prévention des blessures et en sciences des données. L’objectif n’est pas
+              de « prédire » l’avenir, mais de proposer une lecture robuste et actionnable
+              de la charge, du stress et de la fatigue.
+            </p>
+            <ul class="checklist">
+              <li>Modèles entraînés sur des données longitudinales d’athlètes.</li>
+              <li>Prise en compte de la multi-pratique (course, vélo, sports co, etc.).</li>
+              <li>Explicabilité des signaux à l’origine des alertes.</li>
+            </ul>
+          </div>
+          <div class="highlight-box">
+            <h3>Co-construire avec le terrain</h3>
+            <p>
+              Nous cherchons des équipes, coachs et structures pilotes pour confronter la
+              théorie à la réalité du terrain et ajuster les modèles à vos contraintes
+              quotidiennes.
+            </p>
+            <a href="mailto:hello@rockso.app?subject=Equipe%20pilote%20Rockso" class="btn btn-outline">
+              Discuter d’un pilote
+            </a>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- DONNÉES & CONFIDENTIALITÉ -->
+    <!-- SECTION: DATA & PRIVACY -->
     <section id="data" class="section section-alt">
       <div class="container">
-        <h2>Vos données restent vos données</h2>
-        <div class="science-layout">
-          <p>
-            Rockso est conçu avec une exigence forte sur la confidentialité et la
-            gouvernance de la donnée. Les athlètes et les structures conservent le
-            contrôle sur leurs données et peuvent choisir ce qu’ils souhaitent partager.
-          </p>
-          <ul class="bullet-list">
-            <li>Hébergement sécurisé et séparation des environnements.</li>
-            <li>
-              Transparence sur les données utilisées pour alimenter les modèles et les
-              recommandations.
-            </li>
-            <li>
-              Possibilité de scénarios décentralisés à terme (monétisation des données,
-              partage contrôlé avec des projets de recherche, etc.).
-            </li>
-          </ul>
+        <h2 class="section-title">Vos données restent vos données</h2>
+        <div class="columns-2">
+          <div>
+            <p>
+              Rockso est conçu avec une exigence forte de confidentialité et de gouvernance
+              de la donnée. Les athlètes comme les structures conservent le contrôle sur
+              leurs données et choisissent ce qu’ils souhaitent partager.
+            </p>
+            <ul class="checklist">
+              <li>Hébergement sécurisé et séparation des environnements.</li>
+              <li>Transparence sur les données utilisées par les modèles.</li>
+              <li>
+                Possibilité, à terme, de scénarios décentralisés (monétisation de données,
+                partage avec des projets de recherche, etc.).
+              </li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <p>
+              Pour en savoir plus sur la façon dont nous traitons les données personnelles,
+              consultez notre politique de confidentialité.
+            </p>
+            <a href="privacy.html" class="btn btn-ghost">Consulter la politique de confidentialité</a>
+          </div>
         </div>
-        <p class="privacy-link">
-          Pour en savoir plus, consultez notre
-          <a href="privacy.html">politique de confidentialité</a>.
-        </p>
       </div>
     </section>
   </main>
 
+  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="container footer-inner">
       <p>© <span id="year"></span> Rockso. Tous droits réservés.</p>
       <div class="footer-links">
         <a href="privacy.html">Privacy</a>
-        <!-- Pas de lien vers la démo pour la garder “cachée” -->
       </div>
     </div>
   </footer>
 
   <script>
-    // Année dynamique
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
