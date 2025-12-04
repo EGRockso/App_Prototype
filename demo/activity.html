@@ -106,6 +106,27 @@
       </nav>
     </div>
   </main>
-  <script src="app.js"></script>
+  <script src="app.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYs";
+
+    const sbDemo = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+    (async () => {
+      try {
+        const { data, error } = await sbDemo.auth.getUser();
+        if (error || !data.user) {
+          window.location.href = "/demo-login.html";
+        }
+      } catch (e) {
+        console.error("Erreur vérification session démo:", e);
+        window.location.href = "/demo-login.html";
+      }
+    })();
+  </script>
 </body>
 </html>
+
