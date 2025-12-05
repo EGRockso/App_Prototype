@@ -739,3 +739,376 @@ img {
   box-shadow: 0 0 0 2px rgba(47, 127, 95, 0.18);
   background-color: #ffffff;
 }
+/* ==== SECTION SCREENS (PHONES + WATCH) ==== */
+
+.section-screens {
+  background: #f3ebdd;
+  padding-top: 3rem;
+  padding-bottom: 3.5rem;
+}
+
+.screens-header {
+  max-width: 720px;
+  margin: 0 auto 2.5rem auto;
+  text-align: center;
+}
+
+.screens-lead {
+  margin-top: 0.75rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: rgba(15, 23, 42, 0.75);
+}
+
+.screens-devices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Generic device container */
+.device {
+  position: relative;
+}
+
+/* Phones */
+
+.device-phone .device-frame {
+  position: relative;
+  width: 220px;
+  max-width: 46vw;
+  height: 420px;
+  border-radius: 32px;
+  padding: 10px;
+  background: radial-gradient(circle at 10% 0%, #111827, #020617);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.45),
+    0 0 0 1px rgba(148, 163, 184, 0.15);
+}
+
+.device-phone .device-notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 16px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 0%, #0f172a, #020617);
+}
+
+.device-phone .device-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 26px;
+  padding: 1.1rem 1rem 1rem 1rem;
+  background: #f5ecdd;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  overflow: hidden;
+}
+
+/* Placement for a slight overlap feeling */
+
+.device-phone-left {
+  transform: translateY(12px) translateX(-4px);
+}
+
+.device-phone-center {
+  transform: translateY(-8px);
+}
+
+/* Screen content */
+
+.screen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.screen-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: #f0e3cf;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #145f3b;
+}
+
+.screen-pill.pill-soft {
+  background: #e0f2e9;
+}
+
+.screen-meta {
+  font-size: 0.78rem;
+  color: rgba(15, 23, 42, 0.6);
+}
+
+/* Card inside screen */
+
+.screen-card {
+  border-radius: 20px;
+  padding: 0.9rem 0.9rem 0.85rem;
+  background: #fbf6ec;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.screen-card.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.metric-label {
+  font-size: 0.78rem;
+  color: rgba(15, 23, 42, 0.6);
+}
+
+.metric-value {
+  margin-top: 0.15rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Bars under card */
+
+.screen-subtitle {
+  font-size: 0.8rem;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.screen-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.22rem;
+  margin-top: 0.25rem;
+}
+
+.screen-bars .bar {
+  width: 10px;
+  border-radius: 999px;
+  background: #d8c7aa;
+}
+
+.bar-small {
+  height: 14px;
+}
+
+.bar-med {
+  height: 22px;
+}
+
+.bar-high {
+  height: 30px;
+}
+
+.bar-current {
+  height: 34px;
+  background: #2f7f5f;
+}
+
+/* Badges list on second phone */
+
+.screen-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.25rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #ede4d5;
+  color: #374151;
+}
+
+.chip-low {
+  background: #e0f2e9;
+  color: #166534;
+}
+
+.chip-neutral {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.chip-alt {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.screen-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  color: rgba(15, 23, 42, 0.8);
+}
+
+.screen-list li + li {
+  margin-top: 0.25rem;
+}
+
+/* Footer CTA in phone */
+
+.screen-footer-cta {
+  margin-top: auto;
+  padding-top: 0.3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: rgba(15, 23, 42, 0.75);
+}
+
+.btn-mini {
+  padding: 0.25rem 0.8rem;
+  font-size: 0.78rem;
+  border-radius: 999px;
+}
+
+/* Watch */
+
+.device-watch {
+  transform: translateY(6px);
+}
+
+.watch-frame {
+  width: 180px;
+  max-width: 40vw;
+  aspect-ratio: 1 / 1.2;
+  border-radius: 36px;
+  padding: 12px;
+  background: radial-gradient(circle at 0% 0%, #020617, #111827);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.45),
+    0 0 0 1px rgba(148, 163, 184, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.watch-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 32px;
+  background: #f5ecdd;
+  padding: 0.7rem 0.7rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.watch-label {
+  font-size: 0.78rem;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.watch-main {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.watch-km {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.watch-km-unit {
+  font-size: 0.9rem;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.watch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.watch-pill {
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  background: #ede4d5;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.watch-pill-good {
+  background: #e0f2e9;
+  color: #166534;
+}
+
+/* Simple progress ring suggestion */
+
+.watch-ring {
+  margin-top: 0.25rem;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #e4d4b8;
+  overflow: hidden;
+}
+
+.watch-ring-fill {
+  display: block;
+  width: 68%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #34d399, #2f7f5f);
+}
+
+/* Note text under devices */
+
+.screens-note {
+  margin: 0 auto;
+  margin-top: 0.75rem;
+  max-width: 720px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: center;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+/* Responsive tweaks */
+
+@media (max-width: 900px) {
+  .device-phone-left,
+  .device-phone-center,
+  .device-watch {
+    transform: none;
+  }
+
+  .screens-devices {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .device-phone .device-frame {
+    height: 380px;
+  }
+
+  .watch-frame {
+    width: 160px;
+  }
+}
