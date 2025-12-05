@@ -77,9 +77,33 @@
             />
           </div>
 
+          <div class="field">
+            <label for="signup-role">Vous êtes… (optionnel)</label>
+            <select id="signup-role">
+              <option value="">Sélectionnez une option</option>
+              <option value="athlete">Athlète / sportif</option>
+              <option value="coach">Coach / préparateur</option>
+              <option value="staff_sante">Staff médical / santé</option>
+              <option value="dirigeant">Dirigeant / club / structure</option>
+              <option value="autre">Autre</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="signup-organisation">Organisation / club (optionnel)</label>
+            <input
+              id="signup-organisation"
+              type="text"
+              autocomplete="organization"
+              placeholder="Nom du club, de l’équipe ou de l’entreprise"
+            />
+          </div>
+
           <p class="hero-note" style="font-size: 0.9rem; margin-top: 0.5rem;">
-            En demandant un accès, vous acceptez que nous enregistrions votre e-mail
-            dans notre base de prospects afin de vous recontacter au sujet de Rockso.
+            Ces informations optionnelles nous aident à mieux comprendre votre contexte
+            (athlète, coach, club…). En demandant un accès, vous acceptez que nous
+            enregistrions votre e-mail dans notre base de prospects afin de vous
+            recontacter au sujet de Rockso.
           </p>
 
           <div class="hero-actions">
@@ -181,6 +205,8 @@
       const email = document.getElementById("signup-email").value.trim();
       const password = document.getElementById("signup-password").value;
       const passwordConfirm = document.getElementById("signup-password-confirm").value;
+      const role = document.getElementById("signup-role").value;
+      const organisation = document.getElementById("signup-organisation").value.trim();
 
       if (password !== passwordConfirm) {
         setSignupState({ error: "Les deux mots de passe ne correspondent pas." });
@@ -216,6 +242,8 @@
               const { error: insertError } = await sb.from("prospects").insert({
                 email: email,
                 source: "demo_site",
+                role: role || null,
+                organisation: organisation || null,
               });
               if (insertError) {
                 console.error("Erreur insert prospect:", insertError);
