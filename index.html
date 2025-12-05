@@ -30,33 +30,232 @@
     </div>
   </header>
 
-  <!-- HERO -->
   <main id="top">
-    <section class="hero">
+    <!-- HERO INTRO : titre + pitch + CTA -->
+    <section class="hero hero-intro">
+      <div class="container hero-intro-inner">
+        <h1>Rockso, votre assistant d’entraînement pour une progression durable.</h1>
+        <p class="hero-lead hero-lead-center">
+          Une app mobile qui met la recherche en physiologie du sport et l’IA au service
+          des athlètes, coachs et structures, pour gérer la charge, anticiper la fatigue
+          et progresser sans brûler les étapes.
+        </p>
+
+        <div class="hero-badges hero-badges-center">
+          <span class="badge">Assistant d’entraînement</span>
+          <span class="badge">Multisport</span>
+          <span class="badge">Prévention des blessures</span>
+        </div>
+
+        <div class="hero-actions hero-actions-center">
+          <a href="demo-login.html" class="btn btn-primary">
+            Demander un accès démo
+          </a>
+          <a href="mailto:hello@rockso.app?subject=Equipe%20pilote%20Rockso" class="btn btn-ghost">
+            Discuter d’un pilote
+          </a>
+        </div>
+
+        <p class="hero-note hero-note-center">
+          Rockso est en bêta privée. Nous recherchons des athlètes, coachs et structures
+          pilotes pour co-construire la prochaine génération d’outils d’aide à la décision.
+        </p>
+      </div>
+    </section>
+
+    <!-- SECTION: SCREENS (PHONES + WATCH) -->
+    <section class="section section-screens">
+      <div class="container">
+        <div class="screens-header">
+          <h2 class="section-title">À quoi ressemble Rockso&nbsp;?</h2>
+          <p class="screens-lead">
+            Une app mobile pensée pour le terrain&nbsp;: un écran d’accueil centré sur
+            votre dernière activité, des conseils d’ajustement semaine par semaine
+            et une vue ultra simple de vos indicateurs clés.
+          </p>
+        </div>
+
+        <div class="screens-devices">
+          <!-- Téléphone 1 : Choisir une séance -->
+          <div class="mockup-phone mockup-phone--sessions">
+            <div class="phone-body">
+              <div class="phone-notch"></div>
+              <div class="phone-screen phone-screen--sessions">
+                <div class="screen-top">
+                  <span class="screen-title">Choisir une séance</span>
+                  <span class="screen-tag">Course</span>
+                </div>
+                <div class="session-grid">
+                  <div class="session-tile tile-green">Course facile</div>
+                  <div class="session-tile tile-orange">Tempo run</div>
+                  <div class="session-tile tile-red">Intervalles</div>
+                  <div class="session-tile tile-teal">Sortie longue</div>
+                  <div class="session-tile tile-purple">Côtes</div>
+                  <div class="session-tile tile-yellow">Vélo Z2</div>
+                </div>
+                <div class="session-footer">+ 4 autres séances disponibles</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Téléphone 2 : Semaine d'entraînement -->
+          <div class="mockup-phone mockup-phone--week">
+            <div class="phone-body">
+              <div class="phone-notch"></div>
+              <div class="phone-screen phone-screen--week">
+                <div class="week-header">
+                  <div>
+                    <div class="week-title">Programme 10 km</div>
+                    <div class="week-subtitle">Semaine 8 / 12</div>
+                  </div>
+                  <div class="week-badge">2 séances rest.</div>
+                </div>
+
+                <div class="week-progress">
+                  <div class="week-progress-bar">
+                    <span style="width:68%;"></span>
+                  </div>
+                  <div class="week-progress-meta">
+                    34,2 km / 50 km • RPE moy. 3,6
+                  </div>
+                </div>
+
+                <div class="week-card today">
+                  <div class="week-card-header">
+                    <span class="week-day">Aujourd’hui</span>
+                    <span class="week-tag">Qualité</span>
+                  </div>
+                  <div class="week-main">
+                    <div>
+                      <div class="week-session-title">Fractionné 6 × 3’</div>
+                      <div class="week-session-meta">Zone 4 • récup. 2’</div>
+                    </div>
+                    <div class="week-badge-small">3/5 clé</div>
+                  </div>
+                </div>
+
+                <div class="week-card">
+                  <div class="week-card-header">
+                    <span class="week-day">Demain</span>
+                    <span class="week-tag week-tag-easy">Facile</span>
+                  </div>
+                  <div class="week-main">
+                    <div>
+                      <div class="week-session-title">Footing 45’</div>
+                      <div class="week-session-meta">Vélo possible en substitution</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="week-footer-note">
+                  Plan validé par Rockso en fonction de votre charge des 6 dernières semaines.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Téléphone 3 : Détail sortie -->
+          <div class="mockup-phone mockup-phone--run">
+            <div class="phone-body">
+              <div class="phone-notch"></div>
+              <div class="phone-screen phone-screen--run">
+                <div class="run-map-placeholder">
+                  <span class="run-map-label">Course longue 16 km</span>
+                  <span class="run-map-badge">Route vallonnée</span>
+                </div>
+
+                <div class="run-metrics">
+                  <div class="run-metric">
+                    <div class="run-metric-label">Distance</div>
+                    <div class="run-metric-value">16,0 km</div>
+                  </div>
+                  <div class="run-metric">
+                    <div class="run-metric-label">Durée</div>
+                    <div class="run-metric-value">1:28:03</div>
+                  </div>
+                  <div class="run-metric">
+                    <div class="run-metric-label">Allure moy.</div>
+                    <div class="run-metric-value">5:30/km</div>
+                  </div>
+                </div>
+
+                <div class="run-metrics">
+                  <div class="run-metric">
+                    <div class="run-metric-label">FC moy.</div>
+                    <div class="run-metric-value">155 bpm</div>
+                  </div>
+                  <div class="run-metric">
+                    <div class="run-metric-label">RPE</div>
+                    <div class="run-metric-value">3,6 / 10</div>
+                  </div>
+                  <div class="run-metric">
+                    <div class="run-metric-label">D+</div>
+                    <div class="run-metric-value">240 m</div>
+                  </div>
+                </div>
+
+                <div class="run-feedback">
+                  <div class="run-feedback-title">Conseil Rockso</div>
+                  <p>
+                    Semaine maîtrisée dans la zone sûre. Garder 1 séance qualité max
+                    et privilégier une sortie vélo Z2 si fatigue musculaire.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Montre -->
+          <div class="mockup-watch">
+            <div class="watch-strap watch-strap--top"></div>
+            <div class="watch-body">
+              <div class="watch-inner">
+                <div class="watch-top-row">
+                  <span class="watch-mode">Semaine</span>
+                  <span class="watch-icon">●</span>
+                </div>
+                <div class="watch-main-metric">
+                  <span class="watch-main-number">52,4</span>
+                  <span class="watch-main-unit">km</span>
+                </div>
+                <div class="watch-sub-row">
+                  <span>Charge ok</span>
+                  <span>RPE 3,6</span>
+                </div>
+                <div class="watch-ring">
+                  <div class="watch-ring-fill"></div>
+                </div>
+                <div class="watch-bottom-row">
+                  <span class="watch-tag watch-tag-good">Zone sûre</span>
+                  <span class="watch-tag">1 séance clé</span>
+                </div>
+              </div>
+            </div>
+            <div class="watch-strap watch-strap--bottom"></div>
+          </div>
+        </div>
+
+        <p class="screens-note">
+          Aperçu de l’expérience mobile Rockso&nbsp;: écrans maquette non cliquables.
+        </p>
+      </div>
+    </section>
+
+    <!-- SECTION: APERÇU PRODUIT (fake desktop + mobile) -->
+    <section class="hero hero-product">
       <div class="container hero-inner">
         <div class="hero-text">
-          <h1>Rockso, votre assistant d’entraînement pour une progression durable.</h1>
+          <h2>Un assistant d’entraînement ancré dans vos données.</h2>
           <p class="hero-lead">
             Un assistant d’entraînement qui met la recherche en physiologie du sport et l’IA
             au service des athlètes, coachs et structures. Gérez la charge, anticipez la
             fatigue, réduisez le risque de blessure et progressez durablement, en multi-sport.
           </p>
-          <div class="hero-badges">
-            <span class="badge">Assistant d’entraînement</span>
-            <span class="badge">Multisport</span>
-            <span class="badge">Prévention des blessures</span>
-          </div>
-          <div class="hero-actions">
-            <a href="demo-login.html" class="btn btn-primary">
-              Demander un accès démo
-            </a>
-            <a href="mailto:hello@rockso.app?subject=Equipe%20pilote%20Rockso" class="btn btn-ghost">
-              Discuter d’un pilote
-            </a>
-          </div>
           <p class="hero-note">
-            Rockso est en bêta privée. Nous recherchons des athlètes, coachs et structures
-            pilotes pour co-construire la prochaine génération d’outils d’aide à la décision.
+            Rockso centralise et relie vos séances, vos sensations et votre contexte
+            quotidien pour proposer des ajustements simples&nbsp;: stabiliser la charge,
+            l’augmenter ou l’alléger, basculer vers du cross-training ou adapter une
+            semaine clé.
           </p>
         </div>
 
@@ -126,112 +325,11 @@
               </div>
             </div>
 
-            <p class="hero-card-note">
-              Les écrans présentés sont des maquettes marketing non cliquables, illustrant
-              la vision du produit.
-            </p>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION: SCREENS (APERÇU VISUEL) -->
-    <section class="section section-screens">
-      <div class="container">
-        <div class="screens-header">
-          <h2 class="section-title">À quoi ressemble Rockso&nbsp;?</h2>
-          <p class="screens-lead">
-            Une app mobile pensée pour le terrain&nbsp;: un écran d’accueil centré sur
-            votre dernière activité, des conseils d’ajustement semaine par semaine
-            et une vue ultra simple de vos indicateurs clés.
+          <p class="hero-card-note">
+            Les écrans présentés sont des maquettes marketing non cliquables, illustrant
+            la vision du produit.
           </p>
-        </div>
-
-        <div class="screens-devices">
-          <!-- Téléphone : Dernière activité -->
-          <div class="device device-phone device-phone-left">
-            <div class="device-frame">
-              <div class="device-notch"></div>
-              <div class="device-screen">
-                <div class="screen-header">
-                  <span class="screen-pill">Dernière activité</span>
-                  <span class="screen-meta">Dim. 21 sept. • 09:00</span>
-                </div>
-                <div class="screen-card grid-3">
-                  <div class="metric">
-                    <div class="metric-label">Distance</div>
-                    <div class="metric-value">16.0 km</div>
-                  </div>
-                  <div class="metric">
-                    <div class="metric-label">Durée</div>
-                    <div class="metric-value">1:28:00</div>
-                  </div>
-                  <div class="metric">
-                    <div class="metric-label">Allure</div>
-                    <div class="metric-value">5:30/km</div>
-                  </div>
-                </div>
-                <div class="screen-subtitle">Volume (6 sem.)</div>
-                <div class="screen-bars">
-                  <span class="bar bar-small"></span>
-                  <span class="bar bar-small"></span>
-                  <span class="bar bar-med"></span>
-                  <span class="bar bar-med"></span>
-                  <span class="bar bar-high"></span>
-                  <span class="bar bar-current"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Téléphone : Conseil S+1 -->
-          <div class="device device-phone device-phone-center">
-            <div class="device-frame">
-              <div class="device-notch"></div>
-              <div class="device-screen">
-                <div class="screen-header">
-                  <span class="screen-pill pill-soft">Conseil pour S+1</span>
-                  <span class="screen-meta">49,3 km • 4 séances</span>
-                </div>
-                <div class="screen-card">
-                  <div class="screen-badge-row">
-                    <span class="chip chip-low">Volume</span>
-                    <span class="chip chip-neutral">Intensité</span>
-                    <span class="chip chip-alt">Substitution</span>
-                  </div>
-                  <ul class="screen-list">
-                    <li><strong>Volume</strong> : stabiliser (≤ +6&nbsp;%)</li>
-                    <li><strong>Intensité</strong> : 1 séance qualité</li>
-                    <li><strong>Substitution</strong> : 1 sortie → vélo 60–75’ Z2</li>
-                  </ul>
-                </div>
-                <div class="screen-footer-cta">
-                  <span>Plan validé par Rockso</span>
-                  <button type="button" class="btn btn-mini">Appliquer au plan</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Montre -->
-          <div class="device device-watch">
-            <div class="watch-frame">
-              <div class="watch-screen">
-                <div class="watch-label">Semaine en cours</div>
-                <div class="watch-main">
-                  <div class="watch-km">52,4</div>
-                  <div class="watch-km-unit">km</div>
-                </div>
-                <div class="watch-row">
-                  <span class="watch-pill">RPE moy. 3,6</span>
-                  <span class="watch-pill watch-pill-good">Zone sûre</span>
-                </div>
-                <div class="watch-ring">
-                  <span class="watch-ring-fill"></span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
