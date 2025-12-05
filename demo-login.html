@@ -3,82 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Accès démonstrateur Rockso</title>
-
-  <!-- Styles globaux du site -->
+  <title>Accès démo – Rockso</title>
+  <meta
+    name="description"
+    content="Demandez un accès au démonstrateur Rockso, assistant d’entraînement multi-sport centré sur la charge, la fatigue et la prévention des blessures."
+  />
   <link rel="stylesheet" href="assets/styles.css" />
-
-  <style>
-    .login-wrapper {
-      min-height: calc(100vh - 80px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1.5rem;
-    }
-    .login-card {
-      max-width: 420px;
-      width: 100%;
-      background: var(--color-card);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--color-border);
-      box-shadow: var(--shadow-soft);
-      padding: 1.8rem 1.6rem;
-    }
-    .login-card h1 {
-      margin-top: 0;
-      margin-bottom: 0.6rem;
-      font-size: 1.3rem;
-    }
-    .login-card p {
-      margin-top: 0;
-      margin-bottom: 1.2rem;
-      font-size: 0.92rem;
-      color: var(--color-muted);
-    }
-    .field {
-      margin-bottom: 0.9rem;
-    }
-    .field label {
-      display: block;
-      font-size: 0.85rem;
-      margin-bottom: 0.25rem;
-      color: #374151;
-    }
-    .field input {
-      width: 100%;
-      padding: 0.5rem 0.6rem;
-      border-radius: 0.6rem;
-      border: 1px solid var(--color-border);
-      font-size: 0.9rem;
-      font-family: inherit;
-      background: #fff;
-    }
-    .field input:focus {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 1px rgba(31, 157, 106, 0.25);
-    }
-    .login-actions {
-      margin-top: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .login-meta {
-      margin-top: 0.8rem;
-      font-size: 0.8rem;
-      color: var(--color-muted);
-    }
-    .login-error {
-      margin-top: 0.5rem;
-      font-size: 0.8rem;
-      color: #b91c1c;
-    }
-  </style>
 </head>
 <body>
-  <!-- Header du site, même style que la landing -->
+  <!-- HEADER -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="/" class="brand">
@@ -86,171 +19,273 @@
         <span class="brand-name">Rockso</span>
       </a>
       <nav class="main-nav">
-        <a href="/">Retour au site</a>
+        <a href="/">Accueil</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="mentions-legales.html">Mentions légales</a>
       </nav>
     </div>
   </header>
 
-  <main class="login-wrapper">
-    <div class="login-card">
-      <h1>Accès au démonstrateur Rockso</h1>
-      <p>
-        Espace réservé. Saisissez votre adresse e-mail et un mot de passe.
-        Si vous n’avez pas encore de compte démo, nous enverrons un e-mail de confirmation
-        pour activer votre accès.
+  <!-- MAIN -->
+  <main class="section">
+    <div class="container">
+      <h1 class="section-title">Accès au démonstrateur Rockso</h1>
+      <p class="hero-note" style="max-width: 720px;">
+        Cette démo web illustre la vision produit de Rockso, un assistant d’entraînement
+        multi-sport centré sur la charge, la fatigue et la prévention des blessures.
+        L’accès est gratuit mais réservé&nbsp;: il nécessite la création d’un compte et
+        la validation de votre adresse e-mail.
       </p>
 
-      <form id="login-form">
-        <div class="field">
-          <label for="email">E-mail</label>
-          <input id="email" type="email" required autocomplete="email" />
-        </div>
-        <div class="field">
-          <label for="password">Mot de passe</label>
-          <input id="password" type="password" required autocomplete="current-password" />
-        </div>
-        <div class="login-actions">
-          <button type="submit" class="btn btn-primary">Entrer dans la démo</button>
-          <a href="/" class="btn btn-ghost">Retour</a>
-        </div>
-        <div id="login-meta" class="login-meta"></div>
-        <div id="login-error" class="login-error"></div>
-      </form>
+      <!-- BLOC PRINCIPAL : DEMANDER UN ACCÈS -->
+      <section class="card card-soft" style="margin-top: 2rem;">
+        <h2>Demander un accès démo</h2>
+        <p>
+          Remplissez le formulaire ci-dessous. Vous recevrez un e-mail de confirmation.
+          Après validation de votre adresse, vous pourrez accéder au démonstrateur.
+        </p>
 
-      <p class="login-meta">
-        Chaque accès au démonstrateur est enregistré comme prospect. Cela nous aide à
-        prioriser les retours et à vous tenir informé des évolutions.
-      </p>
+        <form id="signup-form">
+          <div class="field">
+            <label for="signup-email">E-mail</label>
+            <input
+              id="signup-email"
+              type="email"
+              required
+              autocomplete="email"
+              placeholder="vous@exemple.com"
+            />
+          </div>
+          <div class="field">
+            <label for="signup-password">Mot de passe</label>
+            <input
+              id="signup-password"
+              type="password"
+              required
+              autocomplete="new-password"
+              placeholder="Au moins 8 caractères, lettres, chiffres…"
+            />
+          </div>
+          <div class="field">
+            <label for="signup-password-confirm">Confirmer le mot de passe</label>
+            <input
+              id="signup-password-confirm"
+              type="password"
+              required
+              autocomplete="new-password"
+              placeholder="Répétez votre mot de passe"
+            />
+          </div>
+
+          <p class="hero-note" style="font-size: 0.9rem; margin-top: 0.5rem;">
+            En demandant un accès, vous acceptez que nous enregistrions votre e-mail
+            dans notre base de prospects afin de vous recontacter au sujet de Rockso.
+          </p>
+
+          <div class="hero-actions">
+            <button type="submit" class="btn btn-primary" id="signup-submit">
+              Créer mon accès démo
+            </button>
+            <a href="/" class="btn btn-ghost">Retour au site</a>
+          </div>
+
+          <div id="signup-meta" class="login-meta"></div>
+          <div id="signup-error" class="login-error"></div>
+        </form>
+      </section>
+
+      <!-- BLOC SECONDAIRE : DÉJÀ UN ACCÈS ? -->
+      <section class="card card-soft" style="margin-top: 2rem;">
+        <h2>Vous avez déjà confirmé votre accès&nbsp;?</h2>
+        <p>
+          Si vous avez déjà reçu et cliqué sur le lien de confirmation dans votre boîte mail,
+          vous pouvez vous connecter ici pour accéder au démonstrateur.
+        </p>
+
+        <form id="login-form">
+          <div class="field">
+            <label for="login-email">E-mail</label>
+            <input id="login-email" type="email" required autocomplete="email" />
+          </div>
+          <div class="field">
+            <label for="login-password">Mot de passe</label>
+            <input
+              id="login-password"
+              type="password"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div class="hero-actions">
+            <button type="submit" class="btn btn-primary" id="login-submit">
+              Se connecter à la démo
+            </button>
+          </div>
+
+          <div id="login-meta" class="login-meta"></div>
+          <div id="login-error" class="login-error"></div>
+        </form>
+      </section>
     </div>
   </main>
 
+  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="container footer-inner">
       <p>© <span id="year"></span> Rockso. Tous droits réservés.</p>
       <div class="footer-links">
         <a href="privacy.html">Privacy</a>
+        <a href="mentions-legales.html">Mentions légales</a>
       </div>
     </div>
   </footer>
 
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
-
-  <!-- Supabase JS depuis CDN -->
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
 
     const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
-    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYs";
+    const supabaseAnonKey =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYs";
 
+    const sb = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-    const form = document.getElementById("login-form");
-    const metaEl = document.getElementById("login-meta");
-    const errEl = document.getElementById("login-error");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
+    const signupForm = document.getElementById("signup-form");
+    const loginForm = document.getElementById("login-form");
 
-    if (!form) {
-      console.error("Formulaire #login-form introuvable");
-    } else if (!window.supabase) {
-      console.error("Supabase SDK non chargé");
-      errEl.textContent = "Erreur technique : impossible de charger le module d'accès.";
-    } else {
-      // 2) Création du client Supabase
-      const sb = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+    const signupMeta = document.getElementById("signup-meta");
+    const signupError = document.getElementById("signup-error");
+    const signupSubmit = document.getElementById("signup-submit");
 
-      // 3) Gestion du formulaire
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        errEl.textContent = "";
-        metaEl.textContent = "Connexion en cours…";
+    const loginMeta = document.getElementById("login-meta");
+    const loginError = document.getElementById("login-error");
+    const loginSubmit = document.getElementById("login-submit");
 
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
+    function setSignupState({ meta = "", error = "" }) {
+      signupMeta.textContent = meta;
+      signupError.textContent = error;
+    }
 
-        try {
-          // --- Étape A : tentative de login (email + mdp) ---
-          let { data, error } = await sb.auth.signInWithPassword({ email, password });
+    function setLoginState({ meta = "", error = "" }) {
+      loginMeta.textContent = meta;
+      loginError.textContent = error;
+    }
 
-          if (error) {
-            const msg = (error.message || "").toLowerCase();
+    // ---------- CRÉATION ACCÈS ----------
+    signupForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setSignupState({ meta: "", error: "" });
 
-            // Cas A.1 : email non confirmé
-            if (msg.includes("email not confirmed") || msg.includes("email not verified")) {
-              metaEl.textContent = "";
-              errEl.textContent =
-                "Votre adresse e-mail n'est pas encore confirmée. " +
-                "Cliquez sur le lien reçu par e-mail pour activer votre accès, puis revenez vous connecter.";
-              return;
-            }
+      const email = document.getElementById("signup-email").value.trim();
+      const password = document.getElementById("signup-password").value;
+      const passwordConfirm = document.getElementById("signup-password-confirm").value;
 
-            // Cas A.2 : autre erreur de login → on tente la création de compte démo
-            metaEl.textContent =
-              "Création d’un accès démo et envoi d’un e-mail de confirmation…";
+      if (password !== passwordConfirm) {
+        setSignupState({ error: "Les deux mots de passe ne correspondent pas." });
+        return;
+      }
 
-            const { data: signupData, error: signupError } = await sb.auth.signUp({
-              email,
-              password,
-              options: {
-                // ⚠️ 3) URL de redirection après clic sur le mail de confirmation
-                emailRedirectTo: "https://rockso.app/demo-login.html?confirmed=1",
-              },
-            });
+      signupSubmit.disabled = true;
+      signupSubmit.textContent = "Création en cours…";
 
-            if (signupError) {
-              console.error("Erreur signup:", signupError);
-              metaEl.textContent = "";
-              errEl.textContent =
-                signupError.message ||
-                "Impossible de créer le compte (adresse e-mail ou mot de passe non valides).";
-              return;
-            }
+      try {
+        const { data, error } = await sb.auth.signUp({
+          email,
+          password,
+          options: {
+            // Après confirmation de l'e-mail, l’utilisateur sera renvoyé ici
+            emailRedirectTo: "https://rockso.app/demo-login.html",
+          },
+        });
 
-            // On log le prospect UNIQUEMENT s'il n'existe pas déjà
-            try {
-              const { data: existing, error: existingError } = await sb
-                .from("prospects")
-                .select("id")
-                .eq("email", email)
-                .maybeSingle(); // supabase-js v2
+        if (error) {
+          let message = error.message || "Erreur lors de la création du compte.";
+          setSignupState({ error: message });
+        } else {
+          // Enregistrement du prospect (sans doublon sur l’e-mail)
+          try {
+            const { data: existing, error: existingError } = await sb
+              .from("prospects")
+              .select("id")
+              .eq("email", email)
+              .maybeSingle();
 
-              if (!existing && !existingError) {
-                const { error: insertError } = await sb
-                  .from("prospects")
-                  .insert({
-                    email: email,
-                    source: "demo_site",
-                  });
-
-                if (insertError) {
-                  console.error("Erreur insert prospect:", insertError);
-                }
+            if (!existing && !existingError) {
+              const { error: insertError } = await sb.from("prospects").insert({
+                email: email,
+                source: "demo_site",
+              });
+              if (insertError) {
+                console.error("Erreur insert prospect:", insertError);
               }
-            } catch (e) {
-              console.error("Erreur lors de la vérification/insert prospect:", e);
             }
-
-            metaEl.textContent =
-              "Un e-mail de confirmation vient d'être envoyé à " +
-              email +
-              ". Merci de cliquer sur le lien pour activer votre accès, puis revenir vous connecter ici.";
-            return; // on NE redirige PAS automatiquement → confirmation d'abord
+          } catch (e) {
+            console.error("Erreur prospects:", e);
           }
 
-          // --- Étape B : login réussi (email déjà confirmé) ---
-          metaEl.textContent = "Connexion réussie, redirection…";
-          setTimeout(() => {
-            window.location.href = "/demo/";
-          }, 700);
-        } catch (e) {
-          console.error("Erreur globale login:", e);
-          metaEl.textContent = "";
-          errEl.textContent =
-            "Impossible de vous connecter pour le moment. Vérifiez vos identifiants ou réessayez plus tard.";
+          setSignupState({
+            meta:
+              "Un e-mail de confirmation vient d’être envoyé à " +
+              email +
+              ". Cliquez sur le lien reçu pour activer votre accès, puis revenez vous connecter ici.",
+          });
         }
-      });
-    }
+      } catch (e) {
+        console.error(e);
+        setSignupState({
+          error: "Erreur technique lors de la création du compte. Merci de réessayer.",
+        });
+      } finally {
+        signupSubmit.disabled = false;
+        signupSubmit.textContent = "Créer mon accès démo";
+      }
+    });
+
+    // ---------- CONNEXION ----------
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setLoginState({ meta: "", error: "" });
+
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+
+      loginSubmit.disabled = true;
+      loginSubmit.textContent = "Connexion…";
+
+      try {
+        const { data, error } = await sb.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          let message = "Impossible de vous connecter. Vérifiez vos identifiants.";
+          if (error.message && error.message.toLowerCase().includes("email not confirmed")) {
+            message =
+              "Votre e-mail n’est pas encore confirmé. Cliquez sur le lien reçu dans votre boîte mail, puis réessayez.";
+          }
+          setLoginState({ error: message });
+        } else if (data && data.session) {
+          setLoginState({ meta: "Connexion réussie, redirection en cours…" });
+          window.location.href = "/demo/";
+        } else {
+          setLoginState({
+            error:
+              "Connexion impossible. Merci de vérifier vos identifiants ou de recréer un accès.",
+          });
+        }
+      } catch (e) {
+        console.error(e);
+        setLoginState({
+          error: "Erreur technique lors de la connexion. Merci de réessayer.",
+        });
+      } finally {
+        loginSubmit.disabled = false;
+        loginSubmit.textContent = "Se connecter à la démo";
+      }
+    });
   </script>
 </body>
 </html>
