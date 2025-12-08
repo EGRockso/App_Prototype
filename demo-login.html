@@ -185,10 +185,31 @@
   </footer>
 
   <!-- SCRIPTS -->
+    <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
+    // ---------- MENU MOBILE (burger) ----------
+    const navToggle = document.querySelector(".nav-toggle");
+    const mainNav = document.querySelector(".main-nav");
+
+    if (navToggle && mainNav) {
+      navToggle.addEventListener("click", () => {
+        const isOpen = document.body.classList.toggle("nav-open");
+        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+
+      // Fermeture du menu quand on clique sur un lien
+      mainNav.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          document.body.classList.remove("nav-open");
+          navToggle.setAttribute("aria-expanded", "false");
+        });
+      });
+    }
+
+    // ---------- SUPABASE (inchangé) ----------
     const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
     const supabaseAnonKey =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYs";
@@ -240,7 +261,6 @@
           email,
           password,
           options: {
-            // Après confirmation de l'e-mail, l’utilisateur sera renvoyé ici
             emailRedirectTo: "https://rockso.app/demo-login.html",
           },
         });
@@ -249,7 +269,6 @@
           let message = error.message || "Erreur lors de la création du compte.";
           setSignupState({ error: message });
         } else {
-          // Enregistrement du prospect (sans doublon sur l’e-mail)
           try {
             const { data: existing, error: existingError } = await sb
               .from("prospects")
