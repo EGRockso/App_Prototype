@@ -71,7 +71,7 @@ img {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 60; /* <- plus haut que le backdrop */
+  z-index: 80; /* plus haut que le backdrop et que le reste */
   background: rgba(252, 247, 239, 0.96);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(216, 196, 172, 0.7);
@@ -190,7 +190,7 @@ body.nav-open .nav-toggle span:nth-child(3) {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease-out;
-  z-index: 40;
+  z-index: 50; /* en dessous du header / menu */
 }
 
 body.nav-open .nav-backdrop {
@@ -758,11 +758,11 @@ body.nav-open .nav-backdrop {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* --- NAV MOBILE --- */
-
   .header-inner {
     gap: 0.75rem;
   }
+
+  /* --- NAV MOBILE : panneau plein écran sous le header --- */
 
   .nav-toggle {
     display: inline-flex;
@@ -770,24 +770,24 @@ body.nav-open .nav-backdrop {
 
   .main-nav {
     position: fixed;
-    top: 56px;                       /* sous le header */
+    top: 56px;                       /* juste sous le header */
+    left: 0;
     right: 0;
     bottom: 0;
-    width: min(260px, 80vw);
-    padding: 0.75rem 1rem 1.5rem;
-    background: transparent;         /* ✅ plus de gros bloc beige derrière */
+    padding: 1.25rem 1.5rem 2.5rem;
+    background: rgba(249, 243, 234, 0.97);  /* fond uniforme */
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 0.4rem;
-    transform: translateX(100%);
+    gap: 0.75rem;
+    transform: translateY(-100%);    /* caché par défaut */
     transition: transform 0.25s ease-out;
-    overflow-y: auto;
-    z-index: 70;
+    overflow-y: auto;                /* scroll si besoin */
+    z-index: 60;                     /* sous le header, au-dessus du contenu */
   }
 
   body.nav-open .main-nav {
-    transform: translateX(0);
+    transform: translateY(0);        /* panneau qui descend */
   }
 
   .main-nav a {
@@ -795,13 +795,9 @@ body.nav-open .nav-backdrop {
     width: 100%;
     padding: 0.75rem 1rem;
     border-radius: 999px;
-    background: #f9f3ea;             /* fond beige par bouton */
+    background: #f9f3ea;
     box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
     font-size: 1rem;
-  }
-
-  .main-nav a + a {
-    margin-top: 0.2rem;
   }
 
   .main-nav .nav-cta {
@@ -810,6 +806,7 @@ body.nav-open .nav-backdrop {
     text-align: center;
   }
 
+  /* Switch EN/FR en bas du panneau */
   .main-nav .lang-switch {
     background: transparent;
     box-shadow: none;
@@ -820,19 +817,9 @@ body.nav-open .nav-backdrop {
     opacity: 0.85;
   }
 
-  /* on enlève le soulignement animé en mobile */
+  /* pas de soulignement animé sur mobile */
   .main-nav a::after {
     display: none;
-  }
-}
-
-@media (max-width: 600px) {
-  .hero {
-    padding-top: 3rem;
-  }
-
-  .header-inner {
-    padding: 0.7rem 0;
   }
 }
 
