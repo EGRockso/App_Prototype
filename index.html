@@ -45,9 +45,6 @@
     </div>
   </header>
 
-  <!-- Fond semi-transparent derrière le menu mobile -->
-  <div class="nav-backdrop"></div>
-
   <main id="top">
     <!-- HERO INTRO : titre + pitch + CTA -->
     <section class="hero hero-intro">
@@ -350,37 +347,26 @@
   </footer>
 
   <script>
-    // Année dans le footer
-    const yearSpan = document.getElementById("year");
-    if (yearSpan) {
-      yearSpan.textContent = new Date().getFullYear();
-    }
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-    // Menu mobile (hamburger)
     const navToggle = document.querySelector(".nav-toggle");
-    const navBackdrop = document.querySelector(".nav-backdrop");
-    const body = document.body;
+    const mainNav = document.querySelector(".main-nav");
 
-    function closeNav() {
-      body.classList.remove("nav-open");
-      if (navToggle) navToggle.setAttribute("aria-expanded", "false");
-    }
-
-    if (navToggle) {
+    if (navToggle && mainNav) {
       navToggle.addEventListener("click", () => {
-        const isOpen = body.classList.toggle("nav-open");
+        const isOpen = document.body.classList.toggle("nav-open");
         navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
       });
-    }
 
-    if (navBackdrop) {
-      navBackdrop.addEventListener("click", closeNav);
+      // On referme le menu quand on clique sur un lien
+      mainNav.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          document.body.classList.remove("nav-open");
+          navToggle.setAttribute("aria-expanded", "false");
+        });
+      });
     }
-
-    // On ferme le menu quand on clique sur un lien de nav
-    document.querySelectorAll(".main-nav a").forEach((link) => {
-      link.addEventListener("click", closeNav);
-    });
   </script>
+
 </body>
 </html>
