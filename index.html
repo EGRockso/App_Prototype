@@ -30,8 +30,23 @@
         <a href="demo-login.html" class="nav-cta">Accès démo</a>
         <a href="index-en.html" class="lang-switch">EN</a>
       </nav>
+
+      <!-- Bouton hamburger (mobile) -->
+      <button
+        class="nav-toggle"
+        type="button"
+        aria-label="Ouvrir le menu"
+        aria-expanded="false"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
+
+  <!-- Fond semi-transparent derrière le menu mobile -->
+  <div class="nav-backdrop"></div>
 
   <main id="top">
     <!-- HERO INTRO : titre + pitch + CTA -->
@@ -334,7 +349,37 @@
   </footer>
 
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+    // Année dans le footer
+    const yearSpan = document.getElementById("year");
+    if (yearSpan) {
+      yearSpan.textContent = new Date().getFullYear();
+    }
+
+    // Menu mobile (hamburger)
+    const navToggle = document.querySelector(".nav-toggle");
+    const navBackdrop = document.querySelector(".nav-backdrop");
+    const body = document.body;
+
+    function closeNav() {
+      body.classList.remove("nav-open");
+      if (navToggle) navToggle.setAttribute("aria-expanded", "false");
+    }
+
+    if (navToggle) {
+      navToggle.addEventListener("click", () => {
+        const isOpen = body.classList.toggle("nav-open");
+        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+    }
+
+    if (navBackdrop) {
+      navBackdrop.addEventListener("click", closeNav);
+    }
+
+    // On ferme le menu quand on clique sur un lien de nav
+    document.querySelectorAll(".main-nav a").forEach((link) => {
+      link.addEventListener("click", closeNav);
+    });
   </script>
 </body>
 </html>
