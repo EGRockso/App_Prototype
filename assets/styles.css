@@ -758,7 +758,11 @@ body.nav-open .nav-backdrop {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* NAV mobile */
+  /* --- NAV MOBILE --- */
+
+  .header-inner {
+    gap: 0.75rem;
+  }
 
   .nav-toggle {
     display: inline-flex;
@@ -766,19 +770,19 @@ body.nav-open .nav-backdrop {
 
   .main-nav {
     position: fixed;
-    top: 56px;                         /* hauteur approximative du header */
+    top: 56px;                       /* sous le header */
     right: 0;
     bottom: 0;
     width: min(260px, 80vw);
-    padding: 1.25rem 1.5rem 2.5rem;
-    background: #f9f3ea;               /* fond plein, on ne voit plus la page derrière */
+    padding: 0.75rem 1rem 1.5rem;
+    background: transparent;         /* ✅ plus de gros bloc beige derrière */
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 1.1rem;
-    transform: translateX(100%);       /* caché par défaut */
+    align-items: stretch;
+    gap: 0.4rem;
+    transform: translateX(100%);
     transition: transform 0.25s ease-out;
-    box-shadow: -18px 0 40px rgba(15, 23, 42, 0.25);
+    overflow-y: auto;
     z-index: 70;
   }
 
@@ -786,48 +790,51 @@ body.nav-open .nav-backdrop {
     transform: translateX(0);
   }
 
-  .nav-toggle {
-    display: inline-flex;
-  }
-
-  .main-nav a::after {
-    display: none;
-  }
-
-    /* Style des liens dans le menu mobile */
   .main-nav a {
     display: block;
     width: 100%;
     padding: 0.75rem 1rem;
     border-radius: 999px;
-    background: #f9f3ea; /* fond plein derrière chaque item */
+    background: #f9f3ea;             /* fond beige par bouton */
     box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
     font-size: 1rem;
   }
 
-  /* petit espace entre chaque ligne */
   .main-nav a + a {
-    margin-top: 0.35rem;
+    margin-top: 0.2rem;
   }
 
-  /* CTA plus mis en avant */
   .main-nav .nav-cta {
     background: var(--color-primary);
     color: #ffffff;
     text-align: center;
   }
 
-  /* Lien EN/FR un peu plus discret */
   .main-nav .lang-switch {
     background: transparent;
     box-shadow: none;
-    padding-left: 0;
+    padding: 0;
     margin-top: 0.5rem;
     font-size: 0.9rem;
-    opacity: 0.8;
+    text-align: right;
+    opacity: 0.85;
+  }
+
+  /* on enlève le soulignement animé en mobile */
+  .main-nav a::after {
+    display: none;
   }
 }
 
+@media (max-width: 600px) {
+  .hero {
+    padding-top: 3rem;
+  }
+
+  .header-inner {
+    padding: 0.7rem 0;
+  }
+}
 
 @media (max-width: 600px) {
   .hero {
