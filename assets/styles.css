@@ -793,6 +793,39 @@ body.nav-open .nav-backdrop {
   .main-nav a::after {
     display: none;
   }
+
+    /* Style des liens dans le menu mobile */
+  .main-nav a {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    background: #f9f3ea; /* fond plein derrière chaque item */
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+    font-size: 1rem;
+  }
+
+  /* petit espace entre chaque ligne */
+  .main-nav a + a {
+    margin-top: 0.35rem;
+  }
+
+  /* CTA plus mis en avant */
+  .main-nav .nav-cta {
+    background: var(--color-primary);
+    color: #ffffff;
+    text-align: center;
+  }
+
+  /* Lien EN/FR un peu plus discret */
+  .main-nav .lang-switch {
+    background: transparent;
+    box-shadow: none;
+    padding-left: 0;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
 }
 
 
