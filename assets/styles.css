@@ -71,7 +71,7 @@ img {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 60; /* <- plus haut que le backdrop */
   background: rgba(252, 247, 239, 0.96);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(216, 196, 172, 0.7);
@@ -190,7 +190,7 @@ body.nav-open .nav-toggle span:nth-child(3) {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease-out;
-  z-index: 30;
+  z-index: 40;
 }
 
 body.nav-open .nav-backdrop {
@@ -779,19 +779,19 @@ body.nav-open .nav-backdrop {
     transform: translateX(100%);       /* caché par défaut */
     transition: transform 0.25s ease-out;
     box-shadow: -18px 0 40px rgba(15, 23, 42, 0.25);
-    z-index: 40;
-  }
-
-  .main-nav a {
-    font-size: 1rem;
-  }
-
-  .main-nav a::after {
-    display: none; /* pas de petit trait sous les liens en mobile */
+    z-index: 70;
   }
 
   body.nav-open .main-nav {
     transform: translateX(0);
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .main-nav a::after {
+    display: none;
   }
 }
 
