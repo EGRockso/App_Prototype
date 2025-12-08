@@ -762,42 +762,39 @@ body.nav-open .nav-backdrop {
     gap: 0.75rem;
   }
 
-  /* --- NAV MOBILE : panneau plein écran sous le header --- */
+  /* --- NAV MOBILE = petit menu déroulant sous le header --- */
 
   .nav-toggle {
     display: inline-flex;
   }
 
   .main-nav {
-    position: fixed;
-    top: 56px;                       /* juste sous le header */
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 1.25rem 1.5rem 2.5rem;
-    background: rgba(249, 243, 234, 0.97);  /* fond uniforme */
-    display: flex;
+    position: absolute;
+    top: 100%;
+    right: 1.5rem;
+    margin-top: 0.6rem;
+    padding: 0.75rem 0.6rem;
+    background: rgba(249, 243, 234, 0.98);
+    border-radius: 1.1rem;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+    display: none;                /* caché par défaut */
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
-    transform: translateY(-100%);    /* caché par défaut */
-    transition: transform 0.25s ease-out;
-    overflow-y: auto;                /* scroll si besoin */
-    z-index: 60;                     /* sous le header, au-dessus du contenu */
+    gap: 0.4rem;
+    z-index: 60;
   }
 
   body.nav-open .main-nav {
-    transform: translateY(0);        /* panneau qui descend */
+    display: flex;                /* montré quand body.nav-open */
   }
 
   .main-nav a {
     display: block;
-    width: 100%;
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 1rem;
     border-radius: 999px;
     background: #f9f3ea;
-    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
-    font-size: 1rem;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+    font-size: 0.95rem;
   }
 
   .main-nav .nav-cta {
@@ -806,18 +803,17 @@ body.nav-open .nav-backdrop {
     text-align: center;
   }
 
-  /* Switch EN/FR en bas du panneau */
   .main-nav .lang-switch {
     background: transparent;
     box-shadow: none;
     padding: 0;
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
+    margin-top: 0.4rem;
+    font-size: 0.88rem;
     text-align: right;
-    opacity: 0.85;
+    opacity: 0.9;
   }
 
-  /* pas de soulignement animé sur mobile */
+  /* on désactive le petit soulignement animé sur mobile */
   .main-nav a::after {
     display: none;
   }
