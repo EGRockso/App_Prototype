@@ -758,43 +758,43 @@ body.nav-open .nav-backdrop {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .header-inner {
-    gap: 0.75rem;
+  /* NAV mobile */
+
+  .nav-toggle {
+    display: inline-flex;
   }
 
-  /* Panneau latéral pour la nav */
   .main-nav {
     position: fixed;
-    top: 0;
+    top: 56px;                         /* hauteur approximative du header */
     right: 0;
     bottom: 0;
-    width: 260px;
-    padding: 4rem 1.5rem 2rem;
-    background: #f9f3ea;
-    box-shadow: -24px 0 50px rgba(15, 23, 42, 0.4);
+    width: min(260px, 80vw);
+    padding: 1.25rem 1.5rem 2.5rem;
+    background: #f9f3ea;               /* fond plein, on ne voit plus la page derrière */
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.2rem;
-    font-size: 0.9rem;
-    transform: translateX(100%);
+    gap: 1.1rem;
+    transform: translateX(100%);       /* caché par défaut */
     transition: transform 0.25s ease-out;
+    box-shadow: -18px 0 40px rgba(15, 23, 42, 0.25);
     z-index: 40;
+  }
+
+  .main-nav a {
+    font-size: 1rem;
+  }
+
+  .main-nav a::after {
+    display: none; /* pas de petit trait sous les liens en mobile */
   }
 
   body.nav-open .main-nav {
     transform: translateX(0);
   }
-
-  .nav-toggle {
-    display: flex;
-  }
-
-  /* sur mobile, on enlève l’animation de soulignement pour plus de lisibilité */
-  .main-nav a::after {
-    display: none;
-  }
 }
+
 
 @media (max-width: 600px) {
   .hero {
