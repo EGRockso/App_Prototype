@@ -1488,3 +1488,92 @@ body.nav-open .nav-backdrop {
     gap: 1.2rem;
   }
 }
+
+/* === OVERRIDE BOTTOM MOCKUP (hero-rockso-mockup) === */
+
+.section-bottom-mockup,
+.hero-bottom-mockup {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border-top: none;
+  border-bottom: none;
+}
+
+.section-bottom-mockup .container,
+.hero-bottom-mockup .container {
+  max-width: none;
+  padding: 0;
+}
+
+/* wrapper utilisé dans l’ancienne et la nouvelle version */
+.bottom-mockup-wrapper,
+.screens-hero-wrapper {
+  max-width: none;
+  margin: 0;
+}
+
+.bottom-mockup-wrapper img,
+.screens-hero-image,
+.hero-bottom-mockup img {
+  display: block;
+  width: 100vw;   /* image = largeur de la fenêtre */
+  max-width: 100%;
+  height: auto;
+}
+
+/* === OVERRIDE HERO TELEPHONE (bloc "Un assistant d’entraînement…") === */
+
+.hero-card--phones {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.hero-card--phones .hero-card-body {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-card--phones .phone-mockup {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  max-width: 380px;   /* ✅ téléphone beaucoup plus grand */
+}
+
+/* === OVERRIDE RANGÉE DES 5 ÉCRANS === */
+
+.screens-row {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 0.75rem;       /* plus proches */
+  margin-bottom: 1.3rem;
+  overflow-x: auto;
+  padding: 0.4rem 0;
+}
+
+.screen-mockup {
+  flex: 0 0 auto;
+  width: 210px;       /* ✅ plus grand */
+  padding: 0;         /* ✅ plus de "carte" autour */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.screen-mockup img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.9rem;
+}
+
+@media (max-width: 600px) {
+  .screen-mockup {
+    width: 180px;
+  }
+}
