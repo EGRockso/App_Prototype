@@ -14,7 +14,7 @@
   --accent-pink: #ec4899;
   --accent-yellow: #facc15;
 
-  /* Couleur principale = vert Rockso (peut être ajustée) */
+  /* Couleur principale = vert Rockso */
   --color-primary: var(--accent-green);
   --color-primary-soft: rgba(31, 157, 106, 0.08);
 
@@ -71,7 +71,7 @@ img {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 80; /* plus haut que le backdrop et que le reste */
+  z-index: 80;
   background: rgba(252, 247, 239, 0.96);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(216, 196, 172, 0.7);
@@ -147,7 +147,7 @@ img {
 /* ------ Bouton hamburger (mobile) ------ */
 
 .nav-toggle {
-  display: none; /* affiché seulement en mobile */
+  display: none;
   margin-left: 1rem;
   border: none;
   background: #f3e7d8;
@@ -190,7 +190,7 @@ body.nav-open .nav-toggle span:nth-child(3) {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease-out;
-  z-index: 50; /* en dessous du header / menu */
+  z-index: 50;
 }
 
 body.nav-open .nav-backdrop {
@@ -243,7 +243,7 @@ body.nav-open .nav-backdrop {
   background: var(--color-primary-soft);
 }
 
-/* on donne une petite variété de couleurs aux badges selon leur ordre */
+/* variantes de badges */
 .hero-badges .badge:nth-child(2) {
   border-color: rgba(249, 115, 22, 0.3);
   color: var(--accent-orange);
@@ -353,7 +353,7 @@ body.nav-open .nav-backdrop {
   text-decoration: none;
 }
 
-/* --------- HERO CARD (FAUX ÉCRANS / MOCKUPS) --------- */
+/* --------- HERO CARD (APERCU PRODUIT) --------- */
 
 .hero-card {
   background: var(--color-card);
@@ -387,26 +387,17 @@ body.nav-open .nav-backdrop {
   color: #b91c1c;
 }
 
-/* grille interne : “desktop” + “mobile” */
-
+/* grille interne */
 .hero-card-body {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
   gap: 1rem;
 }
 
-/* --- Aperçu produit : mockups téléphones dans le hero "Un assistant d’entraînement…" --- */
+/* --- Aperçu produit : mockups téléphones --- */
 
 .hero-card--phones {
   padding-bottom: 1.1rem;
-}
-
-/* Dans ce hero, on ne veut PAS de gros plateau blanc : juste le mockup sur le fond du hero */
-.hero-product .hero-card {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
 }
 
 .hero-card-phones {
@@ -428,13 +419,6 @@ body.nav-open .nav-backdrop {
   border: 1px solid rgba(216, 196, 172, 0.8);
 }
 
-.hero-product .phone-mockup {
-  background: transparent; /* pas de petit fond beige autour du PNG */
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
-
 .phone-mockup img {
   width: 100%;
   display: block;
@@ -447,38 +431,38 @@ body.nav-open .nav-backdrop {
   color: var(--color-muted);
 }
 
-/* léger décalage éventuel */
 .phone-mockup-secondary {
   transform: translateY(6px);
   opacity: 0.96;
 }
 
-@media (max-width: 900px) {
-  .hero-card-phones {
-    justify-content: center;
-  }
-
-  .phone-mockup {
-    max-width: 260px;
-  }
-
-  .phone-mockup-secondary {
-    transform: none;
-  }
+/* Spécifique au hero "Un assistant d’entraînement ancré dans vos données" */
+.hero-product {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
 }
 
-@media (max-width: 600px) {
-  .hero-card-phones {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .phone-mockup {
-    max-width: 260px;
-  }
+.hero-product .hero-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
 
-/* --------- ANCIENS FAUX ÉCRANS (encore présents côté HTML EN / autres pages) --------- */
+.hero-product .hero-card-body {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-product .phone-mockup {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  max-width: 360px;        /* ✅ téléphone plus grand */
+}
+
+/* --------- FAKES (ancienne maquette – encore utilisée ailleurs si besoin) --------- */
 
 .fake-screen {
   border-radius: 0.9rem;
@@ -561,33 +545,15 @@ body.nav-open .nav-backdrop {
   opacity: 0.95;
 }
 
-.bar-low {
-  height: 18px;
-}
+.bar-low { height: 18px; }
+.bar-med { height: 32px; }
+.bar-high { height: 48px; }
 
-.bar-med {
-  height: 32px;
-}
-
-.bar-high {
-  height: 48px;
-}
-
-.fake-chart-bar .bar:nth-child(1) {
-  background: var(--accent-green);
-}
-.fake-chart-bar .bar:nth-child(2) {
-  background: var(--accent-yellow);
-}
-.fake-chart-bar .bar:nth-child(3) {
-  background: var(--accent-orange);
-}
-.fake-chart-bar .bar:nth-child(4) {
-  background: var(--accent-pink);
-}
-.fake-chart-bar .bar:nth-child(5) {
-  background: var(--accent-green);
-}
+.fake-chart-bar .bar:nth-child(1) { background: var(--accent-green); }
+.fake-chart-bar .bar:nth-child(2) { background: var(--accent-yellow); }
+.fake-chart-bar .bar:nth-child(3) { background: var(--accent-orange); }
+.fake-chart-bar .bar:nth-child(4) { background: var(--accent-pink); }
+.fake-chart-bar .bar:nth-child(5) { background: var(--accent-green); }
 
 .fake-list {
   display: flex;
@@ -663,7 +629,7 @@ body.nav-open .nav-backdrop {
   display: flex;
   flex-wrap: nowrap;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;           /* ✅ plus proches */
   margin-bottom: 1.3rem;
   overflow-x: auto;
   padding: 0.4rem 0;
@@ -680,23 +646,23 @@ body.nav-open .nav-backdrop {
 
 .screen-mockup {
   flex: 0 0 auto;
-  width: 180px;               /* largeur fixe pour la rangée */
-  border-radius: 1rem;
-  padding: 0.5rem;
-  background: #fdf7f0;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-  border: 1px solid rgba(216, 196, 172, 0.7);
+  width: 200px;           /* ✅ plus grand */
+  padding: 0;             /* ✅ plus de carte autour */
+  background: transparent;
+  box-shadow: none;
+  border: none;
 }
 
 .screen-mockup img {
   display: block;
   width: 100%;
-  border-radius: 0.8rem;
+  height: auto;
+  border-radius: 0.9rem;
 }
 
 @media (max-width: 600px) {
   .screen-mockup {
-    width: 160px;
+    width: 180px;
   }
 }
 
@@ -835,25 +801,18 @@ body.nav-open .nav-backdrop {
   color: var(--color-muted);
 }
 
-/* --- Mockup global en bas de page (hero-rockso-mockup) --- */
+/* --- Hero global en bas de page (image full width) --- */
 
-.section-bottom-mockup {
-  padding-top: 3rem;
-  padding-bottom: 3.5rem;
-  background: #f3ebdd; /* même fond que la section "À quoi ressemble Rockso ?" */
-  border-top: 1px solid rgba(216, 196, 172, 0.6);
+.hero-bottom-mockup {
+  padding: 0;                 /* pas de marge interne */
+  border: none;
+  background: transparent;
 }
 
-.screens-hero-wrapper {
-  max-width: 960px;
-  margin: 0 auto;
-}
-
-.screens-hero-image {
+.hero-bottom-mockup img {
   display: block;
   width: 100%;
-  border-radius: 1.3rem;
-  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.18);
+  height: auto;
 }
 
 /* --------- FOOTER --------- */
@@ -878,7 +837,7 @@ body.nav-open .nav-backdrop {
   gap: 1rem;
 }
 
-/* --------- RESPONSIVE --------- */
+/* --------- RESPONSIVE GLOBAL --------- */
 
 @media (max-width: 900px) {
   .hero-inner {
@@ -905,7 +864,7 @@ body.nav-open .nav-backdrop {
     gap: 0.75rem;
   }
 
-  /* --- NAV MOBILE = petit menu déroulant sous le header --- */
+  /* --- NAV MOBILE --- */
 
   .nav-toggle {
     display: inline-flex;
@@ -956,7 +915,6 @@ body.nav-open .nav-backdrop {
     opacity: 0.9;
   }
 
-  /* on désactive le petit soulignement animé sur mobile */
   .main-nav a::after {
     display: none;
   }
@@ -1019,7 +977,7 @@ body.nav-open .nav-backdrop {
   background-color: #ffffff;
 }
 
-/* ==== SECTION SCREENS (PHONES + WATCH) ==== */
+/* ==== SECTION SCREENS (PHONES + WATCH – HERO DU HAUT) ==== */
 
 .section-screens {
   background: #f3ebdd;
@@ -1040,7 +998,7 @@ body.nav-open .nav-backdrop {
   color: rgba(15, 23, 42, 0.75);
 }
 
-/* Plateau sombre avec phones + montre (version EN / ancienne FR) */
+/* Plateau sombre avec phones + montre */
 
 .screens-devices {
   position: relative;
@@ -1073,11 +1031,9 @@ body.nav-open .nav-backdrop {
   z-index: 1;
 }
 
-/* --------- PHONES (plateau sombre) --------- */
+/* --------- PHONES (hero du haut) --------- */
 
-.mockup-phone {
-  flex: 0 0 auto;
-}
+.mockup-phone { flex: 0 0 auto; }
 
 .phone-body {
   width: 230px;
@@ -1118,17 +1074,9 @@ body.nav-open .nav-backdrop {
   overflow: hidden;
 }
 
-.mockup-phone--sessions {
-  transform: translateY(10px);
-}
-
-.mockup-phone--week {
-  transform: translateY(-6px);
-}
-
-.mockup-phone--run {
-  transform: translateY(6px);
-}
+.mockup-phone--sessions { transform: translateY(10px); }
+.mockup-phone--week     { transform: translateY(-6px); }
+.mockup-phone--run      { transform: translateY(6px); }
 
 /* Phone 1 : sessions */
 
@@ -1170,24 +1118,12 @@ body.nav-open .nav-backdrop {
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.35);
 }
 
-.tile-green {
-  background: linear-gradient(135deg, #22c55e, #15803d);
-}
-.tile-orange {
-  background: linear-gradient(135deg, #fb923c, #c05621);
-}
-.tile-red {
-  background: linear-gradient(135deg, #f97373, #b91c1c);
-}
-.tile-teal {
-  background: linear-gradient(135deg, #2dd4bf, #0f766e);
-}
-.tile-purple {
-  background: linear-gradient(135deg, #a855f7, #7e22ce);
-}
-.tile-yellow {
-  background: linear-gradient(135deg, #facc15, #ca8a04);
-}
+.tile-green  { background: linear-gradient(135deg, #22c55e, #15803d); }
+.tile-orange { background: linear-gradient(135deg, #fb923c, #c05621); }
+.tile-red    { background: linear-gradient(135deg, #f97373, #b91c1c); }
+.tile-teal   { background: linear-gradient(135deg, #2dd4bf, #0f766e); }
+.tile-purple { background: linear-gradient(135deg, #a855f7, #7e22ce); }
+.tile-yellow { background: linear-gradient(135deg, #facc15, #ca8a04); }
 
 .session-footer {
   margin-top: 0.35rem;
@@ -1197,9 +1133,7 @@ body.nav-open .nav-backdrop {
 
 /* Phone 2 : semaine */
 
-.phone-screen--week {
-  background: #fbf6ec;
-}
+.phone-screen--week { background: #fbf6ec; }
 
 .week-header {
   display: flex;
@@ -1262,9 +1196,7 @@ body.nav-open .nav-backdrop {
   background: #f5ecdd;
 }
 
-.week-card.today {
-  background: #e0f2e9;
-}
+.week-card.today { background: #e0f2e9; }
 
 .week-card-header {
   display: flex;
@@ -1410,13 +1342,8 @@ body.nav-open .nav-backdrop {
   background: linear-gradient(to bottom, #020617, #111827);
 }
 
-.watch-strap--top {
-  height: 38px;
-}
-
-.watch-strap--bottom {
-  height: 34px;
-}
+.watch-strap--top { height: 38px; }
+.watch-strap--bottom { height: 34px; }
 
 .watch-body {
   width: 150px;
@@ -1512,7 +1439,7 @@ body.nav-open .nav-backdrop {
   color: #bbf7d0;
 }
 
-/* --------- NOTE SOUS LES ÉCRANS --------- */
+/* --------- NOTE SOUS LES ECRANS (hero du haut) --------- */
 
 .screens-note {
   margin: 0 auto;
@@ -1524,7 +1451,7 @@ body.nav-open .nav-backdrop {
   color: rgba(15, 23, 42, 0.7);
 }
 
-/* --------- RESPONSIVE (section screens) --------- */
+/* --------- RESPONSIVE SECTION SCREENS --------- */
 
 @media (max-width: 960px) {
   .screens-devices {
