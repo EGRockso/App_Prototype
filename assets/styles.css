@@ -1577,3 +1577,87 @@ body.nav-open .nav-backdrop {
     width: 180px;
   }
 }
+
+/* --- Hero "Un assistant d’entraînement ancré dans vos données" --- */
+
+/* section un peu moins haute */
+.hero-product {
+  padding: 2rem 0 1.8rem;
+}
+
+/* on enlève le plateau et on agrandit le téléphone */
+.hero-product .hero-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.hero-product .hero-card-phones {
+  justify-content: flex-end;
+}
+
+.hero-product .phone-mockup {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  max-width: 360px;   /* téléphone plus grand */
+  flex: 0 0 auto;
+}
+
+@media (max-width: 900px) {
+  .hero-product {
+    padding-top: 2.4rem;
+    padding-bottom: 2.2rem;
+  }
+
+  .hero-product .hero-card-phones {
+    justify-content: center;
+  }
+
+  .hero-product .phone-mockup {
+    max-width: 260px;
+  }
+}
+
+/* --- Rangée de 5 mockups (section "À quoi ressemble Rockso ?") --- */
+
+/* Desktop par défaut */
+.screens-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;        /* plus proches */
+  margin-bottom: 1.3rem;
+  padding: 0.4rem 0;
+  overflow-x: hidden;  /* pas de barre de scroll en desktop */
+}
+
+.screen-mockup {
+  flex: 0 0 auto;
+  width: 190px;        /* plus grand, mais tient sur une seule ligne */
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.screen-mockup img {
+  display: block;
+  width: 100%;
+  border-radius: 0.8rem;  /* juste les coins du téléphone */
+}
+
+/* Scroll horizontal uniquement sur mobile / petit écran */
+@media (max-width: 900px) {
+  .screens-row {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .screen-mockup {
+    width: 160px;
+  }
+}
