@@ -396,9 +396,9 @@ body.nav-open .nav-backdrop {
 
 /* --- Aperçu produit : mockups téléphones (générique) --- */
 
-.hero-card--phones {
+/*.hero-card--phones {
   /* hook si besoin */
-}
+/*}*/
 
 .hero-card-phones {
   display: flex;
