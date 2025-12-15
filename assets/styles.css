@@ -394,10 +394,10 @@ body.nav-open .nav-backdrop {
   gap: 1rem;
 }
 
-/* --- Aperçu produit : mockups téléphones --- */
+/* --- Aperçu produit : mockups téléphones (générique) --- */
 
 .hero-card--phones {
-  /* hook, pas de style spécifique */
+  /* hook si besoin */
 }
 
 .hero-card-phones {
@@ -460,7 +460,7 @@ body.nav-open .nav-backdrop {
   border: none;
   box-shadow: none;
   padding: 0;
-  max-width: 360px;   /* téléphone bien visible */
+  max-width: 400px;   /* ✅ téléphone plus grand en desktop */
   flex: 0 0 auto;
 }
 
@@ -658,7 +658,7 @@ body.nav-open .nav-backdrop {
 
 .screen-mockup {
   flex: 0 0 auto;
-  width: 200px;         /* téléphones plus grands */
+  width: 230px;         /* ✅ téléphones plus grands */
   padding: 0;
   background: transparent;
   border: none;
@@ -700,6 +700,11 @@ body.nav-open .nav-backdrop {
 .section-title {
   margin: 0 0 1.8rem;
   font-size: 1.5rem;
+}
+
+/* Section "À quoi ressemble Rockso ?" un peu plus large */
+.section-screens .container {
+  max-width: 1280px;
 }
 
 /* --------- GRID / LAYOUT --------- */
@@ -1014,7 +1019,7 @@ body.nav-open .nav-backdrop {
   background-color: #ffffff;
 }
 
-/* ==== SECTION SCREENS (PHONES + WATCH – HERO DU HAUT) ==== */
+/* ==== SECTION SCREENS (PHONES + WATCH – HERO DU HAUT, CSS RESTE SI RÉUTILISÉ) ==== */
 
 .section-screens {
   background: #f3ebdd;
@@ -1035,7 +1040,8 @@ body.nav-open .nav-backdrop {
   color: rgba(15, 23, 42, 0.75);
 }
 
-/* Plateau sombre avec phones + montre */
+/* Plateau sombre avec phones + montre (non utilisé sur index.fr actuellement,
+   mais conservé pour la version EN ou réutilisation future) */
 
 .screens-devices {
   position: relative;
@@ -1494,7 +1500,7 @@ body.nav-open .nav-backdrop {
   color: rgba(15, 23, 42, 0.7);
 }
 
-/* --------- RESPONSIVE SECTION SCREENS --------- */
+/* --------- RESPONSIVE SECTION SCREENS (hero du haut) --------- */
 
 @media (max-width: 960px) {
   .screens-devices {
