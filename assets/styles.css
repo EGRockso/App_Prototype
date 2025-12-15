@@ -1537,3 +1537,21 @@ body.nav-open .nav-backdrop {
     gap: 1.2rem;
   }
 }
+
+/* === OVERRIDE SPÉCIFIQUE : rangée des 5 mockups (section "À quoi ressemble Rockso ?") === */
+
+.section-screens .screen-mockup {
+  width: 240px !important;      /* ✅ 1.5–2x plus gros qu'avant */
+}
+
+@media (max-width: 900px) {
+  .section-screens .screen-mockup {
+    width: 190px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .section-screens .screen-mockup {
+    width: 160px !important;
+  }
+}
