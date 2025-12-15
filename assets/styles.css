@@ -1,8 +1,8 @@
 /* --------- PALETTE ROCKSO (V1) --------- */
 :root {
   /* Fond & texte */
-  --color-bg: #f6eee4;        /* beige clair global */
-  --color-bg-alt: #fdf7f0;    /* beige un peu plus clair pour certaines sections */
+  --color-bg: #f6eee4;
+  --color-bg-alt: #fdf7f0;
   --color-card: #ffffff;
   --color-text: #1f2933;
   --color-muted: #6b7280;
@@ -14,7 +14,7 @@
   --accent-pink: #ec4899;
   --accent-yellow: #facc15;
 
-  /* Couleur principale = vert Rockso */
+  /* Couleur principale */
   --color-primary: var(--accent-green);
   --color-primary-soft: rgba(31, 157, 106, 0.08);
 
@@ -171,7 +171,7 @@ img {
   transition: transform 0.18s ease, opacity 0.18s ease;
 }
 
-/* Animation croix quand le menu est ouvert */
+/* Animation croix */
 body.nav-open .nav-toggle span:nth-child(1) {
   transform: translateY(4px) rotate(45deg);
 }
@@ -198,7 +198,7 @@ body.nav-open .nav-backdrop {
   pointer-events: auto;
 }
 
-/* --------- HERO --------- */
+/* --------- HERO (TOP) --------- */
 
 .hero {
   background: var(--color-bg-alt);
@@ -397,7 +397,7 @@ body.nav-open .nav-backdrop {
 /* --- Aperçu produit : mockups téléphones --- */
 
 .hero-card--phones {
-  padding-bottom: 1.1rem;
+  /* hook, pas de style spécifique */
 }
 
 .hero-card-phones {
@@ -436,10 +436,10 @@ body.nav-open .nav-backdrop {
   opacity: 0.96;
 }
 
-/* Spécifique au hero "Un assistant d’entraînement ancré dans vos données" */
+/* --- Hero "Un assistant d’entraînement ancré dans vos données" --- */
+
 .hero-product {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
+  padding: 2rem 0 1.8rem; /* un peu moins haut que les sections standard */
 }
 
 .hero-product .hero-card {
@@ -449,9 +449,10 @@ body.nav-open .nav-backdrop {
   padding: 0;
 }
 
-.hero-product .hero-card-body {
+.hero-product .hero-card-body,
+.hero-product .hero-card-phones {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .hero-product .phone-mockup {
@@ -459,10 +460,27 @@ body.nav-open .nav-backdrop {
   border: none;
   box-shadow: none;
   padding: 0;
-  max-width: 360px;        /* ✅ téléphone plus grand */
+  max-width: 360px;   /* téléphone bien visible */
+  flex: 0 0 auto;
 }
 
-/* --------- FAKES (ancienne maquette – encore utilisée ailleurs si besoin) --------- */
+@media (max-width: 900px) {
+  .hero-product {
+    padding-top: 2.4rem;
+    padding-bottom: 2.2rem;
+  }
+
+  .hero-product .hero-card-body,
+  .hero-product .hero-card-phones {
+    justify-content: center;
+  }
+
+  .hero-product .phone-mockup {
+    max-width: 260px;
+  }
+}
+
+/* --------- FAKES (ancienne maquette) --------- */
 
 .fake-screen {
   border-radius: 0.9rem;
@@ -487,15 +505,9 @@ body.nav-open .nav-backdrop {
   border-radius: 999px;
 }
 
-.fake-screen-header .dot:nth-child(1) {
-  background: var(--accent-green);
-}
-.fake-screen-header .dot:nth-child(2) {
-  background: var(--accent-orange);
-}
-.fake-screen-header .dot:nth-child(3) {
-  background: var(--accent-pink);
-}
+.fake-screen-header .dot:nth-child(1) { background: var(--accent-green); }
+.fake-screen-header .dot:nth-child(2) { background: var(--accent-orange); }
+.fake-screen-header .dot:nth-child(3) { background: var(--accent-pink); }
 
 .fake-metric-row {
   display: flex;
@@ -545,8 +557,8 @@ body.nav-open .nav-backdrop {
   opacity: 0.95;
 }
 
-.bar-low { height: 18px; }
-.bar-med { height: 32px; }
+.bar-low  { height: 18px; }
+.bar-med  { height: 32px; }
 .bar-high { height: 48px; }
 
 .fake-chart-bar .bar:nth-child(1) { background: var(--accent-green); }
@@ -623,16 +635,16 @@ body.nav-open .nav-backdrop {
   color: var(--color-muted);
 }
 
-/* --- Rangée de mockups d'écrans (section "À quoi ressemble Rockso ?") --- */
+/* --- Rangée de 5 mockups (section "À quoi ressemble Rockso ?") --- */
 
+/* Desktop / large */
 .screens-row {
   display: flex;
-  flex-wrap: nowrap;
   justify-content: center;
-  gap: 0.75rem;           /* ✅ plus proches */
-  margin-bottom: 1.3rem;
-  overflow-x: auto;
+  gap: 0.5rem;          /* téléphones plus proches */
+  margin-bottom: 1.5rem;
   padding: 0.4rem 0;
+  overflow-x: hidden;   /* pas de scroll horizontal sur desktop */
 }
 
 .screens-row::-webkit-scrollbar {
@@ -646,23 +658,30 @@ body.nav-open .nav-backdrop {
 
 .screen-mockup {
   flex: 0 0 auto;
-  width: 200px;           /* ✅ plus grand */
-  padding: 0;             /* ✅ plus de carte autour */
+  width: 200px;         /* téléphones plus grands */
+  padding: 0;
   background: transparent;
-  box-shadow: none;
   border: none;
+  box-shadow: none;
 }
 
 .screen-mockup img {
   display: block;
   width: 100%;
-  height: auto;
-  border-radius: 0.9rem;
+  border-radius: 0.8rem;  /* coins du téléphone */
+}
+
+/* Tablette / mobile : on autorise le scroll horizontal */
+@media (max-width: 900px) {
+  .screens-row {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 600px) {
   .screen-mockup {
-    width: 180px;
+    width: 170px;
   }
 }
 
@@ -801,17 +820,35 @@ body.nav-open .nav-backdrop {
   color: var(--color-muted);
 }
 
-/* --- Hero global en bas de page (image full width) --- */
+/* --- Bottom mockup full width (hero-rockso-mockup) --- */
 
+.section-bottom-mockup,
 .hero-bottom-mockup {
-  padding: 0;                 /* pas de marge interne */
-  border: none;
+  padding: 0;
+  margin: 0;
   background: transparent;
+  border-top: none;
+  border-bottom: none;
 }
 
+.section-bottom-mockup .container,
+.hero-bottom-mockup .container {
+  max-width: none;
+  padding: 0;
+}
+
+.bottom-mockup-wrapper,
+.screens-hero-wrapper {
+  max-width: none;
+  margin: 0;
+}
+
+.bottom-mockup-wrapper img,
+.screens-hero-image,
 .hero-bottom-mockup img {
   display: block;
-  width: 100%;
+  width: 100vw;
+  max-width: 100%;
   height: auto;
 }
 
@@ -930,7 +967,7 @@ body.nav-open .nav-backdrop {
   }
 }
 
-/* ---- Formulaires Rockso (champs demo-login) ---- */
+/* ---- Formulaires Rockso ---- */
 
 .field {
   display: flex;
@@ -1033,7 +1070,9 @@ body.nav-open .nav-backdrop {
 
 /* --------- PHONES (hero du haut) --------- */
 
-.mockup-phone { flex: 0 0 auto; }
+.mockup-phone {
+  flex: 0 0 auto;
+}
 
 .phone-body {
   width: 230px;
@@ -1133,7 +1172,9 @@ body.nav-open .nav-backdrop {
 
 /* Phone 2 : semaine */
 
-.phone-screen--week { background: #fbf6ec; }
+.phone-screen--week {
+  background: #fbf6ec;
+}
 
 .week-header {
   display: flex;
@@ -1196,7 +1237,9 @@ body.nav-open .nav-backdrop {
   background: #f5ecdd;
 }
 
-.week-card.today { background: #e0f2e9; }
+.week-card.today {
+  background: #e0f2e9;
+}
 
 .week-card-header {
   display: flex;
@@ -1342,7 +1385,7 @@ body.nav-open .nav-backdrop {
   background: linear-gradient(to bottom, #020617, #111827);
 }
 
-.watch-strap--top { height: 38px; }
+.watch-strap--top    { height: 38px; }
 .watch-strap--bottom { height: 34px; }
 
 .watch-body {
@@ -1486,262 +1529,5 @@ body.nav-open .nav-backdrop {
 
   .screens-devices {
     gap: 1.2rem;
-  }
-}
-
-/* === OVERRIDE BOTTOM MOCKUP (hero-rockso-mockup) === */
-
-.section-bottom-mockup,
-.hero-bottom-mockup {
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  border-top: none;
-  border-bottom: none;
-}
-
-.section-bottom-mockup .container,
-.hero-bottom-mockup .container {
-  max-width: none;
-  padding: 0;
-}
-
-/* wrapper utilisé dans l’ancienne et la nouvelle version */
-.bottom-mockup-wrapper,
-.screens-hero-wrapper {
-  max-width: none;
-  margin: 0;
-}
-
-.bottom-mockup-wrapper img,
-.screens-hero-image,
-.hero-bottom-mockup img {
-  display: block;
-  width: 100vw;   /* image = largeur de la fenêtre */
-  max-width: 100%;
-  height: auto;
-}
-
-/* === OVERRIDE HERO TELEPHONE (bloc "Un assistant d’entraînement…") === */
-
-.hero-card--phones {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
-
-.hero-card--phones .hero-card-body {
-  display: flex;
-  justify-content: center;
-}
-
-.hero-card--phones .phone-mockup {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-  max-width: 380px;   /* ✅ téléphone beaucoup plus grand */
-}
-
-/* === OVERRIDE RANGÉE DES 5 ÉCRANS === */
-
-.screens-row {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-  gap: 0.75rem;       /* plus proches */
-  margin-bottom: 1.3rem;
-  overflow-x: auto;
-  padding: 0.4rem 0;
-}
-
-.screen-mockup {
-  flex: 0 0 auto;
-  width: 210px;       /* ✅ plus grand */
-  padding: 0;         /* ✅ plus de "carte" autour */
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-.screen-mockup img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 0.9rem;
-}
-
-@media (max-width: 600px) {
-  .screen-mockup {
-    width: 180px;
-  }
-}
-
-/* --- Hero "Un assistant d’entraînement ancré dans vos données" --- */
-
-/* section un peu moins haute */
-.hero-product {
-  padding: 2rem 0 1.8rem;
-}
-
-/* on enlève le plateau et on agrandit le téléphone */
-.hero-product .hero-card {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
-
-.hero-product .hero-card-phones {
-  justify-content: flex-end;
-}
-
-.hero-product .phone-mockup {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-  max-width: 360px;   /* téléphone plus grand */
-  flex: 0 0 auto;
-}
-
-@media (max-width: 900px) {
-  .hero-product {
-    padding-top: 2.4rem;
-    padding-bottom: 2.2rem;
-  }
-
-  .hero-product .hero-card-phones {
-    justify-content: center;
-  }
-
-  .hero-product .phone-mockup {
-    max-width: 260px;
-  }
-}
-
-/* --- Rangée de 5 mockups (section "À quoi ressemble Rockso ?") --- */
-
-/* Desktop par défaut */
-.screens-row {
-  display: flex;
-  justify-content: center;
-  gap: 0.75rem;        /* plus proches */
-  margin-bottom: 1.3rem;
-  padding: 0.4rem 0;
-  overflow-x: hidden;  /* pas de barre de scroll en desktop */
-}
-
-.screen-mockup {
-  flex: 0 0 auto;
-  width: 190px;        /* plus grand, mais tient sur une seule ligne */
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-.screen-mockup img {
-  display: block;
-  width: 100%;
-  border-radius: 0.8rem;  /* juste les coins du téléphone */
-}
-
-/* Scroll horizontal uniquement sur mobile / petit écran */
-@media (max-width: 900px) {
-  .screens-row {
-    overflow-x: auto;
-  }
-}
-
-@media (max-width: 600px) {
-  .screen-mockup {
-    width: 160px;
-  }
-}
-
-/* --- Rangée de 5 mockups (section "À quoi ressemble Rockso ?") --- */
-
-/* Desktop par défaut */
-.screens-row {
-  display: flex;
-  justify-content: center;
-  gap: 0.75rem;        /* plus proches */
-  margin-bottom: 1.3rem;
-  padding: 0.4rem 0;
-  overflow-x: hidden;  /* pas de barre de scroll en desktop */
-}
-
-.screen-mockup {
-  flex: 0 0 auto;
-  width: 190px;        /* plus grand, mais tient sur une seule ligne */
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-.screen-mockup img {
-  display: block;
-  width: 100%;
-  border-radius: 0.8rem;  /* juste les coins du téléphone */
-}
-
-/* Scroll horizontal uniquement sur mobile / petit écran */
-@media (max-width: 900px) {
-  .screens-row {
-    overflow-x: auto;
-  }
-}
-
-@media (max-width: 600px) {
-  .screen-mockup {
-    width: 160px;
-  }
-}
-
-/* --- Hero "Un assistant d’entraînement ancré dans vos données" --- */
-
-/* section un peu moins haute */
-.hero-product {
-  padding: 2rem 0 1.8rem;
-}
-
-/* on enlève le plateau et on agrandit le téléphone */
-.hero-product .hero-card {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
-
-.hero-product .hero-card-phones {
-  justify-content: flex-end;
-}
-
-.hero-product .phone-mockup {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-  max-width: 360px;   /* téléphone plus grand */
-  flex: 0 0 auto;
-}
-
-@media (max-width: 900px) {
-  .hero-product {
-    padding-top: 2.4rem;
-    padding-bottom: 2.2rem;
-  }
-
-  .hero-product .hero-card-phones {
-    justify-content: center;
-  }
-
-  .hero-product .phone-mockup {
-    max-width: 260px;
   }
 }
