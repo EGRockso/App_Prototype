@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Accès démo – Rockso</title>
+  <title>Accès anticipé – Rockso</title>
   <meta
     name="description"
-    content="Demandez un accès au démonstrateur Rockso, assistant d’entraînement multi-sport centré sur la charge, la fatigue et la prévention des blessures."
+    content="Demandez un accès anticipé à Rockso, assistant d'entraînement multi-sport centré sur la charge, la fatigue et la prévention des blessures."
   />
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
@@ -23,11 +23,11 @@
 
       <nav class="main-nav">
         <a href="index.html#features">Fonctionnalités</a>
+        <a href="index.html#how-it-works">Comment ça marche</a>
         <a href="index.html#for-whom">Pour qui ?</a>
         <a href="index.html#science">Science</a>
         <a href="index.html#data">Données &amp; confidentialité</a>
-        <a href="privacy.html">Politique de confidentialité</a>
-        <a href="demo-login.html" class="nav-cta">Accès démo</a>
+        <a href="demo-login.html" class="nav-cta">Accès anticipé</a>
         <a href="demo-login-en.html" class="lang-switch">EN</a>
       </nav>
 
@@ -48,20 +48,17 @@
   <!-- MAIN -->
   <main class="section">
     <div class="container">
-      <h1 class="section-title">Accès au démonstrateur Rockso</h1>
-      <p class="hero-note" style="max-width: 720px;">
-        Cette démo web illustre la vision produit de Rockso, un assistant d’entraînement
-        multi-sport centré sur la charge, la fatigue et la prévention des blessures.
-        L’accès est gratuit mais réservé&nbsp;: il nécessite la création d’un compte et
-        la validation de votre adresse e-mail.
+      <h1 class="section-title" style="text-align:center;">Soyez parmi les premiers à tester Rockso</h1>
+      <p class="hero-note" style="max-width: 640px; margin: 0 auto; text-align:center;">
+        Rockso est en bêta privée. Inscrivez-vous pour recevoir un accès anticipé
+        à l'application mobile et contribuer à façonner le produit avec nous.
       </p>
 
       <!-- BLOC PRINCIPAL : DEMANDER UN ACCÈS -->
-      <section class="card card-soft" style="margin-top: 2rem;">
-        <h2>Demander un accès démo</h2>
+      <section class="card card-soft" style="margin-top: 2rem; max-width: 560px; margin-left:auto; margin-right:auto;">
+        <h2>Demander un accès anticipé</h2>
         <p>
-          Remplissez le formulaire ci-dessous. Vous recevrez un e-mail de confirmation.
-          Après validation de votre adresse, vous pourrez accéder au démonstrateur.
+          Laissez-nous vos coordonnées. Nous vous contacterons dès que votre accès sera prêt.
         </p>
 
         <form id="signup-form">
@@ -73,26 +70,6 @@
               required
               autocomplete="email"
               placeholder="vous@exemple.com"
-            />
-          </div>
-          <div class="field">
-            <label for="signup-password">Mot de passe</label>
-            <input
-              id="signup-password"
-              type="password"
-              required
-              autocomplete="new-password"
-              placeholder="Au moins 8 caractères, lettres, chiffres…"
-            />
-          </div>
-          <div class="field">
-            <label for="signup-password-confirm">Confirmer le mot de passe</label>
-            <input
-              id="signup-password-confirm"
-              type="password"
-              required
-              autocomplete="new-password"
-              placeholder="Répétez votre mot de passe"
             />
           </div>
 
@@ -114,60 +91,25 @@
               id="signup-organisation"
               type="text"
               autocomplete="organization"
-              placeholder="Nom du club, de l’équipe ou de l’entreprise"
+              placeholder="Nom du club, de l'équipe ou de l'entreprise"
             />
           </div>
 
-          <p class="hero-note" style="font-size: 0.9rem; margin-top: 0.5rem;">
-            Ces informations optionnelles nous aident à mieux comprendre votre contexte
-            (athlète, coach, club…). En demandant un accès, vous acceptez que nous
-            enregistrions votre e-mail dans notre base de prospects afin de vous
-            recontacter au sujet de Rockso.
+          <p class="hero-note" style="font-size: 0.85rem; margin-top: 0.5rem;">
+            En vous inscrivant, vous acceptez que nous enregistrions votre e-mail
+            dans notre base afin de vous recontacter au sujet de Rockso.
+            Pas de spam, promis.
           </p>
 
-          <div class="hero-actions">
+          <div class="hero-actions" style="margin-top: 1.2rem;">
             <button type="submit" class="btn btn-primary" id="signup-submit">
-              Créer mon accès démo
+              Rejoindre la liste d'attente
             </button>
-            <a href="/" class="btn btn-ghost">Retour au site</a>
+            <a href="index.html" class="btn btn-ghost">Retour au site</a>
           </div>
 
           <div id="signup-meta" class="login-meta"></div>
           <div id="signup-error" class="login-error"></div>
-        </form>
-      </section>
-
-      <!-- BLOC SECONDAIRE : DÉJÀ UN ACCÈS ? -->
-      <section class="card card-soft" style="margin-top: 2rem;">
-        <h2>Vous avez déjà confirmé votre accès&nbsp;?</h2>
-        <p>
-          Si vous avez déjà reçu et cliqué sur le lien de confirmation dans votre boîte mail,
-          vous pouvez vous connecter ici pour accéder au démonstrateur.
-        </p>
-
-        <form id="login-form">
-          <div class="field">
-            <label for="login-email">E-mail</label>
-            <input id="login-email" type="email" required autocomplete="email" />
-          </div>
-          <div class="field">
-            <label for="login-password">Mot de passe</label>
-            <input
-              id="login-password"
-              type="password"
-              required
-              autocomplete="current-password"
-            />
-          </div>
-
-          <div class="hero-actions">
-            <button type="submit" class="btn btn-primary" id="login-submit">
-              Se connecter à la démo
-            </button>
-          </div>
-
-          <div id="login-meta" class="login-meta"></div>
-          <div id="login-error" class="login-error"></div>
         </form>
       </section>
     </div>
@@ -178,14 +120,13 @@
     <div class="container footer-inner">
       <p>© <span id="year"></span> Rockso. Tous droits réservés.</p>
       <div class="footer-links">
-        <a href="privacy.html">Privacy</a>
+        <a href="privacy.html">Politique de confidentialité</a>
         <a href="mentions-legales.html">Mentions légales</a>
       </div>
     </div>
   </footer>
 
   <!-- SCRIPTS -->
-    <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
@@ -200,7 +141,6 @@
         navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
       });
 
-      // Fermeture du menu quand on clique sur un lien
       mainNav.querySelectorAll("a").forEach((link) => {
         link.addEventListener("click", () => {
           document.body.classList.remove("nav-open");
@@ -209,7 +149,7 @@
       });
     }
 
-    // ---------- SUPABASE (inchangé) ----------
+    // ---------- SUPABASE ----------
     const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
     const supabaseAnonKey =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYs";
@@ -217,139 +157,67 @@
     const sb = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
     const signupForm = document.getElementById("signup-form");
-    const loginForm = document.getElementById("login-form");
-
     const signupMeta = document.getElementById("signup-meta");
     const signupError = document.getElementById("signup-error");
     const signupSubmit = document.getElementById("signup-submit");
-
-    const loginMeta = document.getElementById("login-meta");
-    const loginError = document.getElementById("login-error");
-    const loginSubmit = document.getElementById("login-submit");
 
     function setSignupState({ meta = "", error = "" }) {
       signupMeta.textContent = meta;
       signupError.textContent = error;
     }
 
-    function setLoginState({ meta = "", error = "" }) {
-      loginMeta.textContent = meta;
-      loginError.textContent = error;
-    }
-
-    // ---------- CRÉATION ACCÈS ----------
+    // ---------- INSCRIPTION LISTE D'ATTENTE ----------
     signupForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       setSignupState({ meta: "", error: "" });
 
       const email = document.getElementById("signup-email").value.trim();
-      const password = document.getElementById("signup-password").value;
-      const passwordConfirm = document.getElementById("signup-password-confirm").value;
       const role = document.getElementById("signup-role").value;
       const organisation = document.getElementById("signup-organisation").value.trim();
 
-      if (password !== passwordConfirm) {
-        setSignupState({ error: "Les deux mots de passe ne correspondent pas." });
-        return;
-      }
-
       signupSubmit.disabled = true;
-      signupSubmit.textContent = "Création en cours…";
+      signupSubmit.textContent = "Inscription en cours…";
 
       try {
-        const { data, error } = await sb.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: "https://rockso.app/demo-login.html",
-          },
-        });
+        // Check if already registered
+        const { data: existing, error: existingError } = await sb
+          .from("prospects")
+          .select("id")
+          .eq("email", email)
+          .maybeSingle();
 
-        if (error) {
-          let message = error.message || "Erreur lors de la création du compte.";
-          setSignupState({ error: message });
-        } else {
-          try {
-            const { data: existing, error: existingError } = await sb
-              .from("prospects")
-              .select("id")
-              .eq("email", email)
-              .maybeSingle();
-
-            if (!existing && !existingError) {
-              const { error: insertError } = await sb.from("prospects").insert({
-                email: email,
-                source: "demo_site",
-                role: role || null,
-                organisation: organisation || null,
-              });
-              if (insertError) {
-                console.error("Erreur insert prospect:", insertError);
-              }
-            }
-          } catch (e) {
-            console.error("Erreur prospects:", e);
-          }
-
+        if (existing) {
           setSignupState({
-            meta:
-              "Un e-mail de confirmation vient d’être envoyé à " +
-              email +
-              ". Cliquez sur le lien reçu pour activer votre accès, puis revenez vous connecter ici.",
+            meta: "Vous êtes déjà inscrit(e) ! Nous vous contacterons dès que votre accès sera prêt.",
           });
+        } else {
+          const { error: insertError } = await sb.from("prospects").insert({
+            email: email,
+            source: "early_access",
+            role: role || null,
+            organisation: organisation || null,
+          });
+
+          if (insertError) {
+            console.error("Erreur insert prospect:", insertError);
+            setSignupState({
+              error: "Erreur lors de l'inscription. Merci de réessayer.",
+            });
+          } else {
+            setSignupState({
+              meta: "Merci ! Vous êtes inscrit(e) sur la liste d'attente. Nous vous contacterons très bientôt.",
+            });
+            signupForm.reset();
+          }
         }
       } catch (e) {
         console.error(e);
         setSignupState({
-          error: "Erreur technique lors de la création du compte. Merci de réessayer.",
+          error: "Erreur technique. Merci de réessayer ou de nous contacter à hello@rockso.app.",
         });
       } finally {
         signupSubmit.disabled = false;
-        signupSubmit.textContent = "Créer mon accès démo";
-      }
-    });
-
-    // ---------- CONNEXION ----------
-    loginForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      setLoginState({ meta: "", error: "" });
-
-      const email = document.getElementById("login-email").value.trim();
-      const password = document.getElementById("login-password").value;
-
-      loginSubmit.disabled = true;
-      loginSubmit.textContent = "Connexion…";
-
-      try {
-        const { data, error } = await sb.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          let message = "Impossible de vous connecter. Vérifiez vos identifiants.";
-          if (error.message && error.message.toLowerCase().includes("email not confirmed")) {
-            message =
-              "Votre e-mail n’est pas encore confirmé. Cliquez sur le lien reçu dans votre boîte mail, puis réessayez.";
-          }
-          setLoginState({ error: message });
-        } else if (data && data.session) {
-          setLoginState({ meta: "Connexion réussie, redirection en cours…" });
-          window.location.href = "/demo/";
-        } else {
-          setLoginState({
-            error:
-              "Connexion impossible. Merci de vérifier vos identifiants ou de recréer un accès.",
-          });
-        }
-      } catch (e) {
-        console.error(e);
-        setLoginState({
-          error: "Erreur technique lors de la connexion. Merci de réessayer.",
-        });
-      } finally {
-        loginSubmit.disabled = false;
-        loginSubmit.textContent = "Se connecter à la démo";
+        signupSubmit.textContent = "Rejoindre la liste d'attente";
       }
     });
   </script>

@@ -1555,3 +1555,288 @@ body.nav-open .nav-backdrop {
     width: 160px !important;
   }
 }
+
+/* --------- HOW IT WORKS (3 STEPS) --------- */
+
+.steps-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+  counter-reset: step-counter;
+}
+
+.step {
+  text-align: center;
+  position: relative;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  box-shadow: 0 8px 20px rgba(31, 157, 106, 0.25);
+}
+
+.step h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+}
+
+.step p {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+/* Arrow between steps (desktop only) */
+.step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 24px;
+  right: -1rem;
+  width: calc(2rem);
+  height: 2px;
+  background: var(--color-border);
+}
+
+@media (max-width: 900px) {
+  .steps-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .step:not(:last-child)::after {
+    display: none;
+  }
+}
+
+/* --------- SECTION CTA BAND --------- */
+
+.cta-band {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.cta-band p {
+  font-size: 0.92rem;
+  color: var(--color-muted);
+  margin: 0 0 1rem;
+}
+
+/* --------- FAQ ACCORDION --------- */
+
+.faq-list {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.faq-item:first-child {
+  border-top: 1px solid var(--color-border);
+}
+
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+  text-align: left;
+  gap: 1rem;
+}
+
+.faq-question:hover {
+  color: var(--color-primary);
+}
+
+.faq-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  transition: transform 200ms ease;
+}
+
+.faq-icon::before,
+.faq-icon::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+  border-radius: 2px;
+}
+
+.faq-icon::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+.faq-icon::after {
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  transform: translateX(-50%);
+  transition: transform 200ms ease;
+}
+
+.faq-item.open .faq-icon::after {
+  transform: translateX(-50%) rotate(90deg);
+  opacity: 0;
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 250ms ease;
+}
+
+.faq-answer-inner {
+  padding: 0 0 1rem;
+  font-size: 0.92rem;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+/* --------- FOUNDER / CREDIBILITY --------- */
+
+.founder-section {
+  text-align: center;
+}
+
+.founder-card {
+  max-width: 640px;
+  margin: 0 auto;
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem 2rem;
+  border: 1px solid #ead9c7;
+  box-shadow: var(--shadow-soft);
+}
+
+.founder-card h3 {
+  font-size: 1.15rem;
+  margin: 0 0 0.6rem;
+}
+
+.founder-card p {
+  font-size: 0.92rem;
+  color: var(--color-muted);
+  margin: 0 0 0.5rem;
+  line-height: 1.6;
+}
+
+.founder-credentials {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.founder-credentials .badge {
+  font-size: 0.72rem;
+}
+
+/* --------- COMPATIBLE DEVICES --------- */
+
+.devices-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.device-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.device-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+}
+
+.device-icon--logo {
+  padding: 6px;
+  font-size: 0;
+}
+
+.device-icon--logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* --------- LOGIN FORM MESSAGES --------- */
+
+.login-meta {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+}
+
+.login-error {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #b91c1c;
+}
+
+/* --------- SECTION BLOCK (privacy/legal) --------- */
+
+.section-block {
+  margin-top: 2rem;
+}
+
+.section-block h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.15rem;
+}
+
+.section-block h3 {
+  margin-top: 1.2rem;
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+}
+
+.section-block p {
+  margin: 0.2rem 0 0.6rem;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
