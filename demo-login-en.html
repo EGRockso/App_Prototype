@@ -178,37 +178,27 @@
       signupSubmit.textContent = "Signing up…";
 
       try {
-        // Check if already registered
-        const { data: existing, error: existingError } = await sb
-          .from("prospects")
-          .select("id")
-          .eq("email", email)
-          .maybeSingle();
-
-        if (existing) {
-          setSignupState({
-            meta: "You're already on the list! We'll reach out as soon as your access is ready.",
-          });
-        } else {
-          const { error: insertError } = await sb.from("prospects").insert({
-            email: email,
-            source: "early_access",
+        const { data, error } = await sb.functions.invoke("request-beta-access", {
+          body: {
+            email,
             role: role || null,
             organisation: organisation || null,
-          });
+            locale: document.documentElement.lang || "en",
+            source: "early_access_web_en",
+          },
+        });
 
-          if (insertError) {
-            console.error("Error inserting prospect:", insertError);
-            setSignupState({
-              error: "Error while signing up. Please try again.",
-            });
-          } else {
-            setSignupState({
-              meta: "Thank you! You're on the waitlist. We'll be in touch very soon.",
-            });
-            signupForm.reset();
-          }
+        if (error) {
+          console.error("Error calling request-beta-access:", error);
+          throw error;
         }
+
+        setSignupState({
+          meta: data?.alreadyRegistered
+            ? "You're already on the list! We'll reach out as soon as your access is ready."
+            : "Thank you! You're on the waitlist. We'll be in touch very soon.",
+        });
+        signupForm.reset();
       } catch (e) {
         console.error(e);
         setSignupState({
