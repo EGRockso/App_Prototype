@@ -100,6 +100,34 @@
       color: rgba(23, 52, 39, 0.74);
     }
 
+    .beta-form-status {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .beta-form-status--success {
+      color: #1f6d4d;
+    }
+
+    .beta-form-status--error {
+      color: #a23b32;
+    }
+
+    .beta-form-status--muted {
+      color: rgba(23, 52, 39, 0.74);
+    }
+
+    .beta-form-button {
+      border: none;
+      cursor: pointer;
+    }
+
+    .beta-form-button[disabled] {
+      opacity: 0.65;
+      cursor: progress;
+    }
+
     .beta-invalid {
       max-width: 720px;
       margin: 0 auto;
@@ -179,6 +207,52 @@
           <p id="discord-link-note" class="beta-note beta-hidden">
             Le lien Discord beta te sera communique directement par Rockso.
           </p>
+        </article>
+
+        <article class="beta-card beta-hidden" id="beta-password-card">
+          <h2 class="beta-subtitle">Choisir ton mot de passe</h2>
+          <p class="beta-copy">
+            Avant ta premiere connexion dans l application mobile, definis ton mot de passe ici.
+            Tu utiliseras ensuite cet email et ce mot de passe pour te connecter a Rockso.
+          </p>
+          <p class="beta-note" id="beta-password-email"></p>
+          <form id="password-form">
+            <div class="field">
+              <label for="password-input">Mot de passe</label>
+              <input
+                id="password-input"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Choisis un mot de passe"
+                required
+              />
+            </div>
+
+            <div class="field">
+              <label for="password-confirm-input">Confirmer le mot de passe</label>
+              <input
+                id="password-confirm-input"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Confirme ton mot de passe"
+                required
+              />
+            </div>
+
+            <p class="beta-note">
+              Minimum 8 caracteres avec au moins une majuscule, une minuscule, un chiffre et un caractere special.
+            </p>
+
+            <div class="beta-actions">
+              <button type="submit" class="btn btn-primary beta-form-button" id="password-submit-button">
+                Enregistrer mon mot de passe
+              </button>
+            </div>
+
+            <p id="password-form-success" class="beta-form-status beta-form-status--success beta-hidden"></p>
+            <p id="password-form-error" class="beta-form-status beta-form-status--error beta-hidden"></p>
+            <p id="password-form-info" class="beta-form-status beta-form-status--muted beta-hidden"></p>
+          </form>
         </article>
 
         <section class="beta-grid">
@@ -279,6 +353,7 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -319,7 +394,140 @@
     const invalidSection = document.getElementById("beta-access-invalid");
     const discordPrimary = document.getElementById("discord-link-primary");
     const discordNote = document.getElementById("discord-link-note");
+    const passwordCard = document.getElementById("beta-password-card");
+    const passwordForm = document.getElementById("password-form");
+    const passwordInput = document.getElementById("password-input");
+    const passwordConfirmInput = document.getElementById("password-confirm-input");
+    const passwordSubmitButton = document.getElementById("password-submit-button");
+    const passwordEmail = document.getElementById("beta-password-email");
+    const passwordSuccess = document.getElementById("password-form-success");
+    const passwordError = document.getElementById("password-form-error");
+    const passwordInfo = document.getElementById("password-form-info");
     const discordUrl = "https://discord.gg/4KFTwQM2s";
+    const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZ3RueWFyZmVveWFwb2J5c2VlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NjQ3NjcsImV4cCI6MjA4MDM0MDc2N30.TXt98MULdx8vZV6Qc2_3fACFWytK3OOPECjI7seoNYs";
+    const sb = supabase.createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    });
+
+    function validatePassword(value) {
+      if (!value || value.length < 8) {
+        return "Le mot de passe doit contenir au moins 8 caracteres.";
+      }
+      if (!/[A-Z]/.test(value)) {
+        return "Le mot de passe doit contenir au moins une majuscule.";
+      }
+      if (!/[a-z]/.test(value)) {
+        return "Le mot de passe doit contenir au moins une minuscule.";
+      }
+      if (!/[0-9]/.test(value)) {
+        return "Le mot de passe doit contenir au moins un chiffre.";
+      }
+      if (!/[^A-Za-z0-9\\s]/.test(value)) {
+        return "Le mot de passe doit contenir au moins un caractere special.";
+      }
+      return null;
+    }
+
+    function setPasswordFeedback(kind, message) {
+      [passwordSuccess, passwordError, passwordInfo].forEach((element) => {
+        if (element) {
+          element.textContent = "";
+          element.classList.add("beta-hidden");
+        }
+      });
+
+      const target =
+        kind === "success" ? passwordSuccess : kind === "error" ? passwordError : passwordInfo;
+
+      if (target && message) {
+        target.textContent = message;
+        target.classList.remove("beta-hidden");
+      }
+    }
+
+    async function establishInviteSession() {
+      const code = readParam("code");
+      const tokenHash = readParam("token_hash") || readParam("token");
+      const accessToken = readParam("access_token");
+      const refreshToken = readParam("refresh_token");
+
+      if (code) {
+        const { data, error } = await sb.auth.exchangeCodeForSession(code);
+        if (error) {
+          return { ok: false, error: error.message };
+        }
+
+        return { ok: true, email: data.session?.user?.email || "" };
+      }
+
+      if (accessToken && refreshToken) {
+        const { data, error } = await sb.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (error) {
+          return { ok: false, error: error.message };
+        }
+
+        return { ok: true, email: data.user?.email || "" };
+      }
+
+      if (tokenHash && (type === "invite" || type === "recovery" || type === "signup")) {
+        const { data, error } = await sb.auth.verifyOtp({
+          token_hash: tokenHash,
+          type,
+        });
+
+        if (error) {
+          return { ok: false, error: error.message };
+        }
+
+        return { ok: true, email: data.user?.email || "" };
+      }
+
+      const {
+        data: { session },
+      } = await sb.auth.getSession();
+
+      if (session?.user) {
+        return { ok: true, email: session.user.email || "" };
+      }
+
+      return {
+        ok: false,
+        error: "La session d invitation est introuvable. Reouvre le lien recu par email.",
+      };
+    }
+
+    async function initializePasswordStep() {
+      if (!inviteAccessGranted || !passwordCard || !passwordEmail || !passwordForm) {
+        return;
+      }
+
+      setPasswordFeedback("info", "Verification du lien d invitation en cours...");
+
+      const result = await establishInviteSession();
+      if (!result.ok) {
+        passwordCard.classList.remove("beta-hidden");
+        setPasswordFeedback("error", result.error || "Impossible de preparer la creation du mot de passe.");
+        return;
+      }
+
+      passwordCard.classList.remove("beta-hidden");
+      passwordEmail.textContent = result.email
+        ? `Compte invite : ${result.email}`
+        : "Compte invite reconnu. Choisis maintenant ton mot de passe.";
+      setPasswordFeedback(
+        "info",
+        "Choisis un mot de passe maintenant pour pouvoir te connecter ensuite dans l application mobile."
+      );
+    }
 
     if (discordPrimary && discordUrl) {
       discordPrimary.href = discordUrl;
@@ -331,6 +539,50 @@
     if (inviteAccessGranted) {
       validSection.classList.remove("beta-hidden");
       invalidSection.classList.add("beta-hidden");
+      void initializePasswordStep();
+    }
+
+    if (passwordForm && passwordInput && passwordConfirmInput && passwordSubmitButton) {
+      passwordForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const password = passwordInput.value;
+        const confirmPassword = passwordConfirmInput.value;
+        const validationError = validatePassword(password);
+
+        if (validationError) {
+          setPasswordFeedback("error", validationError);
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          setPasswordFeedback("error", "Les mots de passe ne correspondent pas.");
+          return;
+        }
+
+        passwordSubmitButton.disabled = true;
+        passwordSubmitButton.textContent = "Enregistrement...";
+        setPasswordFeedback("info", "Enregistrement du mot de passe en cours...");
+
+        const { error } = await sb.auth.updateUser({ password });
+
+        if (error) {
+          passwordSubmitButton.disabled = false;
+          passwordSubmitButton.textContent = "Enregistrer mon mot de passe";
+          setPasswordFeedback("error", error.message || "Impossible d enregistrer le mot de passe.");
+          return;
+        }
+
+        await sb.auth.signOut();
+        passwordInput.value = "";
+        passwordConfirmInput.value = "";
+        passwordSubmitButton.disabled = false;
+        passwordSubmitButton.textContent = "Enregistrer mon mot de passe";
+        setPasswordFeedback(
+          "success",
+          "Mot de passe enregistre. Tu peux maintenant ouvrir l application mobile Rockso et te connecter avec cet email."
+        );
+      });
     }
   </script>
 </body>
