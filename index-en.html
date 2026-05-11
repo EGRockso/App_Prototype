@@ -1,331 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rockso – Your training assistant for sustainable progress</title>
-  <meta
-    name="description"
-    content="Rockso brings sports science and AI into the hands of athletes and coaches. Centralise your training data, manage load, anticipate fatigue and reduce injury risk."
-  />
-  <link rel="stylesheet" href="assets/styles.css" />
+  <title>Rockso V3 - Every sport. One load. Zero guesswork.</title>
+  <meta name="description"
+    content="Rockso is a multisport training assistant that helps you stay in the right rhythm: knowing when to push, when to recover, and how to build progress that lasts week after week." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="assets/styles-v2.css" />
 </head>
+
 <body>
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="index-en.html" class="brand">
-        <span class="brand-icon">
-          <img src="assets/img/Rockso_vert_bis.png" alt="Rockso" />
-        </span>
-        <span class="brand-name">Rockso</span>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header-v2">
+    <div class="container header-inner-v2">
+      <a href="index-en.html" class="brand-v2">
+        <img src="assets/img/Logos/Rockso_vert_bis copie_sans_fond.png" alt="Rockso" class="brand-logo" />
       </a>
 
-      <nav class="main-nav">
-        <a href="index-en.html#features">Features</a>
-        <a href="index-en.html#how-it-works">How it works</a>
-        <a href="index-en.html#for-whom">Who is it for?</a>
-        <a href="index-en.html#science">Science</a>
-        <a href="index-en.html#data">Data &amp; privacy</a>
-        <a href="demo-login-en.html" class="nav-cta">Early access</a>
+      <nav class="main-nav-v2">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#smart-ai">Smart AI</a>
+        <a href="#for-whom">Who for?</a>
+        <a href="#science">Science</a>
+        <a href="#data">Data &amp; privacy</a>
         <a href="index.html" class="lang-switch">FR</a>
+        <a href="demo-login-en.html" class="nav-cta">Early access</a>
       </nav>
 
-      <!-- Mobile hamburger button -->
-      <button
-        class="nav-toggle"
-        type="button"
-        aria-label="Open menu"
-        aria-expanded="false"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
+      <button class="nav-toggle-v2" type="button" aria-label="Open menu">
+        <span></span><span></span><span></span>
       </button>
     </div>
   </header>
 
   <main id="top">
-    <!-- HERO INTRO: title + pitch + CTA -->
-    <section class="hero hero-intro">
-      <div class="container hero-intro-inner">
-        <h1>Every sport. One load. Zero guesswork.</h1>
-        <p class="hero-lead hero-lead-center">
-          Rockso is a training assistant that brings sports physiology research and AI
-          into the hands of athletes, coaches and organisations, to manage training load,
-          anticipate fatigue and progress without burning out.
-        </p>
 
-        <div class="hero-badges hero-badges-center">
-          <span class="badge">Training assistant</span>
-          <span class="badge">Multisport</span>
-          <span class="badge">Injury prevention</span>
-        </div>
-
-        <div class="hero-actions hero-actions-center">
-          <a href="demo-login-en.html" class="btn btn-primary">
-            Request early access
-          </a>
-          <a href="mailto:hello@rockso.app?subject=Pilot%20team%20Rockso" class="btn btn-ghost">
-            Talk about a pilot
-          </a>
-        </div>
-
-        <p class="hero-note hero-note-center">
-          Rockso is currently in private beta. We are looking for athletes, coaches and
-          performance staffs to co-design the next generation of decision-support tools.
-        </p>
-      </div>
-    </section>
-
-    <!-- SECTION: SCREENS (5 mockups in a row) -->
-    <section class="section section-screens">
-      <div class="container">
-        <div class="screens-header">
-          <h2 class="section-title">What does Rockso look like?</h2>
-          <p class="screens-lead">
-            A mobile experience built for the field: a home screen focused on your
-            latest session, week-by-week recommendations and a very simple view
-            of the indicators that actually matter.
+    <!-- ============ HERO ============ -->
+    <section class="hero-v2">
+      <div class="container hero-v2-inner">
+        <div class="hero-v2-text">
+          <h1>
+            Every sport.<br />
+            One load.<br />
+            Zero guesswork.
+          </h1>
+          <p class="hero-v2-lead">
+            Rockso is a multisport training assistant that helps you stay in the right rhythm: knowing when to push,
+            when to recover, and how to build progress that lasts week after week.
           </p>
-        </div>
-
-        <div class="screens-row">
-          <div class="screen-mockup">
-            <img src="assets/img/mockup_activite.png" alt="Rockso activity screen" />
-          </div>
-          <div class="screen-mockup">
-            <img src="assets/img/mockup_blessure.png" alt="Injury risk screen" />
-          </div>
-          <div class="screen-mockup">
-            <img src="assets/img/mockup_coach_ia.png" alt="AI coach assistant screen" />
-          </div>
-          <div class="screen-mockup">
-            <img src="assets/img/mockup_map.png" alt="Map / activity screen" />
-          </div>
-          <div class="screen-mockup">
-            <img src="assets/img/mockup_semaine_pro.png" alt="Structured week screen" />
+          <div class="hero-v2-actions">
+            <a href="demo-login-en.html" class="btn-v2 green">Request early access</a>
+            <a href="#how-it-works" class="btn-v2 ghost">Discover the method</a>
           </div>
         </div>
 
-        <p class="screens-note">
-          Preview of the Rockso mobile experience: non-clickable visual mock-up.
-        </p>
-      </div>
-    </section>
-
-    <!-- SECTION: HOW IT WORKS (3 steps) -->
-    <section id="how-it-works" class="section section-alt">
-      <div class="container">
-        <h2 class="section-title" style="text-align:center;">How does it work?</h2>
-        <div class="steps-row">
-          <div class="step">
-            <div class="step-number">1</div>
-            <h3>Connect your data</h3>
-            <p>
-              Link your GPS watch (Garmin, Suunto, Coros, Polar…) or import your
-              activities. Rockso centralises all your sessions, across all sports.
-            </p>
-          </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <h3>Rockso analyses your load</h3>
-            <p>
-              AI combines your effort data, perceived exertion (RPE), sleep and daily
-              context to continuously assess your fitness state.
-            </p>
-          </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <h3>Apply the recommendations</h3>
-            <p>
-              Receive simple adjustments: stabilise, increase or reduce load, switch
-              to cross-training, or adapt your week to real-life constraints.
-            </p>
+        <div class="hero-collage-wrap">
+          <div class="hero-collage">
+            <div class="col left">
+              <div class="tile"><img src="assets/img/Trail_Femme.avif" alt="" /></div>
+              <div class="tile"><img src="assets/img/Gravel.avif" alt="" /></div>
+            </div>
+            <div class="col center">
+              <div class="mock-part top-slice">
+                <img src="assets/img/mockup_activite.png" alt="" />
+              </div>
+              <div class="mock-part full">
+                <img src="assets/img/mockup_semaine_pro.png" alt="" />
+              </div>
+              <div class="mock-part bottom-slice">
+                <img src="assets/img/mockup_coach_ia.png" alt="" />
+              </div>
+            </div>
+            <div class="col right">
+              <div class="tile"><img src="assets/img/Basket.avif" alt="" /></div>
+              <div class="tile"><img src="assets/img/Natation_2.avif" alt="" /></div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION: PRODUCT PREVIEW (phone mockup) -->
-    <section class="hero hero-product">
-      <div class="container hero-inner">
-        <div class="hero-text">
-          <h2>A training assistant grounded in your data.</h2>
-          <p class="hero-lead">
-            A training assistant that brings sports physiology research and AI into the
-            hands of athletes, coaches and organisations. Manage training load, anticipate
-            fatigue, reduce injury risk and progress sustainably across multiple sports.
-          </p>
-          <p class="hero-note">
-            Rockso connects your sessions, perceived exertion and daily context to suggest
-            simple adjustments: stabilise the load, increase or reduce it, switch to
-            cross-training or adapt a key week.
-          </p>
-        </div>
+    <!-- ============ SCREENS (5 aligned mockups) ============ -->
+    <section class="section-screens-hero">
+      <div class="section-screens-hero-media">
+        <img src="assets/img/Baniere.png" alt="" />
+      </div>
 
-        <div class="hero-card hero-card--phone">
-          <div class="hero-card-phones">
-            <figure class="phone-mockup">
+      <div class="section-screens-hero-overlay">
+        <div class="container">
+          <span class="eyebrow-v2">Product</span>
+          <h2 class="section-title-v2">A clear view of what matters</h2>
+          <p class="section-lead-v2">
+            A mobile app to centralise your activities, understand your load, visualise your key signals and receive
+            practical adjustments. Every screen helps connect each session to the bigger picture: today, this week,
+            and over time.
+          </p>
+
+          <div class="screens-row">
+            <div class="screen-mockup">
               <img src="assets/img/mockup_activite.png" alt="Rockso activity screen" />
-            </figure>
+            </div>
+            <div class="screen-mockup">
+              <img src="assets/img/mockup_blessure.png" alt="Injury screen" />
+            </div>
+            <div class="screen-mockup">
+              <img src="assets/img/mockup_coach_ia.png" alt="AI coach assistant screen" />
+            </div>
+            <div class="screen-mockup">
+              <img src="assets/img/mockup_map.png" alt="Map screen" />
+            </div>
+            <div class="screen-mockup">
+              <img src="assets/img/mockup_semaine_pro.png" alt="Week screen" />
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION: FEATURES -->
-    <section id="features" class="section">
+    <!-- ============ HOW IT WORKS ============ -->
+    <section id="how-it-works" class="section-v2">
       <div class="container">
-        <h2 class="section-title">What Rockso helps you do</h2>
-        <div class="grid grid-3">
-          <article class="card">
-            <h3>Continuous load analysis</h3>
-            <p>
-              Rockso analyses how your sessions chain together (intensity, volume, frequency)
-              alongside day-to-day stress, and highlights sensitive periods where adjusting
-              training becomes critical to reaching your goals.
-            </p>
-          </article>
+        <span class="eyebrow-v2">The principle</span>
+        <h2 class="section-title-v2">How Rockso helps you stay in the right rhythm</h2>
 
-          <article class="card">
-            <h3>Seamless multi-sport</h3>
+        <div class="how-grid">
+          <div class="how-col">
+            <div class="how-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
+                <path d="M10 5.5h4" />
+                <path d="M10 18.5h4" />
+              </svg>
+            </div>
+            <h3>1. Understand your reality.</h3>
             <p>
-              Running, cycling, triathlon, football, padel, tennis, skiing… Rockso brings
-              endurance sports, team sports, racket sports and winter sports into a single
-              view, even when traditional platforms keep them separate.
+              Watches, activities, sleep, stress, feelings, everyday context: Rockso factors in everything that shapes
+              your fitness state, both in sport and beyond.
             </p>
-          </article>
+          </div>
 
-          <article class="card">
-            <h3>Actionable recommendations</h3>
+          <div class="how-col how-col--visual">
+            <div class="how-icon how-icon--brain">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <path
+                  d="M12 5.5c0-1.7-1.3-3-3-3S6 3.8 6 5.5c-1.7.3-3 1.8-3 3.6 0 1.3.7 2.5 1.9 3.1-.1.3-.2.7-.2 1.1 0 2.1 1.7 3.7 3.7 3.7H9" />
+                <path
+                  d="M12 5.5c0-1.7 1.3-3 3-3s3 1.3 3 3c1.7.3 3 1.8 3 3.6 0 1.3-.7 2.5-1.9 3.1.1.3.2.7.2 1.1 0 2.1-1.7 3.7-3.7 3.7H15" />
+                <path d="M12 5.5V18.5" />
+                <path d="M9 9.5c.8 0 1.5.7 1.5 1.5" />
+                <path d="M15 9.5c-.8 0-1.5.7-1.5 1.5" />
+                <path d="M9.5 14c.5.7 1.4 1.2 2.5 1.2" />
+                <path d="M14.5 14c-.5.7-1.4 1.2-2.5 1.2" />
+              </svg>
+            </div>
+
+            <h3>2. Identify your rhythm.</h3>
+
+            <div class="how-device">
+              <img src="assets/img/Mon_Rythme.png" alt="Rockso preview" />
+            </div>
+          </div>
+          <div class="how-col">
+            <div class="how-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
+                <path d="M8 14l2 2 4-4" />
+              </svg>
+            </div>
+            <h3>3. Help you make the right calls.</h3>
             <p>
-              Instead of leaving you with abstract metrics, Rockso turns your data into
-              simple decisions: increase, stabilise or decrease load, switch to
-              cross-training, adapt a key week to your real-life context.
+              When it is time to adjust, Rockso helps you choose what truly serves the next step: train harder,
+              recover smarter, preserve momentum and build progress that lasts.
             </p>
-          </article>
-        </div>
-
-        <!-- CTA after features -->
-        <div class="cta-band">
-          <p>Ready to turn your training data into real progress?</p>
-          <a href="demo-login-en.html" class="btn btn-primary">Request early access</a>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION: COMPATIBLE DEVICES -->
-    <section class="section section-alt">
-      <div class="container" style="text-align:center;">
-        <h2 class="section-title">Compatible with your devices</h2>
-        <p style="color:var(--color-muted); max-width:600px; margin:0 auto 1.5rem;">
-          Rockso connects to your favourite GPS watches and platforms to centralise
-          all your training data.
+    <!-- ============ IA COACH HERO ============ -->
+    <section id="smart-ai" class="ai-coach-hero">
+      <div class="container ai-coach-inner">
+        <div class="ai-coach-text">
+          <span class="eyebrow-v2 ai-coach-eyebrow">Smart AI · Chat &amp; Voice</span>
+          <h2>
+            Intelligent support,<br />
+            <span class="ai-coach-accent">available 24/7.</span>
+          </h2>
+          <p class="ai-coach-lead">
+            Talk with Rockso. It already understands your history, recent load, and both past and upcoming sessions.
+            In chat or by voice, you can debrief, ask a question or challenge a decision.
+          </p>
+
+          <div class="ai-coach-pillars">
+            <div class="ai-coach-pillar">
+              <div class="pillar-badge athlete">For athletes</div>
+              <h3>Debrief, understand, move forward.</h3>
+              <ul>
+                <li>
+                  <strong>Natural chat or voice</strong> - ask questions about your plan, how you feel, a session to
+                  move, or a decision to make.
+                </li>
+                <li>
+                  <strong>Contextual analysis</strong> - Rockso draws on your data, your state of the day, your plan and
+                  a knowledge base informed by science and field experience.
+                </li>
+                <li>
+                  <strong>Always available</strong> - at 6 a.m. before training or 10 p.m. after a session, the
+                  conversation stays open and connected to your reality.
+                </li>
+              </ul>
+            </div>
+
+            <div class="ai-coach-pillar">
+              <div class="pillar-badge coach">For coaches</div>
+              <h3>Stay in control, extend your presence.</h3>
+              <ul>
+                <li>
+                  <strong>Custom assistants</strong> - configure Rockso to speak with your method, your vocabulary and
+                  your principles.
+                </li>
+                <li>
+                  <strong>24/7 availability</strong> - your athletes can ask questions at any time without multiplying
+                  your mental load.
+                </li>
+                <li>
+                  <strong>Actionable summaries</strong> - review conversations, capture useful signals and adjust fast
+                  while staying in control.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="ai-coach-footnote">
+            Secure infrastructure, hosting in Europe, no data resale.
+            Technology supports decisions; it does not replace them.
+          </div>
+        </div>
+
+        <div class="ai-coach-visual">
+          <img src="assets/img/coach_chat.png" alt="Rockso AI Coach on iPhone" />
+          <div class="ai-coach-glow"></div>
+          <div class="ai-coach-bubble bubble-voice">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              <line x1="12" y1="19" x2="12" y2="23" />
+              <line x1="8" y1="23" x2="16" y2="23" />
+            </svg>
+            <span>Voice</span>
+          </div>
+          <div class="ai-coach-bubble bubble-chat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Chat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FEATURES ============ -->
+    <section id="features" class="section-v2 section-features-bg">
+      <div class="section-features-bg-img">
+        <img src="assets/img/Velo.avif" alt="" />
+      </div>
+      <div class="container">
+        <span class="eyebrow-v2">Core pillars</span>
+        <h2 class="section-title-v2">What Rockso brings you</h2>
+        <p class="section-lead-v2">
+          Rockso connects your reality, your full practice and principles drawn from both science and the field to help
+          you make the right choices and stay in the right rhythm.
         </p>
-        <div class="devices-row">
-          <div class="device-item">
-            <div class="device-icon">G</div>
-            <span>Garmin</span>
-          </div>
-          <div class="device-item">
-            <div class="device-icon device-icon--logo">
-              <img src="assets/img/Partners/Suunto_Logo_black.webp" alt="Suunto" />
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M3 17l6-6 4 4 8-8" />
+                <path d="M14 7h7v7" />
+              </svg>
             </div>
-            <span>Suunto</span>
-          </div>
-          <div class="device-item">
-            <div class="device-icon device-icon--logo">
-              <img src="assets/img/Partners/coros logo.png" alt="Coros" />
+            <h3>Understand your real load</h3>
+            <p>
+              Rockso does not only look at volume or intensity. It puts the sequence of your sessions, your history,
+              recovery and everyday stress into context to understand when load drives progress, and when it becomes too
+              heavy to absorb.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="6" cy="18" r="3" />
+                <circle cx="18" cy="18" r="3" />
+                <path d="M6 18L10 9l4 5 4-5" />
+                <path d="M14 5h4" />
+              </svg>
             </div>
-            <span>Coros</span>
-          </div>
-          <div class="device-item">
-            <div class="device-icon device-icon--logo">
-              <img src="assets/img/Partners/Polar-logo.png" alt="Polar" />
+            <h3>Connect your full practice</h3>
+            <p>
+              Running, cycling, triathlon, football, padel, tennis, skiing... Rockso does not split your practice into
+              silos. It connects what your body is already adding up to give you a unified reading of your load.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" />
+              </svg>
             </div>
-            <span>Polar</span>
-          </div>
-          <div class="device-item">
-            <div class="device-icon device-icon--logo">
-              <img src="assets/img/Partners/p-1699-3-apple-watch-logo-png-transparent-logo-820097204032.png" alt="Apple Watch" />
-            </div>
-            <span>Apple Watch</span>
-          </div>
-          <div class="device-item">
-            <div class="device-icon">St</div>
-            <span>Strava</span>
-          </div>
+            <h3>Respect your rhythm</h3>
+            <p>
+              Rockso draws on sports science and field feedback to help you make decisions that respect your state of
+              the day. The goal is not to always do more, but to stay in the right rhythm, preserve momentum and build
+              progress that lasts.
+            </p>
+          </article>
+        </div>
+
+        <div class="cta-band-v2">
+          <p>The right training is not the hardest. It is the one your body can turn into progress.</p>
+          <a href="demo-login-en.html" class="btn-v2 green">Request early access</a>
         </div>
       </div>
     </section>
 
-    <!-- SECTION: FOR WHOM -->
-    <section id="for-whom" class="section">
-      <div class="container">
-        <h2 class="section-title">For demanding athletes, coaches and organisations</h2>
-        <div class="grid grid-3">
-          <article class="card card-soft">
-            <h3>Athletes &amp; dedicated amateurs</h3>
-            <p>
-              Understand how training cycles, sleep and daily life influence your sensations,
-              performance and injury history. Put numbers behind what you feel, and adjust
-              without skipping steps.
-            </p>
-          </article>
-
-          <article class="card card-soft">
-            <h3>Coaches &amp; performance staff</h3>
-            <p>
-              Save time on monitoring, visualise dynamics in load and adjust sessions in a few
-              clicks based on how athletes actually respond. Rockso acts as a
-              <strong>training assistant</strong> and a
-              <strong>decision-support tool</strong>.
-            </p>
-          </article>
-
-          <article class="card card-soft">
-            <h3>Clubs, academies &amp; teams</h3>
-            <p>
-              Centralise squad data, compare volumes between groups and make it easier for
-              coaches, physical preparation and medical staff to align around a shared view
-              of load and health.
-            </p>
-          </article>
+    <!-- ============ PRODUCT HERO (from V1) ============ 
+    <section class="product-hero">
+      <div class="container product-hero-inner">
+        <div class="product-hero-text">
+          <h2>A training assistant grounded in your data.</h2>
+          <p>
+            Rockso centralises your sessions, feelings and context to help you read your load,
+            anticipate drift and adjust before you pay the cost. The goal is not to show
+            more metrics. The goal is to know what to do next.
+          </p>
+          <p class="note">
+            Sessions themselves are not what drive progress. The adaptations they enable are.
+            Rockso helps dose load and recovery so training can truly be absorbed over time.
+          </p>
         </div>
+        <div class="product-hero-phone">
+          <img src="assets/img/Graph_data.png" alt="Rockso activity screen" />
+        </div>
+      </div>
+    </section>-->
 
-        <!-- CTA after for-whom -->
-        <div class="cta-band">
-          <p>Join the first users and help shape the product.</p>
-          <a href="demo-login-en.html" class="btn btn-primary">Request early access</a>
+    <!-- ============ COMPATIBLE DEVICES ============ -->
+    <section class="section-v2">
+      <div class="container">
+        <span class="eyebrow-v2">Integrations</span>
+        <h2 class="section-title-v2">A unified view of your practice</h2>
+        <p class="section-lead-v2">
+          Watches, sensors, platforms: wherever your data comes from, what matters is turning it into a single, clear
+          and coherent view of your real load.
+        </p>
+        <div class="devices-v2">
+          <div class="device-v2"><span class="text-logo">GARMIN</span></div>
+          <div class="device-v2">
+            <img src="assets/img/Partners/Suunto_Logo_black.webp" alt="Suunto" />
+          </div>
+          <div class="device-v2">
+            <img src="assets/img/Partners/coros logo.png" alt="Coros" />
+          </div>
+          <div class="device-v2">
+            <img src="assets/img/Partners/Polar-logo.png" alt="Polar" />
+          </div>
+          <div class="device-v2">
+            <img src="assets/img/Partners/p-1699-3-apple-watch-logo-png-transparent-logo-820097204032.png"
+              alt="Apple Watch" />
+          </div>
+          <div class="device-v2"><span class="text-logo">STRAVA</span></div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION: SCIENCE -->
-    <section id="science" class="section section-alt">
+    <!-- ============ FOR WHOM (cards avec image header) ============ -->
+    <section id="for-whom" class="section-v2 alt">
       <div class="container">
-        <h2 class="section-title">An approach rooted in sports science</h2>
-        <div class="columns-2">
-          <div>
+        <span class="eyebrow-v2">Who for</span>
+        <h2 class="section-title-v2">For people who want to last and progress</h2>
+        <p class="section-lead-v2">
+          Athletes, coaches, organisations: Rockso brings a clearer reading of load to help people decide better,
+          adjust better and support better.
+        </p>
+
+        <div class="for-whom-grid">
+          <article class="for-whom-card">
+            <div class="fw-image">
+              <img src="assets/img/Hyrox.avif" alt="" />
+            </div>
+            <div class="fw-body">
+              <h3>Athletes &amp; committed amateurs</h3>
+              <p>
+                A good preparation is one that fits your life. Understand what your load is truly producing, identify
+                what you can absorb, what wears you down, and when to adjust to stay consistent over time.
+              </p>
+              <a href="demo-login-en.html" class="fw-link">Build sustainable preparation <span>→</span></a>
+            </div>
+          </article>
+
+          <article class="for-whom-card">
+            <div class="fw-image">
+              <img src="assets/img/Padel_Coach.avif" alt="" />
+            </div>
+            <div class="fw-body">
+              <h3>Coaches &amp; performance staff</h3>
+              <p>
+                Gain a clearer view of your athletes' real load, context and recovery. Visualise useful signals, follow
+                conversations and make decisions faster without losing your philosophy or standards.
+              </p>
+              <a href="demo-login-en.html" class="fw-link">Strengthen your decisions <span>→</span></a>
+            </div>
+          </article>
+
+          <article class="for-whom-card">
+            <div class="fw-image">
+              <img src="assets/img/club.avif" alt="" />
+            </div>
+            <div class="fw-body">
+              <h3>Clubs, academies &amp; staffs</h3>
+              <p>
+                Share a common reading of load, clarify decisions between the field, physical preparation and medical
+                teams, and align choices around availability, progress and continuity.
+              </p>
+              <a href="demo-login-en.html" class="fw-link">Structure collective load <span>→</span></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SCIENCE / RESEARCH ============ -->
+    <section id="science" class="section-v2">
+      <div class="container">
+        <span class="eyebrow-v2">Science</span>
+        <h2 class="section-title-v2">A method grounded in reality</h2>
+
+        <div class="research-grid">
+          <div class="research-text">
+            <h3>Decisions informed by science and the field</h3>
             <p>
-              Rockso is built on research in exercise physiology, injury prevention and data
-              science. The goal is not to "predict" the future, but to offer a robust and
-              actionable reading of training load, stress and fatigue over time.
+              Rockso combines scientific literature, field feedback and individual signals to guide the right decisions
+              at the right time. The goal is not to accumulate metrics, but to make load, fatigue and recovery easier to
+              read so you can adjust better over time.
             </p>
             <ul class="checklist">
-              <li>Models informed by longitudinal athlete data.</li>
-              <li>Support for multi-sport practice (running, cycling, team sports, etc.).</li>
-              <li>Explainability of the signals behind alerts and recommendations.</li>
+              <li>Grounded models, then adjusted to field reality.</li>
+              <li>An individual reading: no copied formulas, no imposed averages.</li>
+              <li>Understandable signals for defensible decisions.</li>
             </ul>
           </div>
-          <div class="highlight-box">
-            <h3>Co-building with the field</h3>
+          <div class="research-image">
+            <img src="assets/img/physiologist-jack-daniels.avif" alt="Physiologist Jack Daniels" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FIELD BAND ========== -->
+    <section class="field-band">
+      <div class="field-band-bg">
+        <img src="assets/img/Natation_2.avif" alt="" />
+      </div>
+
+      <div class="field-band-inner">
+        <div class="manifesto-band">
+          <div class="container">
+            <h2 class="manifesto-band-text">
+              Training itself is not what drives progress.
+              The adaptations it enables are.
+            </h2>
+          </div>
+        </div>
+
+        <div class="co-banner">
+          <div class="co-banner-content">
+            <h3>Co-build with the field</h3>
             <p>
-              We are looking for pilot teams, coaches and organisations to confront theory
-              with the reality of everyday training and adapt the models to your constraints.
+              Rockso is built with teams, coaches and organisations who want to confront models with real practice,
+              refine decisions and build a fairer standard for load monitoring.
             </p>
-            <a href="mailto:hello@rockso.app?subject=Pilot%20team%20Rockso" class="btn btn-outline">
+            <a href="mailto:hello@rockso.app?subject=Rockso%20pilot%20team" class="btn-v2 white">
               Talk about a pilot
             </a>
           </div>
@@ -333,183 +504,230 @@
       </div>
     </section>
 
-    <!-- SECTION: FOUNDER -->
-    <section class="section founder-section">
+    <!-- ============ DATA & PRIVACY ============ -->
+    <section id="data" class="section-v2 alt">
       <div class="container">
-        <h2 class="section-title">Who is behind Rockso?</h2>
-        <div class="founder-card">
-          <h3>Etienne Gay</h3>
-          <p>
-            PhD in applied mathematics, expert in machine learning and AI. But above all,
-            an amateur endurance athlete: Ironman 70.3 finisher, Gravity Race finisher,
-            ranked tennis player, competitive footballer, and a practitioner of triathlon,
-            swimrun, cross-country skiing, ski mountaineering and many other outdoor sports.
-          </p>
-          <p>
-            It is this deeply multi-sport practice — part performance-driven, but mostly
-            fuelled by the joy of movement and the thrill of pushing limits — that inspired
-            him to create Rockso: a tool that finally speaks to those who refuse to fit
-            into a single box.
-          </p>
-          <div class="founder-credentials">
-            <span class="badge">PhD Applied Mathematics</span>
-            <span class="badge">ML / AI Expert</span>
-            <span class="badge">Ironman 70.3 Finisher</span>
-            <span class="badge">Multi-Sport Athlete</span>
+        <span class="eyebrow-v2">Privacy first</span>
+        <h2 class="section-title-v2">Your data stays yours</h2>
+
+        <div class="data-grid">
+          <div class="data-text">
+            <h3 style="font-family: var(--font-serif); font-size: 1.3rem; margin-bottom: 1rem;">Privacy and
+              governance</h3>
+            <p>
+              Your training data tells the story of your progress. It does not become an advertising asset or opaque raw
+              material. With Rockso, you keep control over what comes in, what goes out and what gets shared.
+            </p>
+            <ul>
+              <li>Secure hosting in Europe and separated environments.</li>
+              <li>Transparency around the data used by the models.</li>
+              <li>GDPR compliance and encrypted communications.</li>
+              <li>Clear governance for athletes, coaches and organisations.</li>
+            </ul>
+          </div>
+          <div class="data-image">
+            <img src="assets/img/hero-rockso-mockup - Data.png" alt="Rockso data" />
+          </div>
+        </div>
+
+        <div class="privacy-link-bottom">
+          <a href="privacy-en.html">View the privacy policy</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FOUNDER ============ -->
+    <section class="section-v2">
+      <div class="container">
+        <span class="eyebrow-v2">Behind Rockso</span>
+        <h2 class="section-title-v2">Why Rockso exists</h2>
+
+        <div class="founder-card-v2">
+          <div class="founder-photo">
+            <img src="assets/img/IMG_4622.jpeg" alt="Etienne Gay, founder of Rockso" />
+          </div>
+          <div>
+            <h3>Etienne Gay</h3>
+            <p class="founder-role">Founder · PhD in applied mathematics · Multisport athlete</p>
+            <p>
+              PhD in applied mathematics, machine learning and AI expert. But above all, an amateur endurance athlete:
+              Ironman 70.3 finisher, Gravity Race finisher, ranked 4/6 in tennis, competitive football player, and
+              practitioner of triathlon, swimrun, cross-country skiing, ski mountaineering and many other outdoor sports.
+            </p>
+            <p>
+              This deeply multisport practice is what led him to create Rockso: a tool that finally speaks to people who
+              do not fit into a single box.
+            </p>
+            <div class="founder-creds">
+              <span class="badge-pill">PhD in Applied Mathematics</span>
+              <span class="badge-pill b-orange">ML / AI expert</span>
+              <span class="badge-pill b-pink">Ironman 70.3 Finisher</span>
+              <span class="badge-pill">Gravity Race Finisher</span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SECTION: DATA & PRIVACY -->
-    <section id="data" class="section section-alt">
+    <!-- ============ FAQ ============ -->
+    <section class="section-v2 alt">
       <div class="container">
-        <h2 class="section-title">Your data stays your data</h2>
-        <div class="columns-2">
-          <div>
-            <p>
-              Rockso is designed with a strong focus on confidentiality and data governance.
-              Athletes and organisations remain in control of their data and decide what they
-              want to share and with whom.
-            </p>
-            <ul class="checklist">
-              <li>Secure hosting and separation of environments.</li>
-              <li>Transparency on which data is used by the models.</li>
-              <li>
-                In the future, potential decentralised scenarios (data monetisation,
-                sharing with research projects, etc.) within a controlled framework.
-              </li>
-            </ul>
+        <span class="eyebrow-v2">FAQ</span>
+        <h2 class="section-title-v2">Frequently asked questions</h2>
+
+        <div class="faq-v2">
+
+          <div class="faq-item-v2">
+            <button class="faq-q" type="button">
+              <span>Which watches and platforms are compatible?</span>
+              <span class="chev"></span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">
+                Rockso connects to your training tools to rebuild a coherent view of your load. Garmin, Suunto, Coros,
+                Polar, Strava and Apple Watch are part of the target ecosystem, with a simple logic: your data comes
+                into Rockso to finally tell one story.
+              </div>
+            </div>
           </div>
-          <div class="info-card">
-            <p>
-              For more details about how we handle personal data,
-              please refer to our privacy policy.
-            </p>
-            <a href="privacy-en.html" class="btn btn-ghost">
-              View privacy policy
+
+          <div class="faq-item-v2">
+            <button class="faq-q" type="button">
+              <span>Which sports are supported?</span>
+              <span class="chev"></span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">
+                Running, cycling, triathlon, football, padel, tennis, skiing, swimming and more. Rockso is designed to
+                integrate endurance sports, team sports, racket sports and winter sports into a unified view of load.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item-v2">
+            <button class="faq-q" type="button">
+              <span>Is my data secure?</span>
+              <span class="chev"></span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">
+                Yes. Rockso is designed with strong privacy requirements: hosting in Europe, encrypted communications,
+                GDPR compliance and no commercial sharing of your data without your consent. See our
+                <a href="privacy-en.html">privacy policy</a> for more details.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item-v2">
+            <button class="faq-q" type="button">
+              <span>How is Rockso different from Strava or Garmin Connect?</span>
+              <span class="chev"></span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">
+                Strava and Garmin Connect show your data. Rockso puts it into perspective. The goal is not to add yet
+                another dashboard, but to make load readable, connected across your sports and useful when deciding what
+                to do next.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item-v2">
+            <button class="faq-q" type="button">
+              <span>Does Rockso replace my coach?</span>
+              <span class="chev"></span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">
+                No. Rockso is a decision-support tool. It does not replace a coach's judgement or field experience. It
+                provides a clearer, more coherent and more contextualised view to support better decisions.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item-v2">
+            <button class="faq-q" type="button">
+              <span>How much does it cost?</span>
+              <span class="chev"></span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">
+                Rockso is available through early access during the product-building phase. Over time, different plans
+                will provide access to more advanced levels of insight, support and analysis for athletes, coaches and
+                organisations.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BLOC BAS CTA (50/50) ============ -->
+    <section class="bottom-cta">
+      <div class="container bottom-cta-grid">
+        <div class="bottom-cta-text">
+          <h2>Build progress that lasts.</h2>
+          <p>
+            What matters is not forcing more. It is lasting longer. Join the first users and help build a product made
+            for people who want to progress, endure and make the right calls in real life.
+          </p>
+          <div class="bottom-cta-actions">
+            <a href="demo-login-en.html" class="btn-v2 green">Request early access</a>
+            <a href="mailto:hello@rockso.app?subject=Rockso%20pilot%20team" class="btn-v2 ghost">
+              Talk about a pilot
             </a>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- SECTION: FAQ -->
-    <section class="section">
-      <div class="container">
-        <h2 class="section-title" style="text-align:center;">Frequently asked questions</h2>
-        <div class="faq-list">
-          <div class="faq-item">
-            <button class="faq-question" type="button">
-              <span>Does Rockso replace my coach?</span>
-              <span class="faq-icon"></span>
-            </button>
-            <div class="faq-answer">
-              <div class="faq-answer-inner">
-                No. Rockso is a training assistant and decision-support tool. It does not replace
-                a qualified coach but enriches their work with objective data and research-based
-                recommendations. Coaches can use Rockso to save time and monitor athletes more effectively.
-              </div>
+        <div class="bottom-collage">
+          <div class="collage-row">
+            <div class="collage-photo left">
+              <img src="assets/img/Track.png" alt="" />
+            </div>
+            <div class="collage-phone side">
+              <img src="assets/img/mockup_activite.png" alt="" />
+            </div>
+            <div class="collage-phone center">
+              <img src="assets/img/mockup_semaine_pro.png" alt="" />
+            </div>
+            <div class="collage-phone side">
+              <img src="assets/img/mockup_coach_ia.png" alt="" />
+            </div>
+            <div class="collage-photo right">
+              <img src="assets/img/Natation.avif" alt="" />
             </div>
           </div>
-
-          <div class="faq-item">
-            <button class="faq-question" type="button">
-              <span>Which watches and platforms are compatible?</span>
-              <span class="faq-icon"></span>
-            </button>
-            <div class="faq-answer">
-              <div class="faq-answer-inner">
-                Rockso connects to Garmin, Suunto, Coros and Polar via their official APIs.
-                Import from Strava and Apple Watch is also supported. More integrations
-                (Oura, Whoop, Zwift…) are planned.
-              </div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-question" type="button">
-              <span>Is my data secure?</span>
-              <span class="faq-icon"></span>
-            </button>
-            <div class="faq-answer">
-              <div class="faq-answer-inner">
-                Yes. Rockso is hosted in Europe, communications are encrypted and we comply
-                with GDPR. Your data is never sold or shared with third parties without your
-                consent. See our <a href="privacy-en.html">privacy policy</a> for details.
-              </div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-question" type="button">
-              <span>How is Rockso different from Strava or Garmin Connect?</span>
-              <span class="faq-icon"></span>
-            </button>
-            <div class="faq-answer">
-              <div class="faq-answer-inner">
-                Strava and Garmin Connect display your data. Rockso interprets it and offers
-                concrete decisions (stabilise, lighten, switch to cross-training). Rockso also
-                consolidates all your sports into a single load view, where traditional platforms
-                keep them separate.
-              </div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-question" type="button">
-              <span>How much does it cost?</span>
-              <span class="faq-icon"></span>
-            </button>
-            <div class="faq-answer">
-              <div class="faq-answer-inner">
-                Rockso is free during the private beta. A free tier will remain available with
-                essential features. The Premium plan (9.99 EUR/month) will unlock advanced
-                recommendations, calibrated training plans, unlimited AI coach chat and 14-day
-                risk predictions.
-              </div>
-            </div>
-          </div>
-
-          <div class="faq-item">
-            <button class="faq-question" type="button">
-              <span>Which sports are supported?</span>
-              <span class="faq-icon"></span>
-            </button>
-            <div class="faq-answer">
-              <div class="faq-answer-inner">
-                Running, cycling, triathlon, football, padel, tennis, skiing, swimming and more.
-                Rockso is designed to bring endurance sports, team sports, racket sports and
-                winter sports into a unified load view.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CTA after FAQ -->
-        <div class="cta-band">
-          <a href="demo-login-en.html" class="btn btn-primary">Request early access</a>
         </div>
       </div>
     </section>
 
-    <!-- SECTION: GLOBAL MOCKUP (bottom of page) -->
-    <section class="hero hero-bottom-mockup">
-      <img
-        src="assets/img/hero-rockso-mockup.png"
-        alt="Preview of the Rockso experience on mobile and desktop"
-      />
-    </section>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <p>© <span id="year"></span> Rockso. All rights reserved.</p>
-      <div class="footer-links">
-        <a href="privacy-en.html">Privacy policy</a>
+  <!-- ============ FOOTER (vert Rockso) ============ -->
+  <footer class="site-footer-v2">
+    <div class="container footer-inner-v2">
+      <div class="footer-brand-v2">
+        <img src="assets/img/Logos/rockso_logo_E7DECF.png" alt="Rockso" />
+      </div>
+      <div class="footer-links-v2">
         <a href="legal-notice-en.html">Legal notice</a>
+        <a href="privacy-en.html">Privacy</a>
         <a href="account-deletion-en.html">Account deletion</a>
+        <a href="mailto:hello@rockso.app">Contact</a>
+      </div>
+      <div class="footer-stores-v2">
+        <a href="#" class="store-badge">
+          <img
+            src="assets/img/Badge Stores/IOS/US/Download_on_App_Store/Black_lockup/SVG/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg"
+            alt="Download on the App Store" />
+        </a>
+        <a href="#" class="store-badge">
+          <img src="assets/img/Badge Stores/Android/GetItOnGooglePlay_Badge_Web_color_English.svg"
+            alt="Get it on Google Play" />
+        </a>
+      </div>
+      <div class="footer-copy">
+        © <span id="year"></span> Rockso. All rights reserved.
       </div>
     </div>
   </footer>
@@ -517,37 +735,24 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    const navToggle = document.querySelector(".nav-toggle");
-    const mainNav = document.querySelector(".main-nav");
-
-    if (navToggle && mainNav) {
+    const navToggle = document.querySelector(".nav-toggle-v2");
+    if (navToggle) {
       navToggle.addEventListener("click", () => {
-        const isOpen = document.body.classList.toggle("nav-open");
-        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      });
-
-      mainNav.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-          document.body.classList.remove("nav-open");
-          navToggle.setAttribute("aria-expanded", "false");
-        });
+        document.body.classList.toggle("nav-open-v2");
       });
     }
 
-    // FAQ accordion
-    document.querySelectorAll(".faq-question").forEach((btn) => {
+    document.querySelectorAll(".faq-q").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const item = btn.closest(".faq-item");
-        const answer = item.querySelector(".faq-answer");
+        const item = btn.closest(".faq-item-v2");
+        const answer = item.querySelector(".faq-a");
         const isOpen = item.classList.contains("open");
 
-        // Close all
-        document.querySelectorAll(".faq-item.open").forEach((openItem) => {
+        document.querySelectorAll(".faq-item-v2.open").forEach((openItem) => {
           openItem.classList.remove("open");
-          openItem.querySelector(".faq-answer").style.maxHeight = null;
+          openItem.querySelector(".faq-a").style.maxHeight = null;
         });
 
-        // Toggle current
         if (!isOpen) {
           item.classList.add("open");
           answer.style.maxHeight = answer.scrollHeight + "px";
@@ -555,6 +760,6 @@
       });
     });
   </script>
-
 </body>
+
 </html>
