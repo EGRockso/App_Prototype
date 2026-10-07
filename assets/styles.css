@@ -867,6 +867,7 @@ body.nav-open .nav-backdrop {
 
 .footer-inner {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
@@ -876,7 +877,20 @@ body.nav-open .nav-backdrop {
 
 .footer-links {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
+}
+
+.terms-contents ol {
+  padding-left: 1.5rem;
+  line-height: 1.7;
+}
+
+.section-block blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--color-primary);
+  background: #f9f3ea;
 }
 
 /* --------- RESPONSIVE GLOBAL --------- */
