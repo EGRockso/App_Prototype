@@ -6,4 +6,4 @@ The current policy is maintained in the website pages. This file is a reference,
 - [Privacy policy — English](https://rockso.app/privacy-en.html)
 
 Controller: AIMS Corp. Contact: privacy@rockso.app.
-Version: 2026-10-07.
+Version: 2026-10-07.2.
