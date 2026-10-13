@@ -9,6 +9,7 @@
     content="Procédure de suppression de compte Rockso et informations sur les données supprimées, conservées temporairement et les délais de traitement."
   />
   <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/navigation.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -156,22 +157,6 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    const navToggle = document.querySelector(".nav-toggle");
-    const mainNav = document.querySelector(".main-nav");
-
-    if (navToggle && mainNav) {
-      navToggle.addEventListener("click", () => {
-        const isOpen = document.body.classList.toggle("nav-open");
-        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      });
-
-      mainNav.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-          document.body.classList.remove("nav-open");
-          navToggle.setAttribute("aria-expanded", "false");
-        });
-      });
-    }
   </script>
 </body>
 </html>

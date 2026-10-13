@@ -9,6 +9,7 @@
     content="Traitement des données personnelles par AIMS Corp. pour Rockso : finalités, prestataires, droits et suppression."
   />
   <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/navigation.js" defer></script>
 </head>
 <body>
   <!-- HEADER -->
@@ -46,7 +47,7 @@
   </header>
 
   <!-- MAIN -->
-  <main class="section" data-privacy-version="2026-10-07.3">
+  <main class="section legal" data-privacy-version="2026-10-07.3">
 <div class="container">
 <h1 class="section-title">Politique de confidentialité</h1>
 <p><strong>Dernière mise à jour : 7 octobre 2026</strong></p>
@@ -158,23 +159,6 @@
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
-    // ---------- MENU MOBILE (burger) ----------
-    const navToggle = document.querySelector(".nav-toggle");
-    const mainNav = document.querySelector(".main-nav");
-
-    if (navToggle && mainNav) {
-    navToggle.addEventListener("click", () => {
-        const isOpen = document.body.classList.toggle("nav-open");
-        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    });
-
-    mainNav.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-        document.body.classList.remove("nav-open");
-        navToggle.setAttribute("aria-expanded", "false");
-        });
-    });
-    }
   </script>
 </body>
 </html>

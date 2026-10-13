@@ -21,7 +21,7 @@
         <img src="assets/img/Logos/Rockso_vert_bis copie_sans_fond.png" alt="Rockso" class="brand-logo" />
       </a>
 
-      <nav class="main-nav-v2">
+      <nav class="main-nav-v2" id="rockso-navigation" aria-label="Main navigation">
         <a href="#features">Features</a>
         <a href="#how-it-works">How it works</a>
         <a href="#smart-ai">Smart AI</a>
@@ -32,7 +32,7 @@
         <a href="demo-login-en.html" class="nav-cta">Early access</a>
       </nav>
 
-      <button class="nav-toggle-v2" type="button" aria-label="Open menu">
+      <button class="nav-toggle-v2" type="button" aria-label="Open menu" aria-controls="rockso-navigation" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -733,17 +733,22 @@
     </div>
   </footer>
 
+  <script src="assets/navigation.js"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    const navToggle = document.querySelector(".nav-toggle-v2");
-    if (navToggle) {
-      navToggle.addEventListener("click", () => {
-        document.body.classList.toggle("nav-open-v2");
-      });
-    }
+    document.querySelectorAll(".faq-q").forEach((btn, index) => {
+      const answer = btn.closest(".faq-item-v2").querySelector(".faq-a");
+      answer.id = `faq-answer-${index}`;
+      answer.inert = true;
+      btn.setAttribute("aria-controls", answer.id);
+      btn.setAttribute("aria-expanded", "false");
+      new ResizeObserver(() => {
+        if (btn.getAttribute("aria-expanded") === "true") {
+          answer.style.maxHeight = answer.scrollHeight + "px";
+        }
+      }).observe(answer.querySelector(".faq-a-inner"));
 
-    document.querySelectorAll(".faq-q").forEach((btn) => {
       btn.addEventListener("click", () => {
         const item = btn.closest(".faq-item-v2");
         const answer = item.querySelector(".faq-a");
@@ -751,11 +756,15 @@
 
         document.querySelectorAll(".faq-item-v2.open").forEach((openItem) => {
           openItem.classList.remove("open");
+          openItem.querySelector(".faq-q").setAttribute("aria-expanded", "false");
+          openItem.querySelector(".faq-a").inert = true;
           openItem.querySelector(".faq-a").style.maxHeight = null;
         });
 
         if (!isOpen) {
           item.classList.add("open");
+          btn.setAttribute("aria-expanded", "true");
+          answer.inert = false;
           answer.style.maxHeight = answer.scrollHeight + "px";
         }
       });

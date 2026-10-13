@@ -9,6 +9,7 @@
     content="Demandez un accès anticipé à Rockso, assistant d'entraînement multi-sport centré sur la charge, la fatigue et la prévention des blessures."
   />
   <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/navigation.js" defer></script>
 </head>
 <body>
   <!-- HEADER -->
@@ -133,23 +134,6 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // ---------- MENU MOBILE (burger) ----------
-    const navToggle = document.querySelector(".nav-toggle");
-    const mainNav = document.querySelector(".main-nav");
-
-    if (navToggle && mainNav) {
-      navToggle.addEventListener("click", () => {
-        const isOpen = document.body.classList.toggle("nav-open");
-        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      });
-
-      mainNav.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-          document.body.classList.remove("nav-open");
-          navToggle.setAttribute("aria-expanded", "false");
-        });
-      });
-    }
 
     // ---------- SUPABASE ----------
     const supabaseUrl = "https://hegtnyarfeoyapobysee.supabase.co";

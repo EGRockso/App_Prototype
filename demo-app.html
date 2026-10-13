@@ -13,23 +13,25 @@
     /* Phone mockup styles */
     .demo-container {
       min-height: 100vh;
+      min-height: 100dvh;
       background: linear-gradient(135deg, #3F8C6A 0%, #2E6E55 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
+      padding: clamp(24px, 4vw, 40px) var(--page-gutter);
     }
 
     .demo-header {
       text-align: center;
       color: white;
-      margin-bottom: 40px;
+      margin-bottom: clamp(24px, 4vw, 40px);
       max-width: 800px;
+      min-width: 0;
     }
 
     .demo-header h1 {
-      font-size: 2.5rem;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
       font-weight: 700;
       margin-bottom: 16px;
       text-shadow: 0 2px 10px rgba(0,0,0,0.2);
@@ -43,8 +45,13 @@
 
     .phone-mockup {
       position: relative;
-      width: 375px;
-      height: 812px;
+      width: min(375px, 100%);
+      max-width: 375px;
+      height: auto;
+      aspect-ratio: 375 / 812;
+      flex: none;
+      margin: 0;
+      border: 0;
       background: #1a1a1a;
       border-radius: 40px;
       padding: 12px;
@@ -67,12 +74,15 @@
     }
 
     .phone-screen {
-      width: 100%;
-      height: 100%;
+      width: auto;
+      height: auto;
       background: white;
       border-radius: 32px;
       overflow: hidden;
-      position: relative;
+      position: absolute;
+      inset: 12px;
+      display: block;
+      padding: 0;
     }
 
     .phone-screen iframe {
@@ -88,6 +98,8 @@
       margin-top: 32px;
       max-width: 600px;
       opacity: 0.9;
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
 
     .demo-info p {
@@ -109,6 +121,8 @@
       font-size: 1.05rem;
       transition: transform 0.2s, box-shadow 0.2s;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      max-width: 100%;
+      text-align: center;
     }
 
     .demo-cta a:hover {
@@ -122,8 +136,7 @@
       }
 
       .phone-mockup {
-        width: 320px;
-        height: 693px;
+        width: min(375px, 100%);
         border-radius: 36px;
         padding: 10px;
       }
@@ -135,6 +148,7 @@
 
       .phone-screen {
         border-radius: 28px;
+        inset: 10px;
       }
     }
 

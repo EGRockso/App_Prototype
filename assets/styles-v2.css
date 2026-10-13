@@ -39,6 +39,7 @@
   --shadow-mockup: 0 30px 60px rgba(0, 0, 0, 0.25);
 
   --grid-max: 1200px;
+  --page-gutter: clamp(16px, 2.5vw, 32px);
   --radius-card: 20px;
 }
 
@@ -52,8 +53,11 @@ html,
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
   width: 100%;
+}
+
+html {
+  scroll-padding-top: 88px;
 }
 
 body {
@@ -96,7 +100,23 @@ h5 {
   width: 100%;
   max-width: var(--grid-max);
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 var(--page-gutter);
+}
+
+/* Grid and flex children must be able to shrink with their container. */
+.container :is(h1, h2, h3, p, li, a) {
+  overflow-wrap: anywhere;
+}
+
+:is(.hero-v2-inner, .how-grid, .ai-coach-inner, .ai-coach-pillars,
+    .features-grid, .product-hero-inner, .for-whom-grid, .research-grid,
+    .data-grid, .founder-card-v2, .bottom-cta-grid) > * {
+  min-width: 0;
+}
+
+:is(a, button):focus-visible {
+  outline: 3px solid var(--accent-green);
+  outline-offset: 4px;
 }
 
 /* =====================================================================
@@ -137,12 +157,13 @@ h5 {
 .main-nav-v2 {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 18px;
   font-size: 13px;
   font-weight: 500;
 }
 
 .main-nav-v2>a {
+  white-space: nowrap;
   color: #374151;
   transition: color 0.15s;
 }
@@ -179,8 +200,9 @@ h5 {
   display: none;
   border: none;
   background: #fff;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
   border-radius: 999px;
   cursor: pointer;
   flex-direction: column;
@@ -260,7 +282,9 @@ h5 {
   cursor: pointer;
   text-decoration: none;
   transition: transform 0.15s, box-shadow 0.15s, background 0.15s, border-color 0.15s, color 0.15s;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  min-height: 44px;
   max-width: 100%;
 }
 
@@ -344,7 +368,7 @@ h5 {
 
 .hero-v2-text h1 {
   font-family: var(--font-serif);
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(2rem, 3.5vw, 3.25rem);
   line-height: 1.02;
   font-weight: 600;
   color: var(--color-text-dark);
@@ -369,23 +393,24 @@ h5 {
 /* ---- Hero collage masonry rotaté (inclinaison +, coin haut-droit qui monte) ---- */
 .hero-collage-wrap {
   position: relative;
-  height: 580px;
+  height: clamp(420px, 45vw, 580px);
   display: flex;
   align-items: center;
   justify-content: flex-start;
   /* déborde jusqu'au bord droit de la page */
-  margin-right: calc(50% - 50vw);
+  margin-right: calc(-1 * var(--page-gutter) - max(0px, (100vw - var(--grid-max)) / 2));
   padding-right: 0;
 }
 
 .hero-collage {
   position: relative;
-  width: 125%;
-  height: 660px;
+  width: 100%;
+  max-width: 780px;
+  height: clamp(460px, 52vw, 660px);
   display: grid;
-  grid-template-columns: 1fr 0.95fr 1.05fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, .95fr) minmax(0, 1.05fr);
   gap: 4px;
-  transform: translateX(-30px) rotate(8deg);
+  transform: translateX(-2%) rotate(8deg);
   transform-origin: center center;
   align-items: start;
 }
@@ -394,6 +419,7 @@ h5 {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 /* effet masonry : décalages verticaux discrets */
@@ -403,11 +429,13 @@ h5 {
 
 .hero-collage .col.center {
   padding-top: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-collage .col.right {
   padding-top: 0;
-  transform: translateX(-120px);
+  transform: none;
 }
 
 .hero-collage .tile {
@@ -425,19 +453,23 @@ h5 {
 
 /* Photos latérales bien remplies */
 .hero-collage .col.left .tile:nth-child(1) {
-  height: 260px;
+  height: auto;
+  aspect-ratio: 1;
 }
 
 .hero-collage .col.left .tile:nth-child(2) {
-  height: 300px;
+  height: auto;
+  aspect-ratio: .85;
 }
 
 .hero-collage .col.right .tile:nth-child(1) {
-  height: 340px;
+  height: auto;
+  aspect-ratio: .85;
 }
 
 .hero-collage .col.right .tile:nth-child(2) {
-  height: 280px;
+  height: auto;
+  aspect-ratio: 1;
 }
 
 .hero-collage .col.center .mock-part {
@@ -448,13 +480,12 @@ h5 {
   box-shadow: none;
 }
 
-/* Le PNG du mockup contient ~15% de padding transparent de chaque côté.
-   On agrandit l'image et on la laisse déborder en margin négative pour
-   que le téléphone visible vienne toucher les photos voisines. */
+/* Compensate the PNG's transparent side margins without clipping the phone. */
 .hero-collage .col.center .mock-part img {
-  width: 135%;
-  margin-left: -17.5%;
-  margin-right: -17.5%;
+  width: 160%;
+  max-width: none;
+  margin-left: -30%;
+  margin-right: -30%;
   display: block;
 }
 
@@ -469,24 +500,22 @@ h5 {
 }
 
 .hero-collage .col.center .mock-part.top-slice img {
-  width: 135%;
   height: auto;
-  margin-left: -17.5%;
-  margin-top: -260px;
+  margin-top: 0;
+  transform: translateY(calc(-100% + 130px));
   object-fit: unset;
 }
 
 /* Mockup entier dominant */
 .hero-collage .col.center .mock-part.full {
-  height: 380px;
+  height: auto;
+  aspect-ratio: 1 / 2.02;
   overflow: hidden;
 }
 
 .hero-collage .col.center .mock-part.full img {
-  width: 135%;
   height: auto;
-  margin-left: -17.5%;
-  margin-top: -20px;
+  margin-top: 0;
   object-fit: unset;
 }
 
@@ -497,9 +526,7 @@ h5 {
 }
 
 .hero-collage .col.center .mock-part.bottom-slice img {
-  width: 135%;
   height: auto;
-  margin-left: -17.5%;
   margin-top: 0;
   object-fit: unset;
 }
@@ -637,11 +664,10 @@ h5 {
 }
 
 .how-col--visual .how-device img {
-  width: clamp(520px, 56vw, 920px);
-  max-width: none;
+  width: 100%;
+  max-width: 560px;
   display: block;
-  margin-top: -80px;
-  margin-bottom: -90px;
+  margin: -24px auto -28px;
   filter: drop-shadow(0 25px 45px rgba(15, 58, 42, 0.2));
 }
 
@@ -844,7 +870,7 @@ h5 {
 
 .ai-coach-glow {
   position: absolute;
-  width: 360px;
+  width: min(100%, 360px);
   height: 360px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(124, 220, 176, 0.35) 0%, transparent 65%);
@@ -1665,18 +1691,21 @@ h5 {
 }
 
 .collage-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 0.7fr 1fr 1.2fr 1fr 0.7fr;
   align-items: center;
   justify-content: center;
   gap: 0;
-  margin: 0 -20px;
+  margin: 0;
+  padding: 12px 0;
 }
 
 /* Photos latérales */
 .collage-photo {
   flex: 0 0 auto;
-  width: 170px;
-  height: 280px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 17 / 28;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: var(--shadow-mockup);
@@ -1690,14 +1719,11 @@ h5 {
 
 .collage-photo.left {
   transform: rotate(-3deg);
-  margin-right: -70px;
   z-index: 1;
 }
 
 .collage-photo.right {
   transform: rotate(3deg);
-  margin-left: -80px;
-  margin-right: -120px;
   z-index: 1;
 }
 
@@ -1705,6 +1731,7 @@ h5 {
 .collage-phone {
   flex: 0 0 auto;
   z-index: 2;
+  min-width: 0;
 }
 
 .collage-phone img {
@@ -1715,26 +1742,26 @@ h5 {
 }
 
 .collage-phone.side {
-  width: 280px;
+  width: 100%;
 }
 
 .collage-phone.side img {
-  width: 200%;
-  margin-left: 0%;
-  margin-right: -100%;
+  width: 140%;
+  max-width: none;
+  margin-inline: -20%;
 }
 
 /* Mockup central dominant */
 .collage-phone.center {
-  width: 300px;
+  width: 100%;
   z-index: 3;
-  margin: 0 -150px;
+  margin: 0;
 }
 
 .collage-phone.center img {
-  width: 200%;
-  margin-left: 0%;
-  margin-right: -300%;
+  width: 140%;
+  max-width: none;
+  margin-inline: -20%;
 }
 
 /* =====================================================================
@@ -1768,7 +1795,8 @@ h5 {
 
 .footer-links-v2 {
   display: flex;
-  gap: 28px;
+  flex-wrap: wrap;
+  gap: 14px 24px;
   font-size: 13px;
 }
 
@@ -1822,31 +1850,11 @@ h5 {
     gap: 40px;
   }
 
-  .hero-collage-wrap {
-    height: 520px;
-    justify-content: center;
-    margin-right: 0;
-    padding-right: 0;
-    overflow: visible;
-  }
 
-  .hero-collage {
-    width: min(92vw, 520px);
-    max-width: 520px;
-    height: 520px;
-    transform: rotate(6deg);
-  }
 
-  .hero-collage .col.right {
-    transform: none;
-  }
 
   .screens-row {
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  .screens-row .screen-mockup:nth-child(n+4) {
-    display: none;
   }
 
   .how-grid {
@@ -1923,17 +1931,45 @@ h5 {
     justify-content: center;
   }
 
-  .collage-photo {
-    width: 130px;
-    height: 220px;
+}
+
+/* Switch before the desktop links run out of space, including laptop windows. */
+@media (max-width: 1199px) {
+  .main-nav-v2 {
+    display: none;
   }
 
-  .collage-phone.side {
-    width: 140px;
+  .nav-toggle-v2 {
+    display: flex;
   }
 
-  .collage-phone.center {
-    width: 170px;
+  body.nav-open-v2 .main-nav-v2 {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    max-height: calc(100dvh - 72px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--color-bg);
+    flex-direction: column;
+    padding: 20px clamp(16px, 2.5vw, 32px);
+    gap: 8px;
+    align-items: stretch;
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-elev);
+  }
+
+  .main-nav-v2 > a {
+    padding: 10px 12px;
+    min-height: 44px;
+    white-space: normal;
+  }
+
+  .main-nav-v2 .lang-switch {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
   }
 }
 
@@ -1950,24 +1986,8 @@ h5 {
     height: 30px;
   }
 
-  .main-nav-v2 {
-    display: none;
-  }
-
-  .nav-toggle-v2 {
-    display: flex;
-  }
-
   body.nav-open-v2 .main-nav-v2 {
-    display: flex;
-    position: fixed;
-    inset: 68px 0 0 0;
-    background: var(--color-bg);
-    flex-direction: column;
-    padding: 32px;
-    gap: 20px;
-    z-index: 90;
-    align-items: flex-start;
+    max-height: calc(100dvh - 68px);
   }
 
   .section-v2,
@@ -2011,71 +2031,19 @@ h5 {
     text-align: center;
   }
 
-  .hero-collage-wrap {
-    height: clamp(330px, 86vw, 430px);
-    margin-top: 10px;
-  }
 
-  .hero-collage {
-    width: min(78vw, 340px);
-    height: clamp(330px, 86vw, 430px);
-    grid-template-columns: 0.9fr 1fr 0.9fr;
-    gap: 3px;
-    transform: translateX(0) rotate(3deg);
-  }
 
-  .hero-collage .col {
-    gap: 3px;
-  }
 
-  .hero-collage .col.left {
-    padding-top: 28px;
-  }
 
-  .hero-collage .col.center {
-    padding-top: 0;
-  }
 
-  .hero-collage .col.right {
-    padding-top: 20px;
-    transform: none;
-  }
 
-  .hero-collage .tile {
-    border-radius: 14px;
-  }
 
-  .hero-collage .col.left .tile:nth-child(1) {
-    height: clamp(120px, 31vw, 150px);
-  }
 
-  .hero-collage .col.left .tile:nth-child(2) {
-    height: clamp(140px, 37vw, 185px);
-  }
 
-  .hero-collage .col.right .tile:nth-child(1) {
-    height: clamp(140px, 36vw, 180px);
-  }
 
-  .hero-collage .col.right .tile:nth-child(2) {
-    height: clamp(120px, 31vw, 150px);
-  }
 
-  .hero-collage .col.center .mock-part.full {
-    height: clamp(210px, 54vw, 260px);
-    margin-top: 42px;
-  }
 
-  .hero-collage .col.center .mock-part.top-slice,
-  .hero-collage .col.center .mock-part.bottom-slice {
-    display: none;
-  }
 
-  .hero-collage .col.center .mock-part.full img {
-    width: 138%;
-    margin-left: -19%;
-    margin-top: -8px;
-  }
 
   .how-grid {
     gap: 44px;
@@ -2116,10 +2084,6 @@ h5 {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .screens-row .screen-mockup:nth-child(n+3) {
-    display: none;
-  }
-
   .co-banner {
     min-height: 220px;
     padding: 56px 20px;
@@ -2129,18 +2093,11 @@ h5 {
     display: none;
   }
 
-  .collage-phone.side {
-    width: clamp(88px, 27vw, 120px);
-  }
-
-  .collage-phone.center {
-    width: clamp(120px, 36vw, 160px);
-    margin: 0 -88px;
-  }
-
   .collage-row {
-    margin: 0;
-    overflow: hidden;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    max-width: 460px;
+    margin: 0 auto;
+    padding-inline: 16px;
   }
 
   .bottom-cta-actions {
@@ -2197,61 +2154,84 @@ h5 {
     font-size: 0.94rem;
   }
 
+
+
+
+
+
+
+
+
+
+}
+
+/* Keep the compact collage dense; artwork dimensions follow its own width. */
+@media (max-width: 1024px) {
   .hero-collage-wrap {
-    height: clamp(300px, 82vw, 360px);
+    width: 100%;
+    max-width: 660px;
+    height: auto;
+    aspect-ratio: 1.2;
+    margin: 8px auto 0;
+    justify-content: center;
   }
 
   .hero-collage {
-    width: min(72vw, 300px);
-    height: clamp(300px, 82vw, 360px);
+    width: 94%;
+    max-width: 620px;
+    height: auto;
+    aspect-ratio: 1.2;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1fr) minmax(0, .9fr);
+    gap: 6px;
+    transform: rotate(3deg);
+  }
+
+  .hero-collage .col {
+    min-width: 0;
+    gap: 6px;
   }
 
   .hero-collage .col.left {
-    padding-top: 24px;
+    padding-top: 6%;
   }
 
   .hero-collage .col.right {
-    padding-top: 18px;
+    padding-top: 3%;
+    transform: none;
   }
 
-  .hero-collage .col.left .tile:nth-child(1) {
-    height: clamp(106px, 28vw, 128px);
+  .hero-collage .col.center {
+    padding-top: 12%;
   }
 
-  .hero-collage .col.left .tile:nth-child(2) {
-    height: clamp(126px, 33vw, 156px);
+  .hero-collage .col:is(.left, .right) .tile:nth-child(n) {
+    height: auto;
+    aspect-ratio: .88;
   }
 
-  .hero-collage .col.right .tile:nth-child(1) {
-    height: clamp(126px, 33vw, 156px);
+  .hero-collage .col.center .mock-part.top-slice,
+  .hero-collage .col.center .mock-part.bottom-slice {
+    display: none;
   }
+}
 
-  .hero-collage .col.right .tile:nth-child(2) {
-    height: clamp(106px, 28vw, 128px);
-  }
-
-  .hero-collage .col.center .mock-part.full {
-    height: clamp(186px, 49vw, 228px);
-    margin-top: 38px;
-  }
-
-  .hero-collage .col.center .mock-part.full img {
-    width: 132%;
-    margin-left: -16%;
+@media (min-width: 900px) and (max-width: 1024px) {
+  .hero-v2-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+    gap: 32px;
   }
 }
 
 /* =====================================================================
    SECTION "PRODUCT / SCREENS HERO"
-   Image pleine largeur, sans zoom ni crop
-   La hauteur suit le ratio réel de l'image
-   Le contenu est superposé par-dessus
+   Fond pleine largeur cadré dans une section dimensionnée par son contenu
+   Tous les aperçus restent visibles quand la grille se réorganise
    ===================================================================== */
 
 .section-screens-hero {
   /* Réglages faciles à ajuster */
-  --hero-content-top: 0px;
-  --hero-content-bottom: 0px;
+  --hero-content-top: clamp(32px, 4vw, 64px);
+  --hero-content-bottom: clamp(24px, 3vw, 48px);
   --hero-eyebrow-gap: 0.45rem;
   --hero-title-gap: 0.7rem;
   --hero-lead-gap: 1.25rem;
@@ -2262,7 +2242,7 @@ h5 {
   position: relative;
   display: grid;
   padding: 0;
-  background: transparent;
+  background: var(--color-text-dark);
   overflow: hidden;
 }
 
@@ -2272,16 +2252,18 @@ h5 {
   grid-area: 1 / 1;
 }
 
-/* Image : pleine largeur, hauteur auto => pas de zoom */
+/* Le fond couvre le contenu même quand les aperçus passent sur plusieurs lignes. */
 .section-screens-hero-media {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
 }
 
 .section-screens-hero-media img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   max-width: none;
 }
 
@@ -2342,19 +2324,13 @@ h5 {
 /* Rangée de mockups */
 .section-screens-hero .screens-row {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: end;
   gap: 2px;
 
-  width: 85vw;
-  max-width: 85vw;
-
-  /* centre la row au milieu du viewport, même si le .container est plus étroit */
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-
-  margin: 0.8rem 0 0;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0.8rem auto 0;
   padding: 0;
 
   justify-content: center;
@@ -2367,6 +2343,7 @@ h5 {
   border: none;
   box-shadow: none;
   transition: transform 0.3s;
+  min-width: 0;
 }
 
 .section-screens-hero .screen-mockup:hover {
@@ -2374,10 +2351,10 @@ h5 {
 }
 
 .section-screens-hero .screen-mockup img {
-  width: 162%;
+  width: 140%;
   max-width: none;
-  margin-left: -31%;
-  margin-right: -31%;
+  margin-left: -20%;
+  margin-right: -20%;
   display: block;
   filter: drop-shadow(0 25px 40px rgba(15, 58, 42, 0.18));
 }
@@ -2388,29 +2365,25 @@ h5 {
 
 @media (max-width: 1100px) {
   .section-screens-hero {
-    --hero-content-top: 16px;
-    --hero-content-bottom: 8px;
     --hero-lead-max-width: 1000px;
   }
 
   .section-screens-hero .screen-mockup img {
-    width: 150%;
-    margin-left: -25%;
-    margin-right: -25%;
+    width: 140%;
+    margin-left: -20%;
+    margin-right: -20%;
   }
 }
 
 @media (max-width: 900px) {
   .section-screens-hero {
-    --hero-content-top: 20px;
-    --hero-content-bottom: 16px;
     --hero-lead-max-width: 800px;
   }
 
   .section-screens-hero .screens-row {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
-    padding: 0 16px;
+    padding: 0;
   }
 
   .section-screens-hero .screen-mockup img {
@@ -2422,8 +2395,6 @@ h5 {
 
 @media (max-width: 640px) {
   .section-screens-hero {
-    --hero-content-top: 18px;
-    --hero-content-bottom: 14px;
     --hero-eyebrow-gap: 0.35rem;
     --hero-title-gap: 0.55rem;
     --hero-lead-gap: 1rem;
@@ -2444,10 +2415,16 @@ h5 {
   }
 
   .section-screens-hero .screens-row {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     margin-top: 0.8rem;
     padding: 0 12px;
+  }
+
+  .section-screens-hero .screen-mockup:last-child {
+    grid-column: 1 / -1;
+    width: 50%;
+    justify-self: center;
   }
 
   .section-screens-hero .screen-mockup img {
@@ -2496,7 +2473,7 @@ h5 {
 }
 
 .manifesto-band {
-  padding: 110px 0 90px;
+  padding: clamp(56px, 7vw, 110px) 0 clamp(40px, 6vw, 90px);
 }
 
 .manifesto-band-text {
@@ -2513,14 +2490,14 @@ h5 {
 }
 
 .co-banner {
-  padding: 0 32px 110px;
+  padding: 0 0 clamp(56px, 7vw, 110px);
 }
 
 .co-banner-content {
   max-width: 1140px;
   margin: 0 auto;
   text-align: center;
-  padding: 40px 36px;
+  padding: clamp(24px, 4vw, 40px) clamp(16px, 3vw, 36px);
 }
 
 .co-banner-content h3 {
@@ -2532,4 +2509,32 @@ h5 {
   color: rgba(255, 255, 255, 0.85);
   margin: 0 auto 24px;
   max-width: 640px;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-inline: 16px;
+  }
+
+  .founder-card-v2,
+  .ai-coach-pillar {
+    padding: 24px 20px;
+  }
+
+  .ai-coach-visual img {
+    width: 92%;
+    margin: 0;
+  }
+
+  .ai-coach-bubble {
+    max-width: 90%;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0s !important;
+  }
 }

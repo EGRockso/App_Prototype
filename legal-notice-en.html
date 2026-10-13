@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Legal notice – Rockso</title>
   <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/navigation.js" defer></script>
 </head>
 <body>
   <!-- HEADER -->
@@ -42,7 +43,7 @@
   </header>
 
   <!-- MAIN -->
-  <main class="section">
+  <main class="section legal">
     <div class="container">
       <h1 class="section-title">Legal notice</h1>
       <p><strong>Last updated: 7 October 2026</strong></p>
@@ -162,23 +163,6 @@
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
-    // ---------- MENU MOBILE (burger) ----------
-    const navToggle = document.querySelector(".nav-toggle");
-    const mainNav = document.querySelector(".main-nav");
-
-    if (navToggle && mainNav) {
-    navToggle.addEventListener("click", () => {
-        const isOpen = document.body.classList.toggle("nav-open");
-        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    });
-
-    mainNav.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-        document.body.classList.remove("nav-open");
-        navToggle.setAttribute("aria-expanded", "false");
-        });
-    });
-    }
   </script>
 </body>
 </html>

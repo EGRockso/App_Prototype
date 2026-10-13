@@ -10,6 +10,7 @@
   />
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <link rel="stylesheet" href="assets/styles.css" />
+  <script src="assets/navigation.js" defer></script>
   <style>
     .beta-shell {
       padding: 4rem 0;
@@ -22,6 +23,7 @@
       margin: 0 auto;
       display: grid;
       gap: 1.25rem;
+      min-width: 0;
     }
 
     .beta-card {
@@ -30,6 +32,8 @@
       border-radius: 28px;
       padding: 1.6rem;
       box-shadow: 0 22px 50px rgba(17, 24, 39, 0.08);
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
 
     .beta-kicker {
@@ -361,22 +365,6 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    const navToggle = document.querySelector(".nav-toggle");
-    const mainNav = document.querySelector(".main-nav");
-
-    if (navToggle && mainNav) {
-      navToggle.addEventListener("click", () => {
-        const isOpen = document.body.classList.toggle("nav-open");
-        navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      });
-
-      mainNav.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => {
-          document.body.classList.remove("nav-open");
-          navToggle.setAttribute("aria-expanded", "false");
-        });
-      });
-    }
 
     const params = new URLSearchParams(window.location.search);
     const hashParams = new URLSearchParams(window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "");
