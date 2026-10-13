@@ -101,21 +101,41 @@
             and over time.
           </p>
 
-          <div class="screens-row">
-            <div class="screen-mockup">
-              <img src="assets/img/mockup_activite.png" alt="Rockso activity screen" />
+          <div class="product-gallery" data-product-gallery>
+            <div class="screens-row" id="product-screens" data-gallery-track tabindex="0" role="region"
+              aria-label="Rockso app previews" aria-describedby="product-gallery-hint">
+              <figure class="screen-mockup" data-gallery-slide>
+                <img src="assets/img/mockup_activite.png" alt="Rockso activity screen" />
+                <figcaption>Activity</figcaption>
+              </figure>
+              <figure class="screen-mockup" data-gallery-slide>
+                <img src="assets/img/mockup_blessure.png" alt="Injury screen" />
+                <figcaption>Injury</figcaption>
+              </figure>
+              <figure class="screen-mockup" data-gallery-slide>
+                <img src="assets/img/mockup_coach_ia.png" alt="AI coach assistant screen" />
+                <figcaption>AI assistant</figcaption>
+              </figure>
+              <figure class="screen-mockup" data-gallery-slide>
+                <img src="assets/img/mockup_map.png" alt="Map screen" />
+                <figcaption>Map</figcaption>
+              </figure>
+              <figure class="screen-mockup" data-gallery-slide>
+                <img src="assets/img/mockup_semaine_pro.png" alt="Week screen" />
+                <figcaption>Week</figcaption>
+              </figure>
             </div>
-            <div class="screen-mockup">
-              <img src="assets/img/mockup_blessure.png" alt="Injury screen" />
-            </div>
-            <div class="screen-mockup">
-              <img src="assets/img/mockup_coach_ia.png" alt="AI coach assistant screen" />
-            </div>
-            <div class="screen-mockup">
-              <img src="assets/img/mockup_map.png" alt="Map screen" />
-            </div>
-            <div class="screen-mockup">
-              <img src="assets/img/mockup_semaine_pro.png" alt="Week screen" />
+            <div class="product-gallery-footer">
+              <p id="product-gallery-hint" class="product-gallery-hint">Scroll to explore all five previews</p>
+              <div class="product-gallery-controls">
+                <button type="button" class="gallery-arrow" data-gallery-previous aria-controls="product-screens" aria-label="Previous preview">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
+                </button>
+                <span data-gallery-position aria-live="polite" aria-atomic="true">Preview 1 of 5</span>
+                <button type="button" class="gallery-arrow" data-gallery-next aria-controls="product-screens" aria-label="Next preview">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -734,6 +754,7 @@
   </footer>
 
   <script src="assets/navigation.js"></script>
+  <script src="assets/product-gallery.js"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 

@@ -855,13 +855,13 @@ h5 {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 520px;
+  min-height: 0;
 }
 
 .ai-coach-visual img {
-  width: 110%;
-  max-width: 480px;
-  margin: 0 -5%;
+  width: min(100%, 76vw, 430px);
+  max-width: 430px;
+  margin: 0;
   filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.45));
   transform: rotate(-3deg);
   position: relative;
@@ -920,10 +920,6 @@ h5 {
 
   .ai-coach-pillars {
     grid-template-columns: 1fr;
-  }
-
-  .ai-coach-visual {
-    min-height: 420px;
   }
 
   .bubble-voice {
@@ -2338,12 +2334,58 @@ h5 {
 
 .section-screens-hero .screen-mockup {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  margin: 0;
   background: transparent;
   border: none;
   box-shadow: none;
   transition: transform 0.3s;
   min-width: 0;
+}
+
+.section-screens-hero figcaption {
+  width: 100%;
+  margin-top: 8px;
+  color: #fff;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.product-gallery-footer {
+  display: none;
+}
+
+.gallery-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .65);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(15, 58, 42, .8);
+  cursor: pointer;
+}
+
+.gallery-arrow:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+.gallery-arrow:focus-visible,
+[data-gallery-track]:focus-visible {
+  outline-color: #fff;
+}
+
+[data-gallery-track]:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
 }
 
 .section-screens-hero .screen-mockup:hover {
@@ -2375,21 +2417,73 @@ h5 {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899px) {
   .section-screens-hero {
     --hero-lead-max-width: 800px;
   }
 
   .section-screens-hero .screens-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    padding: 0;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: clamp(176px, calc((100% - 12px) / 2.35), 280px);
+    align-items: start;
+    justify-content: start;
+    gap: 12px;
+    max-width: 680px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, .7) rgba(255, 255, 255, .15);
+    padding: 12px 8px 24px;
   }
 
   .section-screens-hero .screen-mockup img {
-    width: 132%;
-    margin-left: -16%;
-    margin-right: -16%;
+    width: 160%;
+    margin-inline: -30%;
+  }
+
+  .section-screens-hero .screen-mockup {
+    scroll-snap-align: start;
+  }
+
+  .section-screens-hero .screen-mockup:hover {
+    transform: none;
+  }
+
+  .product-gallery-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px 20px;
+    margin: 12px auto 0;
+    max-width: 680px;
+    color: #fff;
+  }
+
+  .product-gallery-hint {
+    margin: 0;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .product-gallery-controls {
+    display: none;
+  }
+
+  [data-gallery-scrollable="true"] .product-gallery-controls {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  [data-gallery-position] {
+    min-width: 110px;
+    text-align: center;
+    font-size: 13px;
   }
 }
 
@@ -2412,25 +2506,6 @@ h5 {
 
   .section-screens-hero .section-lead-v2 {
     font-size: 15px;
-  }
-
-  .section-screens-hero .screens-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin-top: 0.8rem;
-    padding: 0 12px;
-  }
-
-  .section-screens-hero .screen-mockup:last-child {
-    grid-column: 1 / -1;
-    width: 50%;
-    justify-self: center;
-  }
-
-  .section-screens-hero .screen-mockup img {
-    width: 118%;
-    margin-left: -9%;
-    margin-right: -9%;
   }
 
   .section-screens-hero .screens-note {
@@ -2519,11 +2594,6 @@ h5 {
   .founder-card-v2,
   .ai-coach-pillar {
     padding: 24px 20px;
-  }
-
-  .ai-coach-visual img {
-    width: 92%;
-    margin: 0;
   }
 
   .ai-coach-bubble {

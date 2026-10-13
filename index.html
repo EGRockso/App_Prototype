@@ -24,7 +24,7 @@
       <nav class="main-nav-v2" id="rockso-navigation" aria-label="Navigation principale">
         <a href="#features">Fonctionnalités</a>
         <a href="#how-it-works">Comment ça marche</a>
-        <a href="#smart-ai">Smart AI</a>
+        <a href="#smart-ai">Assistant IA</a>
         <a href="#for-whom">Pour qui ?</a>
         <a href="#science">Science</a>
         <a href="#data">Données &amp; confidentialité</a>
@@ -94,30 +94,50 @@
 
       <div class="section-screens-hero-overlay">
         <div class="container">
-          <span class="eyebrow-v2">Product</span>
+          <span class="eyebrow-v2">Produit</span>
           <h2 class="section-title-v2">Une lecture claire de ce qui compte</h2>
           <p class="section-lead-v2">
-            Une app mobile pour centraliser vos activités, comprendre votre charge,
+            Une application mobile pour centraliser vos activités, comprendre votre charge,
             visualiser vos signaux clés et recevoir des ajustements concrets. Chaque
             écran aide à relier une séance au reste&nbsp;: aujourd'hui, cette semaine,
             et sur la durée.
           </p>
 
-          <div class="screens-row">
-            <div class="screen-mockup">
-              <img src="assets/img/mockup_activite.png" alt="Écran activité Rockso" />
+          <div class="product-gallery" data-product-gallery>
+            <div class="screens-row" id="product-screens" data-gallery-track tabindex="0" role="region"
+              aria-label="Aperçus de l'application Rockso" aria-describedby="product-gallery-hint">
+              <figure class="screen-mockup" data-gallery-slide>
+                <img src="assets/img/mockup_activite.png" alt="Écran activité Rockso" />
+                <figcaption>Activité</figcaption>
+              </figure>
+              <figure class="screen-mockup" data-gallery-slide>
+                <img src="assets/img/mockup_blessure.png" alt="Écran blessure" />
+                <figcaption>Blessure</figcaption>
+              </figure>
+              <figure class="screen-mockup" data-gallery-slide>
+                <img src="assets/img/mockup_coach_ia.png" alt="Écran assistant coach IA" />
+                <figcaption>Assistant IA</figcaption>
+              </figure>
+              <figure class="screen-mockup" data-gallery-slide>
+                <img src="assets/img/mockup_map.png" alt="Écran carte" />
+                <figcaption>Carte</figcaption>
+              </figure>
+              <figure class="screen-mockup" data-gallery-slide>
+                <img src="assets/img/mockup_semaine_pro.png" alt="Écran semaine" />
+                <figcaption>Semaine</figcaption>
+              </figure>
             </div>
-            <div class="screen-mockup">
-              <img src="assets/img/mockup_blessure.png" alt="Écran blessure" />
-            </div>
-            <div class="screen-mockup">
-              <img src="assets/img/mockup_coach_ia.png" alt="Écran assistant coach IA" />
-            </div>
-            <div class="screen-mockup">
-              <img src="assets/img/mockup_map.png" alt="Écran carte" />
-            </div>
-            <div class="screen-mockup">
-              <img src="assets/img/mockup_semaine_pro.png" alt="Écran semaine" />
+            <div class="product-gallery-footer">
+              <p id="product-gallery-hint" class="product-gallery-hint">Faites défiler pour découvrir les cinq aperçus</p>
+              <div class="product-gallery-controls">
+                <button type="button" class="gallery-arrow" data-gallery-previous aria-controls="product-screens" aria-label="Aperçu précédent">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
+                </button>
+                <span data-gallery-position aria-live="polite" aria-atomic="true">Aperçu 1 sur 5</span>
+                <button type="button" class="gallery-arrow" data-gallery-next aria-controls="product-screens" aria-label="Aperçu suivant">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -180,7 +200,7 @@
             </div>
             <h3>3. T’aider à faire les bons choix.</h3>
             <p>
-              Quand il faut ajuster, Rockso t’aide à choisir ce qui sert vraiment la suite : s'entrainer plus fort,
+              Quand il faut ajuster, Rockso t’aide à choisir ce qui sert vraiment la suite : s'entraîner plus fort,
               récupérer plus intelligemment, pour préserver la dynamique et construire une progression qui dure.
             </p>
           </div>
@@ -192,23 +212,23 @@
     <section id="smart-ai" class="ai-coach-hero">
       <div class="container ai-coach-inner">
         <div class="ai-coach-text">
-          <span class="eyebrow-v2 ai-coach-eyebrow">Smart AI · Chat &amp; Voix</span>
+          <span class="eyebrow-v2 ai-coach-eyebrow">IA · Messages et voix</span>
           <h2>
             Un accompagnement intelligent,<br />
-            <span class="ai-coach-accent">disponible 24/7.</span>
+            <span class="ai-coach-accent">disponible 24h/24, 7j/7.</span>
           </h2>
           <p class="ai-coach-lead">
             Parle avec Rockso. Il connaît déjà ton historique, ta charge récente, et tes séances passées comme à venir.
-            En chat ou en voix, tu peux débriefer, poser une question ou challenger une décision.
+            Par messages ou à l’oral, tu peux faire le point, poser une question ou remettre en question une décision.
           </p>
 
           <div class="ai-coach-pillars">
             <div class="ai-coach-pillar">
               <div class="pillar-badge athlete">Pour l'athlète</div>
-              <h3>Débriefe, comprends, avance.</h3>
+              <h3>Fais le point, comprends, avance.</h3>
               <ul>
                 <li>
-                  <strong>Chat naturel ou voix</strong> — pose tes questions sur ton
+                  <strong>Échanges par messages ou à l’oral</strong> — pose tes questions sur ton
                   plan, tes sensations, une séance à déplacer, ou un arbitrage à faire.
                 </li>
                 <li>
@@ -250,7 +270,7 @@
         </div>
 
         <div class="ai-coach-visual">
-          <img src="assets/img/coach_chat.png" alt="Rockso AI Coach sur iPhone" />
+          <img src="assets/img/coach_chat.png" alt="Assistant IA Rockso sur iPhone" />
           <div class="ai-coach-glow"></div>
           <div class="ai-coach-bubble bubble-voice">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -267,7 +287,7 @@
               stroke-linejoin="round" aria-hidden="true">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
-            <span>Chat</span>
+            <span>Messages</span>
           </div>
         </div>
       </div>
@@ -279,7 +299,7 @@
         <img src="assets/img/Velo.avif" alt="" />
       </div>
       <div class="container">
-        <span class="eyebrow-v2">Les pilliers</span>
+        <span class="eyebrow-v2">Les piliers</span>
         <h2 class="section-title-v2">Ce que Rockso t'apporte</h2>
         <p class="section-lead-v2">
           Rockso relie ta réalité, toute ta pratique, et des principes issus de la science comme du terrain pour t’aider
@@ -414,9 +434,9 @@
               <h3>Athlètes &amp; amateurs engagés</h3>
               <p>
                 Une bonne préparation est celle qui est compatible avec ta vie.
-                Comprend ce que ta charge produit vraiment, identifie ce qui est
+                Comprends ce que ta charge produit vraiment, identifie ce qui est
                 assimilable, ce qui t'use, et quand ajuster pour garder de la
-                consistance dans le temps.
+                régularité dans le temps.
               </p>
               <a href="demo-login.html" class="fw-link">Construire une prépa durable <span>→</span></a>
             </div>
@@ -443,7 +463,7 @@
               <img src="assets/img/club.avif" alt="" />
             </div>
             <div class="fw-body">
-              <h3>Clubs, académies &amp; staffs</h3>
+              <h3>Clubs, académies et équipes d’encadrement</h3>
               <p>
                 Partagez une lecture commune de la charge, clarifiez les arbitrages entre
                 terrain, préparation physique et médical, et alignez les décisions autour
@@ -477,7 +497,7 @@
             </ul>
           </div>
           <div class="research-image">
-            <img src="assets/img/physiologist-jack-daniels.avif" alt="Physiologist Jack Daniels" />
+            <img src="assets/img/physiologist-jack-daniels.avif" alt="Le physiologiste Jack Daniels" />
           </div>
         </div>
       </div>
@@ -518,7 +538,7 @@
     <!-- ============ DATA & PRIVACY ============ -->
     <section id="data" class="section-v2 alt">
       <div class="container">
-        <span class="eyebrow-v2">Privacy first</span>
+        <span class="eyebrow-v2">Confidentialité</span>
         <h2 class="section-title-v2">Vos données restent vos données</h2>
 
         <div class="data-grid">
@@ -552,7 +572,7 @@
     <!-- ============ FOUNDER ============ -->
     <section class="section-v2">
       <div class="container">
-        <span class="eyebrow-v2">Behind Rockso</span>
+        <span class="eyebrow-v2">À propos de Rockso</span>
         <h2 class="section-title-v2">Pourquoi Rockso existe</h2>
 
         <div class="founder-card-v2">
@@ -563,11 +583,11 @@
             <h3>Etienne Gay</h3>
             <p class="founder-role">Fondateur · Docteur en mathématiques appliquées · Athlète multisport</p>
             <p>
-              Docteur en mathématiques appliquées, expert en machine learning et IA.
-              Mais surtout athlète d'endurance amateur&nbsp;: finisher Ironman 70.3,
-              finisher de la Gravity Race, classé 4/6 au tennis, footballeur en compétition,
+              Docteur en mathématiques appliquées, expert en apprentissage automatique et en IA.
+              Mais surtout athlète d'endurance amateur&nbsp;: ayant terminé un Ironman 70.3
+              et la Gravity Race, classé 4/6 au tennis, footballeur en compétition,
               pratiquant de triathlon, swimrun, ski de fond, ski alpinisme et bien d'autres
-              sports outdoor.
+              sports de plein air.
             </p>
             <p>
               C'est cette pratique résolument multisport qui lui a donné envie de créer
@@ -576,9 +596,9 @@
             </p>
             <div class="founder-creds">
               <span class="badge-pill">Docteur en Maths Appliquées</span>
-              <span class="badge-pill b-orange">Expert ML / IA</span>
-              <span class="badge-pill b-pink">Ironman 70.3 Finisher</span>
-              <span class="badge-pill">Gravity Race Finisher</span>
+              <span class="badge-pill b-orange">IA · Apprentissage automatique</span>
+              <span class="badge-pill b-pink">Ironman 70.3 terminé</span>
+              <span class="badge-pill">Gravity Race terminée</span>
             </div>
           </div>
         </div>
@@ -759,6 +779,7 @@
   </footer>
 
   <script src="assets/navigation.js"></script>
+  <script src="assets/product-gallery.js"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
