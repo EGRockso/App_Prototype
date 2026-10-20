@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="assets/styles-v2.css" />
+  <link rel="stylesheet" href="assets/analytics-consent.css" />
+  <script type="module" src="assets/analytics.js"></script>
 </head>
 
 <body>
@@ -29,7 +31,7 @@
         <a href="#science">Science</a>
         <a href="#data">Data &amp; privacy</a>
         <a href="index.html" class="lang-switch">FR</a>
-        <a href="demo-login-en.html" class="nav-cta">Early access</a>
+        <a href="demo-login-en.html" class="nav-cta">Join the waitlist</a>
       </nav>
 
       <button class="nav-toggle-v2" type="button" aria-label="Open menu" aria-controls="rockso-navigation" aria-expanded="false">
@@ -54,7 +56,7 @@
             when to recover, and how to build progress that lasts week after week.
           </p>
           <div class="hero-v2-actions">
-            <a href="demo-login-en.html" class="btn-v2 green">Request early access</a>
+            <a href="demo-login-en.html" class="btn-v2 green">Join the waitlist</a>
             <a href="#how-it-works" class="btn-v2 ghost">Discover the method</a>
           </div>
         </div>
@@ -355,7 +357,7 @@
 
         <div class="cta-band-v2">
           <p>The right training is not the hardest. It is the one your body can turn into progress.</p>
-          <a href="demo-login-en.html" class="btn-v2 green">Request early access</a>
+          <a href="demo-login-en.html" class="btn-v2 green">Join the waitlist</a>
         </div>
       </div>
     </section>
@@ -511,13 +513,12 @@
 
         <div class="co-banner">
           <div class="co-banner-content">
-            <h3>Co-build with the field</h3>
+            <h3>Supporting teams and organisations</h3>
             <p>
-              Rockso is built with teams, coaches and organisations who want to confront models with real practice,
-              refine decisions and build a fairer standard for load monitoring.
+              Tell us about the training monitoring and support needs of your team, club or organisation.
             </p>
-            <a href="mailto:hello@rockso.app?subject=Rockso%20pilot%20team" class="btn-v2 white">
-              Talk about a pilot
+            <a href="mailto:hello@rockso.app?subject=Rockso%20project" class="btn-v2 white">
+              Discuss your project
             </a>
           </div>
         </div>
@@ -667,14 +668,24 @@
 
           <div class="faq-item-v2">
             <button class="faq-q" type="button">
+              <span>When will Rockso be available?</span>
+              <span class="chev"></span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">
+                Rockso is launching soon. Join the waitlist to be notified as soon as the app is available.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item-v2">
+            <button class="faq-q" type="button">
               <span>How much does it cost?</span>
               <span class="chev"></span>
             </button>
             <div class="faq-a">
               <div class="faq-a-inner">
-                Rockso is available through early access during the product-building phase. Over time, different plans
-                will provide access to more advanced levels of insight, support and analysis for athletes, coaches and
-                organisations.
+                Plans and pricing will be announced when Rockso launches. Join the waitlist to be notified when the app is available.
               </div>
             </div>
           </div>
@@ -688,13 +699,13 @@
         <div class="bottom-cta-text">
           <h2>Build progress that lasts.</h2>
           <p>
-            What matters is not forcing more. It is lasting longer. Join the first users and help build a product made
-            for people who want to progress, endure and make the right calls in real life.
+            What matters is not forcing more. It is lasting longer. Join the waitlist to be notified when Rockso
+            launches and start building progress that lasts.
           </p>
           <div class="bottom-cta-actions">
-            <a href="demo-login-en.html" class="btn-v2 green">Request early access</a>
-            <a href="mailto:hello@rockso.app?subject=Rockso%20pilot%20team" class="btn-v2 ghost">
-              Talk about a pilot
+            <a href="demo-login-en.html" class="btn-v2 green">Join the waitlist</a>
+            <a href="mailto:hello@rockso.app?subject=Rockso%20project" class="btn-v2 ghost">
+              Discuss your project
             </a>
           </div>
         </div>
@@ -730,6 +741,7 @@
         <img src="assets/img/Logos/rockso_logo_E7DECF.png" alt="Rockso" />
       </div>
       <div class="footer-links-v2">
+        <button type="button" class="analytics-preferences" data-analytics-preferences hidden>Audience preferences</button>
         <a href="legal-notice-en.html">Legal notice</a>
         <a href="terms-en.html">Terms of Use</a>
         <a href="privacy-en.html">Privacy</a>
@@ -737,12 +749,12 @@
         <a href="mailto:hello@rockso.app">Contact</a>
       </div>
       <div class="footer-stores-v2">
-        <a href="#" class="store-badge">
+        <a href="#" class="store-badge" data-analytics-download data-analytics-placement="footer">
           <img
             src="assets/img/Badge Stores/IOS/US/Download_on_App_Store/Black_lockup/SVG/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg"
             alt="Download on the App Store" />
         </a>
-        <a href="#" class="store-badge">
+        <a href="#" class="store-badge" data-analytics-download data-analytics-placement="footer">
           <img src="assets/img/Badge Stores/Android/GetItOnGooglePlay_Badge_Web_color_English.svg"
             alt="Get it on Google Play" />
         </a>

@@ -1,0 +1,214 @@
+{
+  "checks": [
+    "default public configuration contains no token and is disabled",
+    "five UTM fields accept new experiment slugs without a campaign list",
+    "UTM validator rejects emails, URLs, phones, tokens, UUIDs, sensitive labels and encoding",
+    "Supabase conversion contract is strict; business UI remains unchanged",
+    "only genuine store destinations qualify; hash/relative/unsafe destinations do not",
+    "SDK configuration disables automatic capture, persistence, flags, replay, logs and beacons",
+    "payload is rebuilt; SDK/user/profile/URL/referrer/device identifiers are discarded",
+    "development and missing-key production remain off; URL parameters cannot enable tracking",
+    "before consent and after refusal: no events, SDK requests, analytics storage or cookies",
+    "accept/refuse have equal prominence; keyboard dismissal and blocked preference storage collect nothing",
+    "closing consent is not acceptance; later acceptance does not replay a prior signup",
+    "home-to-form attribution transfers all five UTMs and the random visit ID after consent",
+    "suspicious UTM parameters never reach events or tab storage",
+    "demo-login.html: new/existing/error/malformed responses and original form payload",
+    "demo-login-en.html: new/existing/error/malformed responses and original form payload",
+    "download # is ignored; valid download records only platform and fixed placement",
+    "withdrawal from a legal page purges the session and blocks an in-flight signup conversion",
+    "expired/corrupt consent and expired visit IDs fail closed",
+    "OAuth, beta invitations, old home pages and both demos have no analytics inclusion or activation",
+    "all eight legal pages expose preference management without page events",
+    "real pinned SDK generates implicit properties; final filter removes them (keyless offline audit)",
+    "real public key: refusal never initializes the SDK or sends a request",
+    "real SDK FR: four events, GeoIP disabled, no implicit collection, withdrawal stops transport",
+    "real SDK EN: four events, GeoIP disabled, no implicit collection, withdrawal stops transport"
+  ],
+  "sdkAudit": {
+    "version": "1.380.0",
+    "rawKeys": [
+      "$browser",
+      "$browser_language",
+      "$browser_language_prefix",
+      "$browser_version",
+      "$config_defaults",
+      "$current_url",
+      "$device_type",
+      "$host",
+      "$initial_current_url",
+      "$insert_id",
+      "$is_identified",
+      "$lib",
+      "$lib_version",
+      "$os",
+      "$os_version",
+      "$pathname",
+      "$process_person_profile",
+      "$raw_user_agent",
+      "$referrer",
+      "$screen_height",
+      "$screen_width",
+      "$sdk_dist_channel",
+      "$time",
+      "$timezone",
+      "$timezone_offset",
+      "$viewport_height",
+      "$viewport_width",
+      "distinct_id",
+      "language",
+      "page_id",
+      "platform",
+      "token"
+    ],
+    "filteredKeys": [
+      "$geoip_disable",
+      "$ip",
+      "$process_person_profile",
+      "distinct_id",
+      "environment",
+      "language",
+      "page_id",
+      "platform"
+    ],
+    "sdkConsentKeys": [
+      "rockso_audience_sdk_consent"
+    ],
+    "clearedConsentKeys": []
+  },
+  "keyedSdkAudit": "PASS: real token supplied externally; all SDK requests intercepted locally",
+  "keyedSdkDetails": {
+    "sdkVersion": "1.380.0",
+    "realPostHogRequests": 0,
+    "languages": [
+      "fr",
+      "en"
+    ],
+    "events": [
+      "landing_page_viewed",
+      "download_clicked",
+      "early_access_page_viewed",
+      "early_access_submitted"
+    ],
+    "propertyKeys": [
+      "$geoip_disable",
+      "$ip",
+      "$process_person_profile",
+      "distinct_id",
+      "download_platform",
+      "environment",
+      "language",
+      "page_id",
+      "placement",
+      "platform",
+      "token",
+      "utm_campaign",
+      "utm_content",
+      "utm_medium",
+      "utm_source",
+      "utm_term"
+    ]
+  },
+  "responsiveChecks": {
+    "pages": 14,
+    "widths": 17,
+    "total": 238,
+    "result": "passed",
+    "note": "Previously passed; not repeated for test/documentation-only changes."
+  },
+  "status": "Public key supplied externally for intercepted local SDK tests only; production configuration remains disabled with an empty token; no PostHog ingestion, real signup, deployment or project-setting change.",
+  "limitations": [
+    "Server acceptance and key/project matching intentionally not tested.",
+    "Owner reports EU hosting and IP discard enabled; project GeoIP transformation and optional product settings not remotely verified."
+  ],
+  "initialSdkConsentVersion": "2026-10-20.1",
+  "policyUpdate": {
+    "consentVersion": "2026-10-20.2",
+    "checksPassed": 22,
+    "checks": [
+      "default public configuration contains no token and is disabled",
+      "five UTM fields accept new experiment slugs without a campaign list",
+      "UTM validator rejects emails, URLs, phones, tokens, UUIDs, sensitive labels and encoding",
+      "Supabase conversion contract is strict; business UI remains unchanged",
+      "only genuine store destinations qualify; hash/relative/unsafe destinations do not",
+      "SDK configuration disables automatic capture, persistence, flags, replay, logs and beacons",
+      "payload is rebuilt; SDK/user/profile/URL/referrer/device identifiers are discarded",
+      "development and missing-key production remain off; URL parameters cannot enable tracking",
+      "before consent and after refusal: no events, SDK requests, analytics storage or cookies",
+      "accept/refuse have equal prominence; keyboard dismissal and blocked preference storage collect nothing",
+      "closing consent is not acceptance; later acceptance does not replay a prior signup",
+      "home-to-form attribution transfers all five UTMs and the random visit ID after consent",
+      "suspicious UTM parameters never reach events or tab storage",
+      "demo-login.html: new/existing/error/malformed responses and original form payload",
+      "demo-login-en.html: new/existing/error/malformed responses and original form payload",
+      "download # is ignored; valid download records only platform and fixed placement",
+      "withdrawal from a legal page purges the session and blocks an in-flight signup conversion",
+      "expired/corrupt consent and expired visit IDs fail closed",
+      "updated FR/EN information matches consent version; superseded acceptance fails closed and text fits mobile",
+      "OAuth, beta invitations, old home pages and both demos have no analytics inclusion or activation",
+      "all eight legal pages expose preference management without page events",
+      "real pinned SDK generates implicit properties; final filter removes them (keyless offline audit)"
+    ],
+    "sdkInitializationWithRealKey": "Previously passed for the initial draft; not repeated for this wording-only change. No key read again.",
+    "viewports": [
+      320,
+      390,
+      1280
+    ],
+    "staticChecks": "FR/EN HTML, local policy links/anchors, four event names, app policy version unchanged, git diff --check: PASS",
+    "notificationVerification": {
+      "deployedSourceMatchesLocal": true,
+      "sha256": "76c4fb56c35bd062424b0a43714d64bdd3f86a1f8b2abcda9ef20625edf12c81",
+      "configuredChannels": [
+        "Discord",
+        "Resend"
+      ],
+      "additionalWebhookConfigured": false,
+      "offlinePayloadAudit": "PASS; in-memory fetch stubs, no database call or real send"
+    },
+    "productionEnabled": false,
+    "realPostHogRequests": 0,
+    "realSignupOrNotification": false,
+    "purgeSystemAdded": false
+  },
+  "notificationMinimization": {
+    "status": "Deployed to production with owner approval on 2026-10-20",
+    "backendSha256": "e5881f52c422467efe18a7afbc6bcad1731800815fe32c2ae8bb7a041b19a4dd",
+    "testsPassed": 9,
+    "testFile": "Rockso_Mobile_Prototype/tests/services/requestBetaAccessNotifications.spec.ts",
+    "checks": [
+      "All signup metadata preserved in Supabase",
+      "Only contact email in Discord/Resend and optional webhook notifications",
+      "Fixed email subject without visitor email",
+      "Default and configured recipients/sender preserved",
+      "Existing and concurrent duplicate signups send no alerts",
+      "Notification failure preserves signup and other channel",
+      "Database/validation failures send no alerts",
+      "Deno type check and formatting: PASS",
+      "Targeted ESLint and Prettier: PASS",
+      "FR/EN policy links/anchors: PASS"
+    ],
+    "realNotificationsSent": 0,
+    "productionPostHogEnabled": false
+  },
+  "prepublicationChecks": {
+    "date": "2026-10-20",
+    "analyticsChecksPassed": 22,
+    "responsivePageViewportChecksPassed": 238,
+    "notificationHandlerTestsPassed": 9,
+    "posthogProductionEnabled": false,
+    "publicPosthogTokenConfigured": false,
+    "realSignupOrNotificationSent": false
+  },
+  "notificationProductionDeployment": {
+    "commit": "08013347bdbcdacfa75711f344c7239db8f46277",
+    "pullRequest": "https://github.com/EGRockso/Rockso_Mobile_Prototype/pull/23",
+    "version": 77,
+    "status": "ACTIVE",
+    "verifyJwt": false,
+    "deployedSourceMatchesTestedSource": true,
+    "sourceSha256": "e5881f52c422467efe18a7afbc6bcad1731800815fe32c2ae8bb7a041b19a4dd",
+    "githubActions": "Did not start: GitHub account billing/spending limit; local checks passed.",
+    "posthogActivated": false
+  }
+}

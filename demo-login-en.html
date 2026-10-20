@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Early access – Rockso</title>
+  <title>Waitlist – Rockso</title>
   <meta
     name="description"
-    content="Request early access to Rockso, a multi-sport training assistant focused on load management, fatigue and injury prevention."
+    content="Join the Rockso waitlist and be notified when the multisport training app launches."
   />
   <link rel="stylesheet" href="assets/styles.css" />
   <script src="assets/navigation.js" defer></script>
+  <link rel="stylesheet" href="assets/analytics-consent.css" />
+  <script type="module" src="assets/analytics.js"></script>
 </head>
 <body>
   <!-- HEADER -->
@@ -28,7 +30,7 @@
         <a href="index-en.html#for-whom">Who is it for?</a>
         <a href="index-en.html#science">Science</a>
         <a href="index-en.html#data">Data &amp; privacy</a>
-        <a href="demo-login-en.html" class="nav-cta">Early access</a>
+        <a href="demo-login-en.html" class="nav-cta">Join the waitlist</a>
         <a href="demo-login.html" class="lang-switch">FR</a>
       </nav>
 
@@ -49,17 +51,17 @@
   <!-- MAIN -->
   <main class="section">
     <div class="container">
-      <h1 class="section-title" style="text-align:center;">Be among the first to try Rockso</h1>
+      <h1 class="section-title" style="text-align:center;">Rockso is coming soon. Be among the first.</h1>
       <p class="hero-note" style="max-width: 640px; margin: 0 auto; text-align:center;">
-        Rockso is in private beta. Sign up to receive early access to the mobile app
-        and help shape the product with us.
+        Rockso is launching soon. Sign up to be notified
+        as soon as the app is available.
       </p>
 
-      <!-- MAIN BLOCK: REQUEST EARLY ACCESS -->
+      <!-- MAIN BLOCK: LAUNCH WAITLIST -->
       <section class="card card-soft" style="margin-top: 2rem; max-width: 560px; margin-left:auto; margin-right:auto;">
-        <h2>Request early access</h2>
+        <h2>Join the waitlist</h2>
         <p>
-          Leave us your details. We will get in touch as soon as your access is ready.
+          Leave your email address to receive launch information.
         </p>
 
         <form id="signup-form">
@@ -97,13 +99,12 @@
           </div>
 
           <p class="hero-note" style="font-size: 0.85rem; margin-top: 0.5rem;">
-            By signing up, you agree that we store your e-mail so that we may contact
-            you about Rockso. No spam, promise.
+            Your email address will be used to notify you when Rockso launches.
           </p>
 
           <div class="hero-actions" style="margin-top: 1.2rem;">
             <button type="submit" class="btn btn-primary" id="signup-submit">
-              Join the waitlist
+              Notify me at launch
             </button>
             <a href="index-en.html" class="btn btn-ghost">Back to site</a>
           </div>
@@ -120,6 +121,7 @@
     <div class="container footer-inner">
       <p>© <span id="year"></span> Rockso. All rights reserved.</p>
       <div class="footer-links">
+        <button type="button" class="analytics-preferences" data-analytics-preferences hidden>Audience preferences</button>
         <a href="privacy-en.html">Privacy policy</a>
         <a href="legal-notice-en.html">Legal notice</a>
         <a href="terms-en.html">Terms of Use</a>
@@ -180,10 +182,15 @@
           throw error;
         }
 
+        // Analytics only: preserve the existing form behavior and payload.
+        if (data?.ok === true && data?.alreadyRegistered === false) {
+          window.dispatchEvent(new CustomEvent("rockso:early-access-confirmed"));
+        }
+
         setSignupState({
           meta: data?.alreadyRegistered
-            ? "You're already on the list! We'll reach out as soon as your access is ready."
-            : "Thank you! You're on the waitlist. We'll be in touch very soon.",
+            ? "You're already on the list. You'll receive the launch information."
+            : "You're on the list! We'll let you know when Rockso launches.",
         });
         signupForm.reset();
       } catch (e) {
@@ -193,7 +200,7 @@
         });
       } finally {
         signupSubmit.disabled = false;
-        signupSubmit.textContent = "Join the waitlist";
+        signupSubmit.textContent = "Notify me at launch";
       }
     });
   </script>

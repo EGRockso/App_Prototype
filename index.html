@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="assets/styles-v2.css" />
+  <link rel="stylesheet" href="assets/analytics-consent.css" />
+  <script type="module" src="assets/analytics.js"></script>
 </head>
 
 <body>
@@ -29,7 +31,7 @@
         <a href="#science">Science</a>
         <a href="#data">Données &amp; confidentialité</a>
         <a href="index-en.html" class="lang-switch">EN</a>
-        <a href="demo-login.html" class="nav-cta">Accès anticipé</a>
+        <a href="demo-login.html" class="nav-cta">Rejoindre la liste d’attente</a>
       </nav>
 
       <button class="nav-toggle-v2" type="button" aria-label="Ouvrir le menu" aria-controls="rockso-navigation" aria-expanded="false">
@@ -55,7 +57,7 @@
             semaine.
           </p>
           <div class="hero-v2-actions">
-            <a href="demo-login.html" class="btn-v2 green">Demander un accès anticipé</a>
+            <a href="demo-login.html" class="btn-v2 green">Rejoindre la liste d’attente</a>
             <a href="#how-it-works" class="btn-v2 ghost">Découvrir la méthode</a>
           </div>
         </div>
@@ -358,7 +360,7 @@
 
         <div class="cta-band-v2">
           <p>Le bon entraînement n’est pas le plus dur. C’est celui que ton corps peut transformer en progrès.</p>
-          <a href="demo-login.html" class="btn-v2 green">Demander un accès anticipé</a>
+          <a href="demo-login.html" class="btn-v2 green">Rejoindre la liste d’attente</a>
         </div>
       </div>
     </section>
@@ -521,14 +523,13 @@
 
         <div class="co-banner">
           <div class="co-banner-content">
-            <h3>Co-construire avec le terrain</h3>
+            <h3>Accompagner les équipes et les structures</h3>
             <p>
-              Rockso se construit avec des équipes, coachs et structures qui veulent
-              confronter les modèles à la pratique réelle, affiner les arbitrages, et bâtir
-              un standard plus juste du suivi de la charge.
+              Pour votre équipe, votre club ou votre structure, échangeons sur vos besoins
+              de suivi et d’accompagnement sportif.
             </p>
-            <a href="mailto:hello@rockso.app?subject=Equipe%20pilote%20Rockso" class="btn-v2 white">
-              Discuter d'un pilote
+            <a href="mailto:hello@rockso.app?subject=Projet%20Rockso" class="btn-v2 white">
+              Parlons de votre projet
             </a>
           </div>
         </div>
@@ -690,15 +691,24 @@
 
           <div class="faq-item-v2">
             <button class="faq-q" type="button">
+              <span>Quand Rockso sera-t-il disponible&nbsp;?</span>
+              <span class="chev"></span>
+            </button>
+            <div class="faq-a">
+              <div class="faq-a-inner">
+                Rockso sera disponible prochainement. Rejoignez la liste d’attente pour être prévenu dès l’ouverture au public.
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item-v2">
+            <button class="faq-q" type="button">
               <span>Combien ça coûte&nbsp;?</span>
               <span class="chev"></span>
             </button>
             <div class="faq-a">
               <div class="faq-a-inner">
-                Rockso est accessible en accès anticipé pendant la phase de construction
-                du produit. À terme, différentes offres donneront accès à des niveaux de
-                lecture, d'accompagnement et d'analyse plus avancés, pour les athlètes,
-                les coachs et les structures.
+                Les offres et leurs tarifs seront présentés au lancement de Rockso. Rejoignez la liste d’attente pour être informé de l’ouverture.
               </div>
             </div>
           </div>
@@ -712,14 +722,14 @@
         <div class="bottom-cta-text">
           <h2>Construisez une progression qui dure.</h2>
           <p>
-            Ce qui compte, ce n'est pas de forcer. C'est de durer. Rejoignez les
-            premiers utilisateurs et contribuez à bâtir un produit pensé pour ceux qui
-            veulent progresser, durer, et faire les bons arbitrages dans le réel.
+            Ce qui compte, ce n'est pas de forcer. C'est de durer. Rejoignez la liste
+            d’attente pour être prévenu dès le lancement de Rockso et commencer
+            à construire une progression qui dure.
           </p>
           <div class="bottom-cta-actions">
-            <a href="demo-login.html" class="btn-v2 green">Demander un accès anticipé</a>
-            <a href="mailto:hello@rockso.app?subject=Equipe%20pilote%20Rockso" class="btn-v2 ghost">
-              Discuter d'un pilote
+            <a href="demo-login.html" class="btn-v2 green">Rejoindre la liste d’attente</a>
+            <a href="mailto:hello@rockso.app?subject=Projet%20Rockso" class="btn-v2 ghost">
+              Parlons de votre projet
             </a>
           </div>
         </div>
@@ -755,6 +765,7 @@
         <img src="assets/img/Logos/rockso_logo_E7DECF.png" alt="Rockso" />
       </div>
       <div class="footer-links-v2">
+        <button type="button" class="analytics-preferences" data-analytics-preferences hidden>Préférences de mesure d’audience</button>
         <a href="mentions-legales.html">Mentions légales</a>
         <a href="cgu.html">CGU</a>
         <a href="privacy.html">Confidentialité</a>
@@ -762,12 +773,12 @@
         <a href="mailto:hello@rockso.app">Contact</a>
       </div>
       <div class="footer-stores-v2">
-        <a href="#" class="store-badge">
+        <a href="#" class="store-badge" data-analytics-download data-analytics-placement="footer">
           <img
             src="assets/img/Badge Stores/IOS/FR/Download_on_App_Store/Black_lockup/SVG/Download_on_the_App_Store_Badge_FR_RGB_blk_100517.svg"
             alt="Télécharger dans l'App Store" />
         </a>
-        <a href="#" class="store-badge">
+        <a href="#" class="store-badge" data-analytics-download data-analytics-placement="footer">
           <img src="assets/img/Badge Stores/Android/GetItOnGooglePlay_Badge_Web_color_French.svg"
             alt="Disponible sur Google Play" />
         </a>
