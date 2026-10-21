@@ -38,7 +38,7 @@ if (sdkPath) {
 }
 const browser=await chromium.launch({headless:true,...(process.env.ROCKSO_BROWSER_PATH?{executablePath:process.env.ROCKSO_BROWSER_PATH}:{})});
 const stub=`window.__signupCalls=[]; window.__signupReply={data:{ok:true,alreadyRegistered:false},error:null}; window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'local-demo-fixture'}},error:null})},functions:{invoke:async(name,options)=>{window.__signupCalls.push({name,body:options.body}); if(window.__signupDelay)return await new Promise(resolve=>window.__signupResolve=resolve);return window.__signupReply;}}})};`;
-async function setup({test=true,production=false,token='',runtimeConfiguration=false,minimal=false,configurationEnabled=true}={}) {
+async function setup({test=true,production=false,token='',runtimeConfiguration=false,minimal=false,configurationEnabled=true,shippedConfiguration=false}={}) {
  // PostHog excludes HeadlessChrome/automation as bots. Exercise the normal
  // visitor pipeline without weakening the SDK's production bot filter.
  const context=await browser.newContext({serviceWorkers:'block',userAgent:`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${browser.version()} Safari/537.36`});
@@ -60,6 +60,7 @@ async function setup({test=true,production=false,token='',runtimeConfiguration=f
   }
   if(url.hostname==='cdn.jsdelivr.net')return route.fulfill({contentType:'application/javascript',body:stub});
   if(production && url.origin==='https://rockso.app'){
+   if(url.pathname==='/assets/analytics-config.js' && shippedConfiguration){const response=await context.request.get(base+url.pathname);return route.fulfill({status:response.status(),headers:response.headers(),body:await response.body()});}
    if(url.pathname==='/assets/analytics-config.js' && runtimeConfiguration)return route.fulfill({contentType:'application/javascript',body:`export const analyticsConfig=Object.freeze({enabled:true,minimalEnabled:${minimal},projectToken:"",configurationUrl:"https://hegtnyarfeoyapobysee.supabase.co/functions/v1/analytics-collect"});`});
    if(url.pathname==='/assets/analytics-config.js' && !token)return route.fulfill({contentType:'application/javascript',body:'export const analyticsConfig=Object.freeze({enabled:false,projectToken:""});'});
    if(url.pathname==='/assets/analytics-config.js' && token)return route.fulfill({contentType:'application/javascript',body:`export const analyticsConfig=Object.freeze({enabled:true,projectToken:${JSON.stringify(token)}});`});
@@ -83,7 +84,13 @@ async function refuse(page,english=false){await page.getByRole('button',{name:en
 async function open(page){await page.locator('[data-analytics-preferences]').click();}
 try {
  await check('public configuration has no inline key; runtime configuration is separately gated',async()=>{
-  assert.equal(analyticsConfig.enabled,true);assert.equal(analyticsConfig.projectToken,'');assert.ok(analyticsConfig.configurationUrl.endsWith('/analytics-collect'));
+  assert.equal(analyticsConfig.enabled,false);assert.equal(analyticsConfig.projectToken,'');assert.ok(analyticsConfig.configurationUrl.endsWith('/analytics-collect'));
+ });
+ await check('shipped disabled configuration prevents every analytics request after acceptance',async()=>{
+  const s=await setup({test:false,production:true,token:realToken,shippedConfiguration:true});
+  await s.context.addInitScript(({key,version})=>{const now=Date.now();localStorage.setItem(key,JSON.stringify({version,accepted:true,createdAt:now,expiresAt:now+86400000}));},{key:CONSENT_KEY,version:CONSENT_VERSION});
+  await s.page.goto(s.origin+'/');await s.page.waitForTimeout(150);
+  assert.equal(s.posthogRequests.length,0);assert.equal(s.collectorRequests.length,0);await s.context.close();
  });
  await check('five UTM fields accept new experiment slugs without a campaign list',async()=>{
   assert.deepEqual(readUtm('?utm_source=New-Partner&utm_medium=social&utm_campaign=launch-2041-z&utm_content=creative_b&utm_term=multisport'),{
