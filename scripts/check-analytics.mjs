@@ -82,7 +82,7 @@ const events=async page=>{
 const stored=(page,type,key)=>page.evaluate(({type,key})=>window[type].getItem(key),{type,key});
 async function accept(page,english=false){await page.getByRole('button',{name:english?'Accept':'Accepter',exact:true}).click();}
 async function refuse(page,english=false){await page.getByRole('button',{name:english?'Refuse':'Refuser',exact:true}).click();}
-async function open(page){await page.locator('[data-analytics-preferences]').click();}
+async function open(page){await page.evaluate(()=>window.RocksoAnalytics.openPreferences());}
 try {
  await check('public configuration has no inline key; runtime configuration is separately gated',async()=>{
   assert.equal(typeof analyticsConfig.enabled,'boolean');assert.equal(analyticsConfig.projectToken,'');assert.ok(analyticsConfig.configurationUrl.endsWith('/analytics-collect'));
@@ -103,6 +103,21 @@ try {
   assert.equal(await stored(s.page,'localStorage',CONSENT_KEY),null);
   await s.context.close();
  });
+ for(const [home,policy,english] of [['index.html','privacy.html',false],['index-en.html','privacy-en.html',true]]){
+  await check('manual '+(english?'EN':'FR')+' privacy settings remain usable with a banner filter and preserve safe UTM',async()=>{
+   const s=await setup();await s.context.addInitScript(()=>{document.addEventListener('DOMContentLoaded',()=>{const style=document.createElement('style');style.textContent='.analytics-consent {display:none!important;}';document.head.append(style);});});
+   await s.page.goto(s.origin+'/'+home+'?utm_source=validation&utm_campaign=new-test');
+   await s.page.locator('[data-analytics-preferences]').click();await s.page.waitForURL('**/'+policy+'?**#audience-preferences');
+   assert.equal(await s.page.locator('#audience-preferences').isVisible(),true);
+   assert.equal(await stored(s.page,'sessionStorage',SESSION_KEY),null);assert.deepEqual(await events(s.page),[]);
+   await accept(s.page,english);assert.deepEqual(await events(s.page),[]);
+   await s.page.getByRole('link',{name:english?'Return to home':'Retour à l’accueil',exact:true}).click();
+   const received=await events(s.page);assert.equal(received.length,1);assert.equal(received[0].properties.utm_campaign,'new-test');
+   await s.page.locator('[data-analytics-preferences]').click();await s.page.waitForURL('**/'+policy+'?**#audience-preferences');await refuse(s.page,english);
+   assert.equal(await stored(s.page,'sessionStorage',SESSION_KEY),null);assert.equal(JSON.parse(await stored(s.page,'localStorage',CONSENT_KEY)).accepted,false);
+   await s.context.close();
+  });
+ }
  await check('five UTM fields accept new experiment slugs without a campaign list',async()=>{
   assert.deepEqual(readUtm('?utm_source=New-Partner&utm_medium=social&utm_campaign=launch-2041-z&utm_content=creative_b&utm_term=multisport'),{
    utm_source:'new-partner',utm_medium:'social',utm_campaign:'launch-2041-z',utm_content:'creative_b',utm_term:'multisport'});
@@ -250,7 +265,7 @@ try {
    },{CONSENT_KEY});
    assert.notEqual(CONSENT_VERSION,'2026-10-20.1');await page.reload();
    assert.deepEqual(await events(page),[]);assert.equal(await stored(page,'sessionStorage',SESSION_KEY),null);
-   assert.equal(await page.locator('.analytics-consent[open]').count(),1);
+   assert.equal(await page.locator('.analytics-consent[open], #audience-preferences').count(),1);
    const dialogText=await page.locator('.analytics-consent').textContent();
    assert.match(dialogText,english?/acquisition sources/:/sources d’acquisition/);
    assert.match(dialogText,english?/withdraw consent at any time/:/retirer votre accord à tout moment/);
@@ -292,7 +307,7 @@ try {
   const {context,page,posthogRequests}=await setup();
   for(const file of ['privacy.html','privacy-en.html','cgu.html','terms-en.html','mentions-legales.html','legal-notice-en.html','account-deletion.html','account-deletion-en.html']){
    await page.goto(base+'/'+file);assert.equal(await page.locator('[data-analytics-preferences]:visible').count(),1);
-   assert.deepEqual(await events(page),[]);await open(page);assert.equal(await page.locator('.analytics-consent[open]').count(),1);
+   assert.deepEqual(await events(page),[]);await open(page);assert.equal(await page.locator('.analytics-consent[open], #audience-preferences').count(),1);
    assert.equal(await stored(page,'sessionStorage',SESSION_KEY),null);
   }
   assert.deepEqual(posthogRequests,[]);await context.close();

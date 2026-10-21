@@ -66,3 +66,7 @@
   .analytics-consent-actions { flex-direction: column; }
   .analytics-consent-actions button { flex: none; }
 }
+
+.audience-settings { padding: 20px; margin: 24px 0; border: 1px solid #176343; border-radius: 12px; scroll-margin-top: 100px; }
+.audience-settings .analytics-consent-actions button { font: inherit; cursor: pointer; padding: 12px 20px; border-radius: 8px; border: 1px solid #176343; background: #176343; color: #fff; }
+.audience-settings > a { display: inline-block; margin-top: 16px; }

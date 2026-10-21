@@ -389,8 +389,27 @@ function mountAnalytics() {
   dialog.append(heading, description, status, information, actions, close);
   document.body.append(dialog);
   let previousFocus;
+  const policySection = document.getElementById(english ? "website-analytics" : "site-analytics");
+  let policyPanel = null;
+  if (policySection && /\/privacy(?:-en)?\.html$/.test(window.location.pathname)) {
+    policyPanel = document.createElement("section");
+    policyPanel.id = "audience-preferences";
+    policyPanel.className = "audience-settings";
+    policyPanel.tabIndex = -1;
+    policyPanel.setAttribute("aria-labelledby", heading.id);
+    // Deliberate, inline privacy settings, not another automatic popup.
+    policyPanel.append(heading, description, status, actions);
+    const back = document.createElement("a");
+    const target = new URL(english ? "index-en.html" : "index.html", window.location.href);
+    for (const [key, value] of Object.entries(readUtm(window.location.search))) target.searchParams.set(key, value);
+    back.href = target.href;
+    back.textContent = english ? "Return to home" : "Retour à l’accueil";
+    policyPanel.append(back);
+    policySection.prepend(policyPanel);
+    dialog.remove();
+  }
 
-  function openPreferences() {
+  function updatePreferenceStatus() {
     accept.disabled = !ready;
     const current = readChoice();
     status.textContent = !ready
@@ -400,6 +419,15 @@ function mountAnalytics() {
         : current?.accepted === true
           ? (english ? "Current choice: accepted. You can withdraw by choosing Refuse." : "Choix actuel : accepté. Pour retirer votre accord, choisissez Refuser.")
           : (english ? "Without your agreement, no audience measurement takes place." : "Sans votre accord, aucune mesure d’audience n’est effectuée.");
+  }
+
+  function openPreferences() {
+    updatePreferenceStatus();
+    if (policyPanel) {
+      policyPanel.scrollIntoView({ block: "center" });
+      policyPanel.focus({ preventScroll: true });
+      return;
+    }
     previousFocus = document.activeElement;
     if (!dialog.open) dialog.show();
     // Banner blockers can hide this element after it opens. A non-modal
@@ -420,6 +448,7 @@ function mountAnalytics() {
     choice = next;
     if (accepted) activate(); else stop();
     dialog.close();
+    updatePreferenceStatus();
   }
   accept.addEventListener("click", () => decide(true));
   refuse.addEventListener("click", () => decide(false));
@@ -430,7 +459,13 @@ function mountAnalytics() {
   });
   document.querySelectorAll("[data-analytics-preferences]").forEach(button => {
     button.hidden = false;
-    button.addEventListener("click", openPreferences);
+    button.addEventListener("click", () => {
+      if (policyPanel) { openPreferences(); return; }
+      const target = new URL(english ? "privacy-en.html" : "privacy.html", window.location.href);
+      target.hash = "audience-preferences";
+      for (const [key, value] of Object.entries(readUtm(window.location.search))) target.searchParams.set(key, value);
+      window.location.assign(target.href);
+    });
   });
 
   window.addEventListener("storage", event => {
@@ -469,6 +504,10 @@ function mountAnalytics() {
     },
     getTestEvents() { return test ? structuredClone(testEvents) : []; },
   });
+  if (policyPanel) {
+    updatePreferenceStatus();
+    if (window.location.hash === "#audience-preferences") openPreferences();
+  }
   choice = readChoice();
   if (choice?.accepted === true) activate();
   else {
