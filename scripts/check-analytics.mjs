@@ -93,6 +93,16 @@ try {
   await s.page.goto(s.origin+'/');await s.page.waitForTimeout(350);
   assert.equal(s.posthogRequests.length,0);assert.equal(s.collectorRequests.filter(r=>r.method==='POST').length,0);assert.equal(s.collectorRequests.filter(r=>r.method==='GET').length,analyticsConfig.enabled?1:0);await s.context.close();
  });
+ await check('a banner blocker cannot make the website inert or imply consent',async()=>{
+  const s=await setup();
+  await s.page.addInitScript(()=>{document.addEventListener('DOMContentLoaded',()=>{const style=document.createElement('style');style.textContent='.analytics-consent { display:none!important; }';document.head.append(style);});});
+  await s.page.goto(s.origin+'/');await s.page.waitForTimeout(100);
+  assert.equal(await s.page.locator('dialog').evaluate(e=>e.matches(':modal')),false);
+  await s.page.locator('a[href="demo-login.html"]').first().click();await s.page.waitForURL('**/demo-login.html');
+  assert.deepEqual(await events(s.page),[]);assert.equal(s.posthogRequests.length,0);
+  assert.equal(await stored(s.page,'localStorage',CONSENT_KEY),null);
+  await s.context.close();
+ });
  await check('five UTM fields accept new experiment slugs without a campaign list',async()=>{
   assert.deepEqual(readUtm('?utm_source=New-Partner&utm_medium=social&utm_campaign=launch-2041-z&utm_content=creative_b&utm_term=multisport'),{
    utm_source:'new-partner',utm_medium:'social',utm_campaign:'launch-2041-z',utm_content:'creative_b',utm_term:'multisport'});

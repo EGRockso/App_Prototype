@@ -401,7 +401,10 @@ function mountAnalytics() {
           ? (english ? "Current choice: accepted. You can withdraw by choosing Refuse." : "Choix actuel : accepté. Pour retirer votre accord, choisissez Refuser.")
           : (english ? "Without your agreement, no audience measurement takes place." : "Sans votre accord, aucune mesure d’audience n’est effectuée.");
     previousFocus = document.activeElement;
-    if (!dialog.open) dialog.showModal();
+    if (!dialog.open) dialog.show();
+    // Banner blockers can hide this element after it opens. A non-modal
+    // dialog never makes the rest of the site inert in that case.
+    accept.focus({ preventScroll: true });
   }
 
   function decide(accepted) {
@@ -422,6 +425,9 @@ function mountAnalytics() {
   refuse.addEventListener("click", () => decide(false));
   close.addEventListener("click", () => dialog.close());
   dialog.addEventListener("close", () => previousFocus?.focus());
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && dialog.open) dialog.close();
+  });
   document.querySelectorAll("[data-analytics-preferences]").forEach(button => {
     button.hidden = false;
     button.addEventListener("click", openPreferences);

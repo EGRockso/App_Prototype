@@ -16,6 +16,11 @@
   outline-offset: 4px;
 }
 .analytics-consent {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  z-index: 10000;
   box-sizing: border-box;
   width: min(560px, calc(100% - 32px));
   max-height: calc(100dvh - 32px);
