@@ -80,7 +80,7 @@ export function filterSdkEvent(event, context) {
   if (event.event.startsWith("early_access_") && page[2] !== "early_access_page_viewed") return null;
   const properties = {
     distinct_id: context.id,
-    $process_person_profile: false,
+    $process_person_profile: true,
     $geoip_disable: true,
     $ip: null,
     environment: context.environment,
@@ -126,7 +126,7 @@ export function sdkOptions(id, beforeSend, signal) {
     advanced_disable_flags: true,
     remote_config_refresh_interval_ms: 0,
     opt_in_site_apps: false,
-    person_profiles: "never",
+    person_profiles: "always",
     save_campaign_params: false,
     save_referrer: false,
     persistence: "memory",
@@ -345,8 +345,8 @@ function mountAnalytics() {
   heading.textContent = english ? "Audience measurement" : "Mesure d’audience";
   const description = document.createElement("p");
   description.textContent = english
-    ? "With your permission, AIMS Corp. uses PostHog EU to measure visits to the home and waitlist pages, acquisition sources, confirmed new waitlist signups and genuine download clicks, without advertising profiling. No form content, email, sports or health data is sent to PostHog. Your choice does not affect access to the site or waitlist. You can withdraw consent at any time through Audience preferences in the footer."
-    : "Avec votre accord, AIMS Corp. utilise PostHog EU pour mesurer les visites de l’accueil et du formulaire, les sources d’acquisition, les nouvelles inscriptions confirmées à la liste d’attente et les clics sur de vrais téléchargements, sans profilage publicitaire. Aucun contenu de formulaire, e-mail, donnée sportive ou de santé n’est envoyé à PostHog. Votre choix ne conditionne pas l’accès au site ou à la liste d’attente. Vous pouvez retirer votre accord à tout moment dans les préférences de mesure d’audience en pied de page.";
+    ? "With your permission, AIMS Corp. uses PostHog EU to measure visits to the home and waitlist pages, acquisition sources, confirmed new waitlist signups and genuine download clicks, without advertising profiling. No form content, email, sports or health data is sent to PostHog. A technical profile uses only the random visit identifier so its events can be erased. Your choice does not affect access to the site or waitlist. You can withdraw consent at any time through Audience preferences in the footer."
+    : "Avec votre accord, AIMS Corp. utilise PostHog EU pour mesurer les visites de l’accueil et du formulaire, les sources d’acquisition, les nouvelles inscriptions confirmées à la liste d’attente et les clics sur de vrais téléchargements, sans profilage publicitaire. Aucun contenu de formulaire, e-mail, donnée sportive ou de santé n’est envoyé à PostHog. Un profil technique utilise uniquement l’identifiant aléatoire de visite pour permettre l’effacement de ses événements. Votre choix ne conditionne pas l’accès au site ou à la liste d’attente. Vous pouvez retirer votre accord à tout moment dans les préférences de mesure d’audience en pied de page.";
   const status = document.createElement("p");
   status.setAttribute("role", "status");
   const information = document.createElement("a");

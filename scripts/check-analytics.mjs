@@ -116,7 +116,7 @@ try {
   const o=sdkOptions(crypto.randomUUID(),()=>null,new AbortController().signal);
   for(const name of ['autocapture','capture_pageview','capture_pageleave','capture_heatmaps','capture_dead_clicks','capture_exceptions','capture_performance','rageclick','save_campaign_params','save_referrer','cross_subdomain_cookie'])assert.equal(o[name],false,name);
   for(const name of ['disable_session_recording','disable_surveys','disable_external_dependency_loading','advanced_disable_flags','disable_persistence','disable_beacon','opt_out_capturing_by_default'])assert.equal(o[name],true,name);
-  assert.equal(o.person_profiles,'never');assert.equal(o.persistence,'memory');assert.equal(o.logs.captureConsoleLogs,false);assert.equal(o.fetch_options.referrerPolicy,'no-referrer');
+  assert.equal(o.person_profiles,'always');assert.equal(o.persistence,'memory');assert.equal(o.logs.captureConsoleLogs,false);assert.equal(o.fetch_options.referrerPolicy,'no-referrer');
  });
  await check('payload is rebuilt; SDK/user/profile/URL/referrer/device identifiers are discarded',async()=>{
   const id=crypto.randomUUID();
@@ -300,7 +300,7 @@ try {
     sdk.opt_out_capturing();sdk.clear_opt_in_out_capturing();
     const clearedConsentKeys=Object.keys(localStorage);
     // Exercise the real enrichment method without inventing a token or calling init.
-    const persistence={properties:()=>({distinct_id:id,$referrer:'https://private.invalid/?email=marker',$initial_current_url:location.href}),remove_event_timer:()=>undefined,get_property:()=>undefined};
+    const persistence={register:()=>undefined,unregister:()=>undefined,properties:()=>({distinct_id:id,$referrer:'https://private.invalid/?email=marker',$initial_current_url:location.href}),remove_event_timer:()=>undefined,get_property:()=>undefined};
     sdk.persistence=persistence;sdk.sessionPersistence=persistence;
     const raw=sdk.calculateEventProperties('landing_page_viewed',{page_id:'home_fr',language:'fr',platform:'desktop'});
     const result=filterSdkEvent({event:'landing_page_viewed',properties:raw},{allowed:true,id,environment:'test',projectToken:''});
@@ -329,7 +329,7 @@ try {
    assert.ok(!url.search.includes(realToken),'Project token must not appear in request URL');
    const p=payload.properties;
    assert.ok(p && p.token===realToken,'SDK transport must retain only the supplied public project token');
-   assert.equal(p.$geoip_disable,true);assert.equal(p.$ip,null);assert.equal(p.$process_person_profile,false);
+   assert.equal(p.$geoip_disable,true);assert.equal(p.$ip,null);assert.equal(p.$process_person_profile,true);
    const keys=['surface','distinct_id','$process_person_profile','$geoip_disable','$ip','environment','page_id','language','platform','token','utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
    if(payload.event==='download_clicked')keys.push('download_platform','placement');
    assert.ok(Object.keys(p).every(key=>keys.includes(key)),'Unexpected implicit SDK property');
