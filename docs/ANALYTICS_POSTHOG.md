@@ -195,3 +195,12 @@ The owner requested publication of the notifications and public website. The fin
 The backend release is isolated from in-progress mobile/Coach work in [PR #23](https://github.com/EGRockso/Rockso_Mobile_Prototype/pull/23). Only `request-beta-access` was deployed to Supabase (version 77); no database migration, other function or project setting is part of this publication. Analytics stays disabled while retention/deletion confirmation is pending. No real signup or notification is used for publication tests.
 
 GitHub Actions for the backend PR did not start: GitHub reported failed account payments or an insufficient spending limit (run `39515927633`). The nine local handler tests, Deno type-check and formatting, targeted lint and the prepublication website checks passed. No billing or protection settings were changed and no administrator merge override was used.
+
+
+## Préparation Analytics produit — 21 octobre 2026 (non déployée)
+
+La clé publique est désormais fournie après consentement par le GET de `analytics-collect`, depuis le secret Supabase `POSTHOG_PROJECT_TOKEN`. Aucune clé ne doit être commitée. `assets/analytics-config.js` prépare le chargement, mais le contrôle serveur `landing_enabled` reste désactivé par défaut. L'endpoint et la migration doivent être livrés avant le site, après autorisation. Les tests interceptent les deux services.
+
+Les quatre événements restent inchangés et portent `surface=landing`. Une copie sans identifiant de visite alimente les compteurs agrégés Supabase après accord. Les inscriptions de référence viennent de `prospects`, pas de l'événement navigateur. Le module `minimal-audience.js` prépare une mesure de pages sans cookies ni identifiant ; `minimalEnabled=false` et le contrôle serveur indépendant empêchent toute collecte avant validation de ce nouveau périmètre. Aucun visiteur unique n'est déduit de ces compteurs.
+
+Préférences et politiques du site conservées ; avant activation, compléter uniquement la mention des copies statistiques dans Supabase (même consentement). La politique applicable aux nouveaux événements Mobile/Coach et à l'éventuel socle minimal doit être validée séparément. Aucun déploiement ni événement réel envoyé pendant cette préparation.

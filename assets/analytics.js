@@ -84,6 +84,7 @@ export function filterSdkEvent(event, context) {
     $geoip_disable: true,
     $ip: null,
     environment: context.environment,
+    surface: "landing",
     page_id: page[0],
     language: page[1],
     platform: ["ios", "android", "desktop", "unknown"].includes(p.platform) ? p.platform : "unknown",
@@ -161,8 +162,11 @@ function mountAnalytics() {
     remove(type, key) { try { window[type].removeItem(key); } catch { /* Fail closed. */ } },
   };
   const test = local && storage.get("sessionStorage", TEST_KEY) === "enabled";
-  const productionReady = production && analyticsConfig.enabled === true && /^phc_[a-z0-9_-]{12,196}$/i.test(analyticsConfig.projectToken);
+  const hasInlineToken = /^phc_[a-z0-9_-]{12,196}$/i.test(analyticsConfig.projectToken);
+  const configurationUrl = analyticsConfig.configurationUrl === "https://hegtnyarfeoyapobysee.supabase.co/functions/v1/analytics-collect" ? analyticsConfig.configurationUrl : null;
+  const productionReady = production && analyticsConfig.enabled === true && (hasInlineToken || !!configurationUrl);
   const ready = test || productionReady;
+  let projectToken = analyticsConfig.projectToken;
   let choice = null;
   let session = null;
   let sdk = null;
@@ -215,7 +219,7 @@ function mountAnalytics() {
   }
 
   function context() {
-    return { allowed: allowed(), id: session?.id, environment: test ? "test" : "production", projectToken: test ? "" : analyticsConfig.projectToken };
+    return { allowed: allowed(), id: session?.id, environment: test ? "test" : "production", projectToken: test ? "" : projectToken };
   }
 
   function stop() {
@@ -275,13 +279,22 @@ function mountAnalytics() {
       }
     } else if (sdk && controller && !controller.signal.aborted) {
       sdk.capture(event.event, event.properties, { send_instantly: true, transport: "fetch" });
+      // Aggregate reference counts only. No visit ID, email, URL or form value.
+      if (configurationUrl) {
+        const safe = filterSdkEvent(event, context());
+        if (safe) {
+          const properties = Object.fromEntries(Object.entries(safe.properties).filter(([key]) => ["page_id", "language", "download_platform", "placement", ...UTM_KEYS].includes(key)));
+          fetch(configurationUrl, { method: "POST", headers: { "content-type": "application/json" }, credentials: "omit", referrerPolicy: "no-referrer", signal: controller.signal,
+            body: JSON.stringify({mode:"landing",surface:"landing",consent:true,consent_version:CONSENT_VERSION,events:[{id:event.uuid,event:event.event,platform:safe.properties.platform,properties}]}) }).catch(() => {});
+        }
+      }
     } else if (pending.length < 20) pending.push(event);
   }
 
   function record(name, extra = {}) {
     const data = sessionData();
     if (!data) return;
-    send({ event: name, timestamp: new Date().toISOString(), properties: {
+    send({ uuid: crypto.randomUUID(), event: name, timestamp: new Date().toISOString(), properties: {
       page_id: page[0], language: page[1], platform: platform(), ...data.utm, ...extra,
     } });
   }
@@ -301,18 +314,27 @@ function mountAnalytics() {
     if (!viewed) { viewed = true; record(page[2]); }
     if (test) return;
     try {
+      controller?.abort();
+      controller = new AbortController();
+      if (!projectToken && configurationUrl) {
+        const response = await fetch(configurationUrl, { credentials:"omit", referrerPolicy:"no-referrer", signal:controller.signal });
+        const config = response.ok ? await response.json() : null;
+        if (epoch !== activeEpoch || !allowed()) return;
+        if (!config?.landing_enabled || !/^phc_[a-z0-9_-]{12,196}$/i.test(config.projectToken) || config.api_host !== "https://eu.i.posthog.com") throw new Error("Analytics unavailable.");
+        projectToken = config.projectToken;
+      }
       const instance = sdk || await loadSdk();
       if (epoch !== activeEpoch || !allowed()) return;
       if (sdk) return;
       controller?.abort();
       controller = new AbortController();
       const options = sdkOptions(data.id, event => filterSdkEvent(event, context()), controller.signal);
-      sdk = instance.init(analyticsConfig.projectToken, options);
+      sdk = instance.init(projectToken, options);
       sdk.opt_in_capturing({ captureEventName: false });
       const queued = pending;
       pending = [];
       queued.forEach(send);
-    } catch { pending = []; /* Analytics must never affect signup or navigation. */ }
+    } catch { pending = []; viewed = false; /* Analytics must never affect signup or navigation. */ }
   }
 
   const dialog = document.createElement("dialog");

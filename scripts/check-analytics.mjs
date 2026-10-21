@@ -38,7 +38,7 @@ if (sdkPath) {
 }
 const browser=await chromium.launch({headless:true,...(process.env.ROCKSO_BROWSER_PATH?{executablePath:process.env.ROCKSO_BROWSER_PATH}:{})});
 const stub=`window.__signupCalls=[]; window.__signupReply={data:{ok:true,alreadyRegistered:false},error:null}; window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'local-demo-fixture'}},error:null})},functions:{invoke:async(name,options)=>{window.__signupCalls.push({name,body:options.body}); if(window.__signupDelay)return await new Promise(resolve=>window.__signupResolve=resolve);return window.__signupReply;}}})};`;
-async function setup({test=true,production=false,token=''}={}) {
+async function setup({test=true,production=false,token='',runtimeConfiguration=false,minimal=false,configurationEnabled=true}={}) {
  // PostHog excludes HeadlessChrome/automation as bots. Exercise the normal
  // visitor pipeline without weakening the SDK's production bot filter.
  const context=await browser.newContext({serviceWorkers:'block',userAgent:`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${browser.version()} Safari/537.36`});
@@ -46,9 +46,13 @@ async function setup({test=true,production=false,token=''}={}) {
   Object.defineProperty(Navigator.prototype,'webdriver',{get:()=>false});
   if(navigator.userAgentData)Object.defineProperty(navigator.userAgentData,'brands',{get:()=>[{brand:'Chromium',version},{brand:'Google Chrome',version}]});
  },browser.version().split('.')[0]);
- const posthogRequests=[];
+ const posthogRequests=[];const collectorRequests=[];
  await context.route('**/*',async route=>{
   const url=new URL(route.request().url());
+  if(url.hostname==='hegtnyarfeoyapobysee.supabase.co' && url.pathname==='/functions/v1/analytics-collect'){
+   collectorRequests.push({method:route.request().method(),body:route.request().postData()});
+   return route.fulfill({contentType:'application/json',body:route.request().method()==='GET'?JSON.stringify({landing_enabled:configurationEnabled,minimal_enabled:minimal,projectToken:configurationEnabled?token:'',api_host:'https://eu.i.posthog.com'}):'{"ok":true}',headers:{'access-control-allow-origin':'*','access-control-allow-methods':'GET, POST, OPTIONS','access-control-allow-headers':'*'}});
+  }
   if (url.hostname.endsWith('posthog.com')) {
    posthogRequests.push({url:url.href,method:route.request().method(),body:route.request().postData(),headers:route.request().headers()});
    if(url.href===SDK_URL && sdkSource)return route.fulfill({contentType:'application/javascript',body:sdkSource,headers:{'access-control-allow-origin':'*'}});
@@ -56,6 +60,8 @@ async function setup({test=true,production=false,token=''}={}) {
   }
   if(url.hostname==='cdn.jsdelivr.net')return route.fulfill({contentType:'application/javascript',body:stub});
   if(production && url.origin==='https://rockso.app'){
+   if(url.pathname==='/assets/analytics-config.js' && runtimeConfiguration)return route.fulfill({contentType:'application/javascript',body:`export const analyticsConfig=Object.freeze({enabled:true,minimalEnabled:${minimal},projectToken:"",configurationUrl:"https://hegtnyarfeoyapobysee.supabase.co/functions/v1/analytics-collect"});`});
+   if(url.pathname==='/assets/analytics-config.js' && !token)return route.fulfill({contentType:'application/javascript',body:'export const analyticsConfig=Object.freeze({enabled:false,projectToken:""});'});
    if(url.pathname==='/assets/analytics-config.js' && token)return route.fulfill({contentType:'application/javascript',body:`export const analyticsConfig=Object.freeze({enabled:true,projectToken:${JSON.stringify(token)}});`});
    const response=await context.request.get(base+url.pathname);
    return route.fulfill({status:response.status(),headers:response.headers(),body:await response.body()});
@@ -65,7 +71,7 @@ async function setup({test=true,production=false,token=''}={}) {
  });
  if(test)await context.addInitScript(({TEST_KEY})=>{if(location.hostname==='127.0.0.1')sessionStorage.setItem(TEST_KEY,'enabled');},{TEST_KEY});
  const page=await context.newPage();
- return {context,page,posthogRequests,origin:production?'https://rockso.app':base};
+ return {context,page,posthogRequests,collectorRequests,origin:production?'https://rockso.app':base};
 }
 const events=async page=>{
  await page.waitForFunction(()=>!!window.RocksoAnalytics);
@@ -76,8 +82,8 @@ async function accept(page,english=false){await page.getByRole('button',{name:en
 async function refuse(page,english=false){await page.getByRole('button',{name:english?'Refuse':'Refuser',exact:true}).click();}
 async function open(page){await page.locator('[data-analytics-preferences]').click();}
 try {
- await check('default public configuration contains no token and is disabled',async()=>{
-  assert.equal(analyticsConfig.enabled,false);assert.equal(analyticsConfig.projectToken,'');
+ await check('public configuration has no inline key; runtime configuration is separately gated',async()=>{
+  assert.equal(analyticsConfig.enabled,true);assert.equal(analyticsConfig.projectToken,'');assert.ok(analyticsConfig.configurationUrl.endsWith('/analytics-collect'));
  });
  await check('five UTM fields accept new experiment slugs without a campaign list',async()=>{
   assert.deepEqual(readUtm('?utm_source=New-Partner&utm_medium=social&utm_campaign=launch-2041-z&utm_content=creative_b&utm_term=multisport'),{
@@ -108,7 +114,7 @@ try {
  await check('payload is rebuilt; SDK/user/profile/URL/referrer/device identifiers are discarded',async()=>{
   const id=crypto.randomUUID();
   const payload=filterSdkEvent({event:'landing_page_viewed',uuid:crypto.randomUUID(),timestamp:new Date().toISOString(),$set:{email:'do-not-send@example.invalid'},properties:{page_id:'home_fr',language:'fr',platform:'ios',email:'do-not-send@example.invalid',$set:{private:'text'},$initial_current_url:'https://secret.invalid',$referrer:'https://secret.invalid',$current_url:'https://secret.invalid',$device_id:'private',distinct_id:'account-id',utm_source:'social',utm_content:'do-not-send@example.invalid'}},{allowed:true,id,environment:'test',projectToken:''});
-  assert.deepEqual(Object.keys(payload.properties).sort(),['distinct_id','$process_person_profile','$geoip_disable','$ip','environment','page_id','language','platform','utm_source'].sort());
+  assert.deepEqual(Object.keys(payload.properties).sort(),['surface','distinct_id','$process_person_profile','$geoip_disable','$ip','environment','page_id','language','platform','utm_source'].sort());
   assert.equal(payload.properties.distinct_id,id);assert.ok(!JSON.stringify(payload).includes('do-not-send'));
   assert.equal(filterSdkEvent({event:'$snapshot'}, {allowed:true,id}),null);
   assert.equal(filterSdkEvent(payload,{allowed:false,id}),null);
@@ -317,7 +323,7 @@ try {
    const p=payload.properties;
    assert.ok(p && p.token===realToken,'SDK transport must retain only the supplied public project token');
    assert.equal(p.$geoip_disable,true);assert.equal(p.$ip,null);assert.equal(p.$process_person_profile,false);
-   const keys=['distinct_id','$process_person_profile','$geoip_disable','$ip','environment','page_id','language','platform','token','utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
+   const keys=['surface','distinct_id','$process_person_profile','$geoip_disable','$ip','environment','page_id','language','platform','token','utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
    if(payload.event==='download_clicked')keys.push('download_platform','placement');
    assert.ok(Object.keys(p).every(key=>keys.includes(key)),'Unexpected implicit SDK property');
    assert.ok(Object.keys(payload).every(key=>['event','uuid','timestamp','properties'].includes(key)),'Unexpected implicit top-level SDK field');
@@ -333,6 +339,42 @@ try {
     assert.equal(requests.filter(r=>r.method==='POST').length,count);
    },'Expected locally intercepted SDK capture count');
   };
+  await check('unconfigured server fails closed after acceptance without SDK loading or counter writes',async()=>{
+   const {context,page,origin,posthogRequests,collectorRequests}=await setup({test:false,production:true,token:realToken,runtimeConfiguration:true,configurationEnabled:false});
+   await page.goto(origin+'/index.html');await accept(page);await page.waitForTimeout(250);
+   assert.equal(posthogRequests.length,0);assert.equal(collectorRequests.filter(r=>r.method==='POST').length,0);
+   await context.close();
+  });
+  await check('runtime configuration and Supabase counters start only after consent; no visit ID in aggregate request',async()=>{
+   const {context,page,origin,posthogRequests,collectorRequests}=await setup({test:false,production:true,token:realToken,runtimeConfiguration:true});
+   await page.goto(origin+'/index.html?utm_source=partner&utm_campaign=new-launch');
+   assert.equal(collectorRequests.length,0);assert.equal(posthogRequests.length,0);
+   await accept(page);await waitForCaptures(posthogRequests,1);
+   await page.waitForTimeout(200);
+   const writes=collectorRequests.filter(r=>r.method==='POST').map(r=>JSON.parse(r.body));
+   assert.equal(writes.length,1);assert.equal(writes[0].mode,'landing');assert.equal(writes[0].events[0].event,'landing_page_viewed');
+   assert.ok(!/distinct_id|session_id|email|\$device_id/.test(JSON.stringify(writes)));
+   assert.equal(writes[0].events[0].properties.utm_campaign,'new-launch');
+   await open(page);await refuse(page);const n=collectorRequests.length;
+   await page.evaluate(()=>window.dispatchEvent(new CustomEvent('rockso:early-access-confirmed')));await page.waitForTimeout(100);
+   assert.equal(collectorRequests.length,n);await context.close();
+  });
+  await check('independent minimal audience counts pages without a PostHog consent or visitor identifier',async()=>{
+   const {context,page,origin,posthogRequests,collectorRequests}=await setup({test:false,production:true,token:realToken,runtimeConfiguration:true,minimal:true});
+   await page.goto(origin+'/index.html?utm_source=partner&utm_campaign=anonymous-launch');await page.waitForTimeout(300);
+   await refuse(page);assert.equal(posthogRequests.length,0);
+   const writes=collectorRequests.filter(r=>r.method==='POST').map(r=>JSON.parse(r.body));assert.equal(writes.length,1);assert.equal(writes[0].mode,'audience');
+   assert.ok(!/distinct_id|session_id|user_id/.test(JSON.stringify(writes)));
+   assert.equal(await stored(page,'sessionStorage',SESSION_KEY),null);
+   const badge=page.locator('[data-analytics-download]').first();await badge.click();await page.waitForTimeout(100);
+   assert.equal(collectorRequests.filter(r=>r.method==='POST').length,1,'Hash download must not count');
+   await page.locator('a[href*="demo-login.html"]').first().click();await page.waitForTimeout(300);
+   const names=collectorRequests.filter(r=>r.method==='POST').map(r=>JSON.parse(r.body).events[0].event);
+   assert.ok(names.includes('landing_cta_clicked'));assert.ok(names.includes('early_access_page_viewed'));
+   assert.equal(collectorRequests.filter(r=>r.method==='POST').map(r=>JSON.parse(r.body)).find(b=>b.events[0].event==='early_access_page_viewed').events[0].properties.utm_campaign,'anonymous-launch');
+   assert.equal(posthogRequests.length,0);
+   await context.close();
+  });
   await check('real public key: refusal never initializes the SDK or sends a request',async()=>{
    const {context,page,origin,posthogRequests}=await setup({test:false,production:true,token:realToken});
    await page.goto(origin+'/');await refuse(page);await page.goto(origin+'/demo-login.html');
