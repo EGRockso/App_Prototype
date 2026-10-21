@@ -204,3 +204,14 @@ La clé publique est désormais fournie après consentement par le GET de `analy
 Les quatre événements restent inchangés et portent `surface=landing`. Une copie sans identifiant de visite alimente les compteurs agrégés Supabase après accord. Les inscriptions de référence viennent de `prospects`, pas de l'événement navigateur. Le module `minimal-audience.js` prépare une mesure de pages sans cookies ni identifiant ; `minimalEnabled=false` et le contrôle serveur indépendant empêchent toute collecte avant validation de ce nouveau périmètre. Aucun visiteur unique n'est déduit de ces compteurs.
 
 Préférences et politiques du site conservées ; avant activation, compléter uniquement la mention des copies statistiques dans Supabase (même consentement). La politique applicable aux nouveaux événements Mobile/Coach et à l'éventuel socle minimal doit être validée séparément. Aucun déploiement ni événement réel envoyé pendant cette préparation.
+
+
+## Production acceptance decision — 21 October 2026
+
+The owner explicitly authorized progressive production collection after the disabled common release. This supersedes the earlier isolated-project prerequisite above: no additional organization is created, and the isolated fixture script must not be used against production. Acceptance uses only the owner's real navigation after explicit consent, followed by actual profile-and-event erasure verification. Neither local interception nor an accepted deletion request proves hosted completion. Minimal collection stays disabled; there is no backfill.
+
+The existing server landing switch is checked without caching before every SDK capture, including on already-open pages. Failure or a disabled switch stops that document, aborts its transport and clears its visit ID; suppressed events are never replayed. Withdrawal is rechecked after the asynchronous switch check. A request already received by PostHog cannot be recalled: stop collection and withdraw locally before the erasure acceptance test. Reload after a remote stop to start a new visit.
+
+The 12-month target remains distinct from the Free query window and is not an automatic erasure guarantee. Production activation and real acceptance results are recorded separately from the historical disabled-release tests.
+
+Local activation verification: 31 browser checks passed on 21 October 2026 with the pinned SDK and externally supplied public key. All PostHog and Supabase browser requests were intercepted. Both a remote stop on an open page and withdrawal while the control request is pending prevent new captures and counter writes. Existing acceptance fixtures use the actual 180-day receipt format. This is not a claim of real production navigation or successful vendor erasure.

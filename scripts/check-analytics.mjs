@@ -46,11 +46,12 @@ async function setup({test=true,production=false,token='',runtimeConfiguration=f
   Object.defineProperty(Navigator.prototype,'webdriver',{get:()=>false});
   if(navigator.userAgentData)Object.defineProperty(navigator.userAgentData,'brands',{get:()=>[{brand:'Chromium',version},{brand:'Google Chrome',version}]});
  },browser.version().split('.')[0]);
- const posthogRequests=[];const collectorRequests=[];
+ const posthogRequests=[];const collectorRequests=[];let configurationGate=null;
  await context.route('**/*',async route=>{
   const url=new URL(route.request().url());
   if(url.hostname==='hegtnyarfeoyapobysee.supabase.co' && url.pathname==='/functions/v1/analytics-collect'){
    collectorRequests.push({method:route.request().method(),body:route.request().postData()});
+   if(route.request().method()==='GET' && configurationGate)await configurationGate();
    return route.fulfill({contentType:'application/json',body:route.request().method()==='GET'?JSON.stringify({landing_enabled:configurationEnabled,minimal_enabled:minimal,projectToken:configurationEnabled?token:'',api_host:'https://eu.i.posthog.com'}):'{"ok":true}',headers:{'access-control-allow-origin':'*','access-control-allow-methods':'GET, POST, OPTIONS','access-control-allow-headers':'*'}});
   }
   if (url.hostname.endsWith('posthog.com')) {
@@ -72,7 +73,7 @@ async function setup({test=true,production=false,token='',runtimeConfiguration=f
  });
  if(test)await context.addInitScript(({TEST_KEY})=>{if(location.hostname==='127.0.0.1')sessionStorage.setItem(TEST_KEY,'enabled');},{TEST_KEY});
  const page=await context.newPage();
- return {context,page,posthogRequests,collectorRequests,origin:production?'https://rockso.app':base};
+ return {context,page,posthogRequests,collectorRequests,setConfigurationEnabled:value=>{configurationEnabled=value;},setConfigurationGate:value=>{configurationGate=value;},origin:production?'https://rockso.app':base};
 }
 const events=async page=>{
  await page.waitForFunction(()=>!!window.RocksoAnalytics);
@@ -84,13 +85,13 @@ async function refuse(page,english=false){await page.getByRole('button',{name:en
 async function open(page){await page.locator('[data-analytics-preferences]').click();}
 try {
  await check('public configuration has no inline key; runtime configuration is separately gated',async()=>{
-  assert.equal(analyticsConfig.enabled,false);assert.equal(analyticsConfig.projectToken,'');assert.ok(analyticsConfig.configurationUrl.endsWith('/analytics-collect'));
+  assert.equal(typeof analyticsConfig.enabled,'boolean');assert.equal(analyticsConfig.projectToken,'');assert.ok(analyticsConfig.configurationUrl.endsWith('/analytics-collect'));
  });
- await check('shipped disabled configuration prevents every analytics request after acceptance',async()=>{
-  const s=await setup({test:false,production:true,token:realToken,shippedConfiguration:true});
-  await s.context.addInitScript(({key,version})=>{const now=Date.now();localStorage.setItem(key,JSON.stringify({version,accepted:true,createdAt:now,expiresAt:now+86400000}));},{key:CONSENT_KEY,version:CONSENT_VERSION});
-  await s.page.goto(s.origin+'/');await s.page.waitForTimeout(150);
-  assert.equal(s.posthogRequests.length,0);assert.equal(s.collectorRequests.length,0);await s.context.close();
+ await check('disabled server prevents SDK and writes with the shipped configuration and an existing acceptance',async()=>{
+  const s=await setup({test:false,production:true,token:realToken,shippedConfiguration:true,configurationEnabled:false});
+  await s.context.addInitScript(({key,version})=>{const now=Date.now();localStorage.setItem(key,JSON.stringify({version,accepted:true,createdAt:now,expiresAt:now+180*86400000}));},{key:CONSENT_KEY,version:CONSENT_VERSION});
+  await s.page.goto(s.origin+'/');await s.page.waitForTimeout(350);
+  assert.equal(s.posthogRequests.length,0);assert.equal(s.collectorRequests.filter(r=>r.method==='POST').length,0);assert.equal(s.collectorRequests.filter(r=>r.method==='GET').length,analyticsConfig.enabled?1:0);await s.context.close();
  });
  await check('five UTM fields accept new experiment slugs without a campaign list',async()=>{
   assert.deepEqual(readUtm('?utm_source=New-Partner&utm_medium=social&utm_campaign=launch-2041-z&utm_content=creative_b&utm_term=multisport'),{
@@ -365,6 +366,33 @@ try {
    await open(page);await refuse(page);const n=collectorRequests.length;
    await page.evaluate(()=>window.dispatchEvent(new CustomEvent('rockso:early-access-confirmed')));await page.waitForTimeout(100);
    assert.equal(collectorRequests.length,n);await context.close();
+  });
+  await check('server stop suppresses captures on an already-open consented page',async()=>{
+   const s=await setup({test:false,production:true,token:realToken,runtimeConfiguration:true});
+   await s.page.goto(s.origin+'/index.html');await accept(s.page);await waitForCaptures(s.posthogRequests,1);await s.page.waitForTimeout(150);
+   s.setConfigurationEnabled(false);
+   const badge=s.page.locator('[data-analytics-download]').first();
+   await badge.evaluate(link=>{link.href='https://apps.apple.com/app/testflight/id899247664';link.target='_blank';});
+   const popup=s.page.waitForEvent('popup');await badge.click();await (await popup).close();await s.page.waitForTimeout(200);
+   assert.equal(s.posthogRequests.filter(r=>r.method==='POST').length,1);
+   assert.equal(s.collectorRequests.filter(r=>r.method==='POST').length,1);
+   assert.equal(await stored(s.page,'sessionStorage',SESSION_KEY),null);
+   s.setConfigurationEnabled(true);
+   await s.page.evaluate(()=>window.dispatchEvent(new CustomEvent('rockso:early-access-confirmed')));await s.page.waitForTimeout(150);
+   assert.equal(s.posthogRequests.filter(r=>r.method==='POST').length,1,'Suppressed events must never replay');
+   await s.context.close();
+  });
+  await check('withdrawal during the server check prevents both SDK capture and aggregate write',async()=>{
+   const s=await setup({test:false,production:true,token:realToken,runtimeConfiguration:true});
+   await s.page.goto(s.origin+'/demo-login.html');await accept(s.page);await waitForCaptures(s.posthogRequests,1);await s.page.waitForTimeout(150);
+   let release,entered;const waiting=new Promise(resolve=>{entered=resolve;});
+   const gate=new Promise(resolve=>{release=resolve;});s.setConfigurationGate(async()=>{entered();await gate;});
+   await s.page.evaluate(()=>window.dispatchEvent(new CustomEvent('rockso:early-access-confirmed')));await waiting;
+   await open(s.page);await refuse(s.page);release();await s.page.waitForTimeout(250);
+   assert.equal(s.posthogRequests.filter(r=>r.method==='POST').length,1);
+   assert.equal(s.collectorRequests.filter(r=>r.method==='POST').length,1);
+   assert.equal(await stored(s.page,'sessionStorage',SESSION_KEY),null);
+   await s.context.close();
   });
   await check('independent minimal audience counts pages without a PostHog consent or visitor identifier',async()=>{
    const {context,page,origin,posthogRequests,collectorRequests}=await setup({test:false,production:true,token:realToken,runtimeConfiguration:true,minimal:true});

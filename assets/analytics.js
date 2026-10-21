@@ -167,6 +167,7 @@ function mountAnalytics() {
   const productionReady = production && analyticsConfig.enabled === true && (hasInlineToken || !!configurationUrl);
   const ready = test || productionReady;
   let projectToken = analyticsConfig.projectToken;
+  let remotelyStopped = false;
   let choice = null;
   let session = null;
   let sdk = null;
@@ -190,7 +191,7 @@ function mountAnalytics() {
 
   function allowed() {
     const current = readChoice();
-    return ready && !!page && choice?.accepted === true && current?.accepted === true;
+    return ready && !remotelyStopped && !!page && choice?.accepted === true && current?.accepted === true;
   }
 
   function clearSession() {
@@ -278,16 +279,36 @@ function mountAnalytics() {
         window.dispatchEvent(new CustomEvent("rockso:analytics-test-event", { detail: structuredClone(safe) }));
       }
     } else if (sdk && controller && !controller.signal.aborted) {
-      sdk.capture(event.event, event.properties, { send_instantly: true, transport: "fetch" });
-      // Aggregate reference counts only. No visit ID, email, URL or form value.
-      if (configurationUrl) {
-        const safe = filterSdkEvent(event, context());
-        if (safe) {
-          const properties = Object.fromEntries(Object.entries(safe.properties).filter(([key]) => ["page_id", "language", "download_platform", "placement", ...UTM_KEYS].includes(key)));
-          fetch(configurationUrl, { method: "POST", headers: { "content-type": "application/json" }, credentials: "omit", referrerPolicy: "no-referrer", signal: controller.signal,
-            body: JSON.stringify({mode:"landing",surface:"landing",consent:true,consent_version:CONSENT_VERSION,events:[{id:event.uuid,event:event.event,platform:safe.properties.platform,properties}]}) }).catch(() => {});
+      const activeController = controller;
+      const activeEpoch = epoch;
+      void (async () => {
+        try {
+          // Recheck the existing server switch before every transmission, including
+          // on already-open pages. Fail closed; never replay a suppressed event.
+          if (configurationUrl) {
+            const response = await fetch(configurationUrl, { cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer", signal: activeController.signal });
+            const config = response.ok ? await response.json() : null;
+            if (epoch !== activeEpoch || !allowed() || activeController.signal.aborted) return;
+            if (config?.landing_enabled !== true || config.projectToken !== projectToken || config.api_host !== "https://eu.i.posthog.com") {
+              remotelyStopped = true;
+              stop();
+              return;
+            }
+          }
+          if (epoch !== activeEpoch || !allowed() || activeController.signal.aborted) return;
+          const safe = filterSdkEvent(event, context());
+          if (!safe) return;
+          sdk.capture(event.event, event.properties, { send_instantly: true, transport: "fetch" });
+          // Aggregate reference counts only. No visit ID, email, URL or form value.
+          if (configurationUrl) {
+            const properties = Object.fromEntries(Object.entries(safe.properties).filter(([key]) => ["page_id", "language", "download_platform", "placement", ...UTM_KEYS].includes(key)));
+            await fetch(configurationUrl, { method: "POST", headers: { "content-type": "application/json" }, credentials: "omit", referrerPolicy: "no-referrer", signal: activeController.signal,
+              body: JSON.stringify({mode:"landing",surface:"landing",consent:true,consent_version:CONSENT_VERSION,events:[{id:event.uuid,event:event.event,platform:safe.properties.platform,properties}]}) });
+          }
+        } catch {
+          if (epoch === activeEpoch) { remotelyStopped = true; stop(); }
         }
-      }
+      })();
     } else if (pending.length < 20) pending.push(event);
   }
 
@@ -317,7 +338,7 @@ function mountAnalytics() {
       controller?.abort();
       controller = new AbortController();
       if (!projectToken && configurationUrl) {
-        const response = await fetch(configurationUrl, { credentials:"omit", referrerPolicy:"no-referrer", signal:controller.signal });
+        const response = await fetch(configurationUrl, { cache:"no-store", credentials:"omit", referrerPolicy:"no-referrer", signal:controller.signal });
         const config = response.ok ? await response.json() : null;
         if (epoch !== activeEpoch || !allowed()) return;
         if (!config?.landing_enabled || !/^phc_[a-z0-9_-]{12,196}$/i.test(config.projectToken) || config.api_host !== "https://eu.i.posthog.com") throw new Error("Analytics unavailable.");
