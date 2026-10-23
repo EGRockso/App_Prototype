@@ -1,5 +1,5 @@
-import { safeUtmValue, readUtm, classifySource, propagateUtm } from "./acquisition.js";
-import { analyticsConfig } from "./analytics-config.js";
+import { safeUtmValue, readUtm, classifySource, propagateUtm } from "./acquisition.js?v=20261023-preferences";
+import { analyticsConfig } from "./analytics-config.js?v=20261023-preferences";
 
 export const SDK_URL = "https://eu-assets.i.posthog.com/static/1.380.0/array.js";
 export const SDK_INTEGRITY = "sha384-OkAZ5oESfzEQoGLu0RgDrWPX37oaUYIxe0S5PLKr1SzTEaTH9G6lHvizeuw6EM/y";
@@ -28,7 +28,7 @@ const EVENTS = new Set([
 ]);
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
-export { safeUtmValue, readUtm } from "./acquisition.js";
+export { safeUtmValue, readUtm } from "./acquisition.js?v=20261023-preferences";
 export function isNewSignup(data, error) {
   return !error && data?.ok === true && data?.alreadyRegistered === false;
 }
