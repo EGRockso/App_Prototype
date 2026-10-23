@@ -1,3 +1,4 @@
+import { safeUtmValue, readUtm, classifySource, propagateUtm } from "./acquisition.js";
 import { analyticsConfig } from "./analytics-config.js";
 
 export const SDK_URL = "https://eu-assets.i.posthog.com/static/1.380.0/array.js";
@@ -27,33 +28,7 @@ const EVENTS = new Set([
 ]);
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
-// UTM values are campaign slugs, never arbitrary text. This rejects common PII
-// and token formats; it cannot decide whether an otherwise valid slug is a name.
-export function safeUtmValue(value) {
-  if (typeof value !== "string" || value.length > 64 || !/^[a-z][a-z0-9_-]*$/i.test(value)) return null;
-  const normalized = value.toLowerCase();
-  if (/\d{7}|[a-f0-9]{24}|[a-z0-9]{40}/i.test(normalized)) return null;
-  if ((normalized.match(/\d/g) || []).length > 10) return null;
-  if (normalized === "email") return normalized; // Standard marketing channel, not an address.
-  if (/(^|[-_])(email|mail|phone|tel|mobile|token|jwt|password|secret|auth|userid|user_id|patient|medical|health|diagnosis|injury|blessure|sante|hrv|rpe|gps)([-_]|$)/i.test(normalized)) return null;
-  if (/^[a-f0-9]{8}-[a-f0-9-]{27}$/i.test(normalized)) return null;
-  return normalized;
-}
-
-export function readUtm(search) {
-  const params = new URLSearchParams(search);
-  if ([...params.keys()].some(key => /^(email|e-mail|phone|token|token_hash|access_token|refresh_token|code|state|password|authorization)$/i.test(key))) return {};
-  const output = {};
-  for (const key of UTM_KEYS) {
-    const values = params.getAll(key);
-    if (!values.length) continue;
-    // Reject the whole incoming attribution on duplicates or suspicious values.
-    if (values.length !== 1 || !safeUtmValue(values[0])) return {};
-    output[key] = safeUtmValue(values[0]);
-  }
-  return output;
-}
-
+export { safeUtmValue, readUtm } from "./acquisition.js";
 export function isNewSignup(data, error) {
   return !error && data?.ok === true && data?.alreadyRegistered === false;
 }
@@ -93,6 +68,11 @@ export function filterSdkEvent(event, context) {
   for (const key of UTM_KEYS) {
     const value = safeUtmValue(p[key]);
     if (value) properties[key] = value;
+  }
+  if (["campaign", "organic_search", "social", "referral", "internal", "unknown"].includes(p.traffic_channel) &&
+      ["campaign", "google", "bing", "duckduckgo", "linkedin", "instagram", "facebook", "other_referrer", "internal", "unknown"].includes(p.traffic_source)) {
+    properties.traffic_channel = p.traffic_channel;
+    properties.traffic_source = p.traffic_source;
   }
   if (event.event === "download_clicked") {
     if (!["ios", "android"].includes(p.download_platform) || p.placement !== "footer") return null;
@@ -153,6 +133,7 @@ function mountAnalytics() {
   const page = PAGES[path];
   if (!page && !LEGAL_PAGES.has(path)) return;
   if (window.RocksoAnalytics) return;
+  propagateUtm(document, window.location);
   const english = document.documentElement.lang === "en";
   const local = LOCAL_HOSTS.has(window.location.hostname);
   const production = window.location.protocol === "https:" && ["rockso.app", "www.rockso.app"].includes(window.location.hostname);
@@ -170,6 +151,7 @@ function mountAnalytics() {
   let remotelyStopped = false;
   let choice = null;
   let session = null;
+  let source = null;
   let sdk = null;
   let sdkPromise = null;
   let controller = null;
@@ -196,6 +178,7 @@ function mountAnalytics() {
 
   function clearSession() {
     session = null;
+    source = null;
     storage.remove("sessionStorage", SESSION_KEY);
   }
 
@@ -212,6 +195,9 @@ function mountAnalytics() {
       }
     }
     if (!session || now - session.updatedAt >= SESSION_DURATION) session = { id: crypto.randomUUID(), updatedAt: now, utm: {} };
+    // Read the referrer only inside the consent gate and the separate rollout switch.
+    if (analyticsConfig.sourceClassificationEnabled === true && !source)
+      source = classifySource(window.location.search, document.referrer, window.location.origin);
     const incoming = readUtm(window.location.search);
     if (Object.keys(incoming).length) session.utm = incoming;
     session.updatedAt = now;
@@ -301,7 +287,7 @@ function mountAnalytics() {
           sdk.capture(event.event, event.properties, { send_instantly: true, transport: "fetch" });
           // Aggregate reference counts only. No visit ID, email, URL or form value.
           if (configurationUrl) {
-            const properties = Object.fromEntries(Object.entries(safe.properties).filter(([key]) => ["page_id", "language", "download_platform", "placement", ...UTM_KEYS].includes(key)));
+            const properties = Object.fromEntries(Object.entries(safe.properties).filter(([key]) => ["page_id", "language", "download_platform", "placement", "traffic_channel", "traffic_source", ...UTM_KEYS].includes(key)));
             await fetch(configurationUrl, { method: "POST", headers: { "content-type": "application/json" }, credentials: "omit", referrerPolicy: "no-referrer", signal: activeController.signal,
               body: JSON.stringify({mode:"landing",surface:"landing",consent:true,consent_version:CONSENT_VERSION,events:[{id:event.uuid,event:event.event,platform:safe.properties.platform,properties}]}) });
           }
@@ -316,7 +302,7 @@ function mountAnalytics() {
     const data = sessionData();
     if (!data) return;
     send({ uuid: crypto.randomUUID(), event: name, timestamp: new Date().toISOString(), properties: {
-      page_id: page[0], language: page[1], platform: platform(), ...data.utm, ...extra,
+      page_id: page[0], language: page[1], platform: platform(), ...data.utm, ...(source || {}), ...extra,
     } });
   }
 
@@ -363,11 +349,29 @@ function mountAnalytics() {
   dialog.setAttribute("aria-labelledby", "analytics-consent-title");
   const heading = document.createElement("h2");
   heading.id = "analytics-consent-title";
-  heading.textContent = english ? "Audience measurement" : "Mesure d’audience";
+  heading.textContent = english ? "Privacy preferences" : "Préférences de confidentialité";
   const description = document.createElement("p");
   description.textContent = english
-    ? "With your permission, AIMS Corp. uses PostHog EU to measure visits to the home and waitlist pages, acquisition sources, confirmed new waitlist signups and genuine download clicks, without advertising profiling. No form content, email, sports or health data is sent to PostHog. A technical profile uses only the random visit identifier so its events can be erased. Your choice does not affect access to the site or waitlist. You can withdraw consent at any time through Audience preferences in the footer."
-    : "Avec votre accord, AIMS Corp. utilise PostHog EU pour mesurer les visites de l’accueil et du formulaire, les sources d’acquisition, les nouvelles inscriptions confirmées à la liste d’attente et les clics sur de vrais téléchargements, sans profilage publicitaire. Aucun contenu de formulaire, e-mail, donnée sportive ou de santé n’est envoyé à PostHog. Un profil technique utilise uniquement l’identifiant aléatoire de visite pour permettre l’effacement de ses événements. Votre choix ne conditionne pas l’accès au site ou à la liste d’attente. Vous pouvez retirer votre accord à tout moment dans les préférences de mesure d’audience en pied de page.";
+    ? "Optional measurement with PostHog EU: pages, acquisition sources, confirmed waitlist signups and genuine download clicks. Refusing does not affect access."
+    : "Mesure facultative avec PostHog EU : pages, sources d’acquisition, inscriptions confirmées à la liste d’attente et clics sur de vrais téléchargements. Refuser ne change pas l’accès.";
+  const essential = document.createElement("p");
+  essential.textContent = english ? "Essential — Always on: site delivery, requested waitlist registration and security." : "Essentiel — Toujours actif : affichage du site, inscription demandée à la liste d’attente et sécurité.";
+  const label = document.createElement("label");
+  label.className = "analytics-preference-toggle";
+  const toggle = document.createElement("input");
+  toggle.type = "checkbox";
+  toggle.setAttribute("role", "switch");
+  const toggleText = document.createElement("span");
+  toggleText.textContent = english ? "Performance & product improvement (optional)" : "Performance et amélioration du produit (facultatif)";
+  label.append(toggle, toggleText);
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = english ? "Data, purposes and your rights" : "Données, finalités et droits";
+  const detailText = document.createElement("p");
+  detailText.textContent = english
+    ? "AIMS Corp. uses Supabase aggregate counters and PostHog EU with a random visit identifier. No form contents, email, sports or health data. Choice: 180 days; visit identifier: 30 minutes idle in this tab; counters: 12 months; PostHog retention target: 12 months without automatic deletion guaranteed. You can withdraw consent at any time here or in the footer. Access/erasure: support@rockso.app. No advertising tool is active."
+    : "AIMS Corp. utilise des compteurs agrégés Supabase et PostHog EU avec un identifiant aléatoire de visite. Aucun contenu de formulaire, e-mail, donnée sportive ou de santé. Choix : 180 jours ; identifiant de visite : 30 minutes d’inactivité dans cet onglet ; compteurs : 12 mois ; cible PostHog : 12 mois sans garantie de suppression automatique. Vous pouvez retirer votre accord à tout moment ici ou en pied de page. Accès/effacement : support@rockso.app. Aucun outil publicitaire actif.";
+  details.append(summary, detailText);
   const status = document.createElement("p");
   status.setAttribute("role", "status");
   const information = document.createElement("a");
@@ -377,16 +381,17 @@ function mountAnalytics() {
   actions.className = "analytics-consent-actions";
   const accept = document.createElement("button");
   accept.type = "button";
-  accept.textContent = english ? "Accept" : "Accepter";
+  accept.textContent = english ? "Accept all" : "Tout accepter";
   const refuse = document.createElement("button");
   refuse.type = "button";
-  refuse.textContent = english ? "Refuse" : "Refuser";
+  refuse.textContent = english ? "Reject all optional" : "Tout refuser les options";
   const close = document.createElement("button");
   close.type = "button";
   close.className = "analytics-consent-close";
   close.textContent = english ? "Close" : "Fermer";
   actions.append(accept, refuse);
-  dialog.append(heading, description, status, information, actions, close);
+  details.append(information);
+  dialog.append(heading, essential, label, description, status, actions, details, close);
   document.body.append(dialog);
   let previousFocus;
   const policySection = document.getElementById(english ? "website-analytics" : "site-analytics");
@@ -398,7 +403,7 @@ function mountAnalytics() {
     policyPanel.tabIndex = -1;
     policyPanel.setAttribute("aria-labelledby", heading.id);
     // Deliberate, inline privacy settings, not another automatic popup.
-    policyPanel.append(heading, description, status, actions);
+    policyPanel.append(heading, essential, label, description, status, actions, details);
     const back = document.createElement("a");
     const target = new URL(english ? "index-en.html" : "index.html", window.location.href);
     for (const [key, value] of Object.entries(readUtm(window.location.search))) target.searchParams.set(key, value);
@@ -412,6 +417,8 @@ function mountAnalytics() {
   function updatePreferenceStatus() {
     accept.disabled = !ready;
     const current = readChoice();
+    toggle.checked = current?.accepted === true;
+    toggle.disabled = !ready;
     status.textContent = !ready
       ? (english ? "Audience measurement is currently disabled." : "La mesure d’audience est actuellement désactivée.")
       : test
@@ -452,6 +459,7 @@ function mountAnalytics() {
   }
   accept.addEventListener("click", () => decide(true));
   refuse.addEventListener("click", () => decide(false));
+  toggle.addEventListener("change", () => decide(toggle.checked));
   close.addEventListener("click", () => dialog.close());
   dialog.addEventListener("close", () => previousFocus?.focus());
   document.addEventListener("keydown", event => {

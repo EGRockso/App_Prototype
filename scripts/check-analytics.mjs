@@ -38,13 +38,13 @@ if (sdkPath) {
 }
 const browser=await chromium.launch({headless:true,...(process.env.ROCKSO_BROWSER_PATH?{executablePath:process.env.ROCKSO_BROWSER_PATH}:{})});
 const stub=`window.__signupCalls=[]; window.__signupReply={data:{ok:true,alreadyRegistered:false},error:null}; window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'local-demo-fixture'}},error:null})},functions:{invoke:async(name,options)=>{window.__signupCalls.push({name,body:options.body}); if(window.__signupDelay)return await new Promise(resolve=>window.__signupResolve=resolve);return window.__signupReply;}}})};`;
-async function setup({test=true,production=false,token='',runtimeConfiguration=false,minimal=false,configurationEnabled=true,shippedConfiguration=false}={}) {
+async function setup({test=true,production=false,token='',runtimeConfiguration=false,minimal=false,configurationEnabled=true,shippedConfiguration=false,sourceClassification=false}={}) {
  // PostHog excludes HeadlessChrome/automation as bots. Exercise the normal
  // visitor pipeline without weakening the SDK's production bot filter.
  const context=await browser.newContext({serviceWorkers:'block',userAgent:`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${browser.version()} Safari/537.36`});
  await context.addInitScript(version=>{
   Object.defineProperty(Navigator.prototype,'webdriver',{get:()=>false});
-  if(navigator.userAgentData)Object.defineProperty(navigator.userAgentData,'brands',{get:()=>[{brand:'Chromium',version},{brand:'Google Chrome',version}]});
+  if(navigator.userAgentData)Object.defineProperty(Object.getPrototypeOf(navigator.userAgentData),'brands',{get:()=>[{brand:'Chromium',version},{brand:'Google Chrome',version}]});
  },browser.version().split('.')[0]);
  const posthogRequests=[];const collectorRequests=[];let configurationGate=null;
  await context.route('**/*',async route=>{
@@ -68,6 +68,7 @@ async function setup({test=true,production=false,token='',runtimeConfiguration=f
    const response=await context.request.get(base+url.pathname);
    return route.fulfill({status:response.status(),headers:response.headers(),body:await response.body()});
   }
+  if(url.origin===base && url.pathname==='/assets/analytics-config.js' && sourceClassification)return route.fulfill({contentType:'application/javascript',body:'export const analyticsConfig=Object.freeze({enabled:false,projectToken:"",minimalEnabled:false,sourceClassificationEnabled:true});'});
   if(url.origin===base)return route.continue();
   return route.abort();
  });
@@ -80,8 +81,8 @@ const events=async page=>{
  return page.evaluate(()=>window.RocksoAnalytics.getTestEvents());
 };
 const stored=(page,type,key)=>page.evaluate(({type,key})=>window[type].getItem(key),{type,key});
-async function accept(page,english=false){await page.getByRole('button',{name:english?'Accept':'Accepter',exact:true}).click();}
-async function refuse(page,english=false){await page.getByRole('button',{name:english?'Refuse':'Refuser',exact:true}).click();}
+async function accept(page,english=false){await page.getByRole('button',{name:english?'Accept all':'Tout accepter',exact:true}).click();}
+async function refuse(page,english=false){await page.getByRole('button',{name:english?'Reject all optional':'Tout refuser les options',exact:true}).click();}
 async function open(page){await page.evaluate(()=>window.RocksoAnalytics.openPreferences());}
 try {
  await check('public configuration has no inline key; runtime configuration is separately gated',async()=>{
@@ -98,7 +99,7 @@ try {
   await s.page.addInitScript(()=>{document.addEventListener('DOMContentLoaded',()=>{const style=document.createElement('style');style.textContent='.analytics-consent { display:none!important; }';document.head.append(style);});});
   await s.page.goto(s.origin+'/');await s.page.waitForTimeout(100);
   assert.equal(await s.page.locator('dialog').evaluate(e=>e.matches(':modal')),false);
-  await s.page.locator('a[href="demo-login.html"]').first().click();await s.page.waitForURL('**/demo-login.html');
+  await s.page.locator('a[href*="demo-login.html"]').first().click();await s.page.waitForURL('**/demo-login.html');
   assert.deepEqual(await events(s.page),[]);assert.equal(s.posthogRequests.length,0);
   assert.equal(await stored(s.page,'localStorage',CONSENT_KEY),null);
   await s.context.close();
@@ -191,11 +192,34 @@ try {
   assert.deepEqual(await events(page),[]);await open(page);await accept(page);
   assert.deepEqual((await events(page)).map(e=>e.event),['early_access_page_viewed']);await context.close();
  });
+ await check('referrer classification reads only after consent, behind its rollout gate, and retains no raw referrer',async()=>{
+  for(const enabled of [false,true]) {
+   const s=await setup({sourceClassification:enabled});
+   await s.context.addInitScript(()=>{window.__referrerReads=0;Object.defineProperty(Document.prototype,'referrer',{get(){window.__referrerReads++;return 'https://www.google.fr/search?q=private-health-marker#secret';}});});
+   await s.page.goto(base+'/index.html');assert.equal(await s.page.evaluate(()=>window.__referrerReads),0);await accept(s.page);
+   const e=(await events(s.page))[0];assert.equal(await s.page.evaluate(()=>window.__referrerReads),enabled?1:0);
+   assert.equal(e.properties.traffic_source,enabled?'google':undefined);assert.equal(e.properties.traffic_channel,enabled?'organic_search':undefined);
+   assert.ok(!/private-health|secret|search\?/.test(JSON.stringify(e)));assert.equal(s.posthogRequests.length,0);await s.context.close();
+  }
+ });
+ await check('late consent preserves valid UTMs FR/EN without pre-consent analytics or storage',async()=>{
+  for(const [home,form,en] of [['index.html','demo-login.html',false],['index-en.html','demo-login-en.html',true]]) {
+   const s=await setup();await s.page.goto(base+'/'+home+'?utm_source=email&utm_campaign=tester-launch');
+   assert.deepEqual(await events(s.page),[]);assert.equal(s.posthogRequests.length,0);assert.equal(s.collectorRequests.length,0);
+   assert.equal(await stored(s.page,'sessionStorage',SESSION_KEY),null);assert.equal(await stored(s.page,'localStorage',CONSENT_KEY),null);
+   const link=s.page.locator('main a[href*="'+form+'"]').first();assert.match(await link.getAttribute('href'),/utm_campaign=tester-launch/);
+   await s.page.evaluate(()=>document.querySelector('dialog').close());await link.click();
+   assert.deepEqual(await events(s.page),[]);assert.equal(await stored(s.page,'sessionStorage',SESSION_KEY),null);
+   for(const width of [320,390,1280]) {await s.page.setViewportSize({width,height:900});assert.equal(await s.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
+    if(process.env.ROCKSO_ANALYTICS_SCREENSHOTS)await s.page.screenshot({path:path.join(process.env.ROCKSO_ANALYTICS_SCREENSHOTS,'preferences-'+(en?'en':'fr')+'-'+width+'.png'),fullPage:true});}
+   await accept(s.page,en);const first=(await events(s.page))[0];assert.equal(first.event,'early_access_page_viewed');assert.equal(first.properties.utm_source,'email');assert.equal(first.properties.utm_campaign,'tester-launch');await s.context.close();
+  }
+ });
  await check('home-to-form attribution transfers all five UTMs and the random visit ID after consent',async()=>{
   const {context,page,posthogRequests}=await setup();
   await page.goto(base+'/?utm_source=partner&utm_medium=social&utm_campaign=launch-next&utm_content=variant-b&utm_term=multisport');await accept(page);
   const home=(await events(page))[0];assert.equal(home.event,'landing_page_viewed');
-  await page.locator('main a[href="demo-login.html"]').first().click();
+  await page.locator('main a[href*="demo-login.html"]').first().click();
   const form=(await events(page))[0];assert.equal(form.event,'early_access_page_viewed');
   assert.equal(home.properties.distinct_id,form.properties.distinct_id);
   for(const key of ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'])assert.equal(form.properties[key],home.properties[key]);
@@ -273,8 +297,8 @@ try {
    for(const width of [320,390,1280]){
     await page.setViewportSize({width,height:800});
     assert.equal(await page.locator('.analytics-consent').evaluate(el=>el.scrollWidth<=el.clientWidth+1),true);
-    await page.getByRole('button',{name:english?'Refuse':'Refuser',exact:true}).scrollIntoViewIfNeeded();
-    assert.equal(await page.getByRole('button',{name:english?'Refuse':'Refuser',exact:true}).isVisible(),true);
+    await page.getByRole('button',{name:english?'Reject all optional':'Tout refuser les options',exact:true}).scrollIntoViewIfNeeded();
+    assert.equal(await page.getByRole('button',{name:english?'Reject all optional':'Tout refuser les options',exact:true}).isVisible(),true);
    }
    if(process.env.ROCKSO_ANALYTICS_SCREENSHOT_DIR){
     await page.setViewportSize({width:390,height:844});
@@ -382,7 +406,11 @@ try {
    const {context,page,origin,posthogRequests,collectorRequests}=await setup({test:false,production:true,token:realToken,runtimeConfiguration:true});
    await page.goto(origin+'/index.html?utm_source=partner&utm_campaign=new-launch');
    assert.equal(collectorRequests.length,0);assert.equal(posthogRequests.length,0);
-   await accept(page);await waitForCaptures(posthogRequests,1);
+   await accept(page);
+   try {await waitForCaptures(posthogRequests,1);}catch(error){
+    console.log('Sanitized local SDK status',await page.evaluate(()=>({sdk:!!window.posthog,loaded:window.posthog?.__loaded,session:!!sessionStorage.getItem('rockso_audience_session_v1'),accepted:JSON.parse(localStorage.getItem('rockso_audience_consent_v1')||'null')?.accepted,script:!!document.querySelector('script[integrity]'),optedOut:window.posthog?.has_opted_out_capturing?.(),filterPass:!!window.posthog?.config.before_send?.({event:'landing_page_viewed',uuid:crypto.randomUUID(),timestamp:new Date().toISOString(),properties:{page_id:'home_fr',language:'fr',platform:'desktop'}}),ua:navigator.userAgent,bot:window.posthog?.config.opt_out_useragent_filter,captureDisabled:window.posthog?.config.disable_capture,tokenConfigured:!!window.posthog?.config.token,isBot:window.posthog?._is_bot?.(),webdriver:navigator.webdriver,brands:navigator.userAgentData?.brands,aborted:window.posthog?.config.fetch_options?.signal?.aborted,calcFilterPass:!!window.posthog?.config.before_send?.({event:'landing_page_viewed',uuid:crypto.randomUUID(),properties:window.posthog.calculateEventProperties('landing_page_viewed',{page_id:'home_fr',language:'fr',platform:'desktop'})})})));
+    console.log('Local request paths only',posthogRequests.map(r=>({method:r.method,path:new URL(r.url).pathname})),collectorRequests.map(r=>({method:r.method})));throw error;
+   }
    await page.waitForTimeout(200);
    const writes=collectorRequests.filter(r=>r.method==='POST').map(r=>JSON.parse(r.body));
    assert.equal(writes.length,1);assert.equal(writes[0].mode,'landing');assert.equal(writes[0].events[0].event,'landing_page_viewed');
