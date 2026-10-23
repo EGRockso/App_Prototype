@@ -1,6 +1,6 @@
 # Acquisition et préférences Rockso — 23 octobre 2026
 
-Préparé et testé localement, non publié à ce stade. La publication applicative attend la confirmation ciblée demandée après refus du contrôle automatique. Aucune migration ni nouvelle collecte activée.
+Publication applicative autorisée explicitement puis réalisée le 23 octobre 2026 via GitHub Pages (dernier correctif applicatif d3e6c7a). Aucune migration ni nouvelle collecte activée. Le module minimal et la classification des référents restent désactivés.
 
 - assets/acquisition.js centralise les cinq UTM et leur validation ; la version Edge correspondante est contrôlée par tests de parité et une migration SQL préparée séparément. Les noms de campagnes restent libres sous forme de slugs sans données personnelles. email est un canal admissible, pas une adresse.
 - Les liens internes des deux accueils et deux formulaires propagent les UTM valides, sans identifiant, stockage Analytics, requête ou événement avant accord. Les paramètres déjà présents sur la destination sont conservés ; OAuth, pages légales et liens externes exclus. L'accord tardif ne rejoue pas les pages déjà consultées.
@@ -14,3 +14,7 @@ Vérifications : 36 contrôles navigateur, dont vraie clé publique et SDK épin
 Dépendances avant activation des sources : migrations Analytics préparées dans Rockso_Mobile_Prototype, puis publication du collecteur correspondant. Déployer les seules préférences/propagation avec sourceClassificationEnabled false n'active pas cette collecte. Aucun build Mobile ni release store n'est modifié ici.
 
 Sources : [CNIL — outil d'auto-évaluation](https://www.cnil.fr/sites/default/files/2025-07/outil_d_auto-evaluation_mesure_d_audience.pdf), [Supabase — logs](https://supabase.com/docs/guides/functions/logging).
+
+Recette hébergée : quatre scénarios des préférences manuelles FR/EN desktop/mobile, acceptation, refus et retrait réussis ; absence de requête avant accord, tous les transports PostHog/compteurs interceptés. Le navigateur de recette masque la bannière et retire les UTM de son adresse ; le site reste utilisable et les réglages en page de confidentialité restent accessibles. Pas de validation d’attribution hébergée prétendue lorsque les paramètres sont retirés ; les 36 scénarios locaux de SDK/propagation passent. Les imports versionnés de la page et du module minimal dormant pointent vers le même module Analytics pour éviter qu’une ancienne copie en cache initialise les préférences en premier. Aucun changement de flag.
+
+Autres publications du lot : Coach 0.2.4, journal IA LLM118 et accusés de réception collecteur3, sans nouveau champ collecté. Limite préexistante relevée sur Coach Mon compte : l’état du panneau dépend d’une admission Coach non chargée sur cette route ; parcours intégré non déclaré validé. Aucun contrôle d’accès modifié pour le contourner. Aucun build Mobile ni publication de sa release publique.
