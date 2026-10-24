@@ -1,5 +1,5 @@
-import { safeUtmValue, readUtm, classifySource, propagateUtm } from "./acquisition.js?v=20261023-preferences";
-import { analyticsConfig } from "./analytics-config.js?v=20261023-preferences";
+import { safeUtmValue, readUtm, classifySource, propagateUtm } from "./acquisition.js?v=20261024-privacy";
+import { analyticsConfig } from "./analytics-config.js?v=20261024-privacy";
 
 export const SDK_URL = "https://eu-assets.i.posthog.com/static/1.380.0/array.js";
 export const SDK_INTEGRITY = "sha384-OkAZ5oESfzEQoGLu0RgDrWPX37oaUYIxe0S5PLKr1SzTEaTH9G6lHvizeuw6EM/y";
@@ -28,7 +28,7 @@ const EVENTS = new Set([
 ]);
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
-export { safeUtmValue, readUtm } from "./acquisition.js?v=20261023-preferences";
+export { safeUtmValue, readUtm } from "./acquisition.js?v=20261024-privacy";
 export function isNewSignup(data, error) {
   return !error && data?.ok === true && data?.alreadyRegistered === false;
 }
@@ -352,26 +352,65 @@ function mountAnalytics() {
   heading.textContent = english ? "Privacy preferences" : "Préférences de confidentialité";
   const description = document.createElement("p");
   description.textContent = english
-    ? "Optional measurement with PostHog EU: pages, acquisition sources, confirmed waitlist signups and genuine download clicks. Refusing does not affect access."
-    : "Mesure facultative avec PostHog EU : pages, sources d’acquisition, inscriptions confirmées à la liste d’attente et clics sur de vrais téléchargements. Refuser ne change pas l’accès.";
-  const essential = document.createElement("p");
-  essential.textContent = english ? "Essential — Always on: site delivery, requested waitlist registration and security." : "Essentiel — Toujours actif : affichage du site, inscription demandée à la liste d’attente et sécurité.";
-  const label = document.createElement("label");
-  label.className = "analytics-preference-toggle";
-  const toggle = document.createElement("input");
-  toggle.type = "checkbox";
-  toggle.setAttribute("role", "switch");
-  const toggleText = document.createElement("span");
-  toggleText.textContent = english ? "Performance & product improvement (optional)" : "Performance et amélioration du produit (facultatif)";
-  label.append(toggle, toggleText);
-  const details = document.createElement("details");
-  const summary = document.createElement("summary");
-  summary.textContent = english ? "Data, purposes and your rights" : "Données, finalités et droits";
-  const detailText = document.createElement("p");
-  detailText.textContent = english
-    ? "AIMS Corp. uses Supabase aggregate counters and PostHog EU with a random visit identifier. No form contents, email, sports or health data. Choice: 180 days; visit identifier: 30 minutes idle in this tab; counters: 12 months; PostHog retention target: 12 months without automatic deletion guaranteed. You can withdraw consent at any time here or in the footer. Access/erasure: support@rockso.app. No advertising tool is active."
-    : "AIMS Corp. utilise des compteurs agrégés Supabase et PostHog EU avec un identifiant aléatoire de visite. Aucun contenu de formulaire, e-mail, donnée sportive ou de santé. Choix : 180 jours ; identifiant de visite : 30 minutes d’inactivité dans cet onglet ; compteurs : 12 mois ; cible PostHog : 12 mois sans garantie de suppression automatique. Vous pouvez retirer votre accord à tout moment ici ou en pied de page. Accès/effacement : support@rockso.app. Aucun outil publicitaire actif.";
-  details.append(summary, detailText);
+    ? "Optional Analytics with PostHog EU: pages and acquisition sources. Refusing does not affect access."
+    : "Analyse facultative avec PostHog EU : pages et sources d’acquisition. Refuser ne change pas l’accès.";
+  const text = (fr, en) => english ? en : fr;
+  function category(title, brief, values, fixed = false) {
+    const row = document.createElement("section");
+    row.className = "privacy-category";
+    row.setAttribute("aria-label", title);
+    const line = document.createElement("div");
+    line.className = "privacy-category-line";
+    const content = document.createElement("div");
+    const name = document.createElement("h3"); name.textContent = title;
+    const note = document.createElement("p"); note.textContent = brief;
+    content.append(name, note); line.append(content);
+    const control = document.createElement("span");
+    control.className = "privacy-category-control";
+    let input = null;
+    if (fixed) control.textContent = text("Toujours actif", "Always on");
+    else {
+      input = document.createElement("input"); input.type = "checkbox";
+      input.className = "privacy-category-switch"; input.setAttribute("role", "switch"); input.setAttribute("aria-label", title);
+      control.append(input);
+    }
+    line.append(control);
+    const details = document.createElement("details"), summary = document.createElement("summary");
+    summary.textContent = text("En savoir plus", "Learn more") + " — " + title;
+    const list = document.createElement("dl");
+    const names = [text("Finalités", "Purposes"),text("Données", "Data"),text("Destinataires", "Recipients"),text("Conservation", "Retention"),text("En cas de refus", "If declined")];
+    values.forEach((value,index)=>{ const group=document.createElement("div"),dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=names[index];dd.textContent=value;group.append(dt,dd);list.append(group); });
+    details.append(summary,list); row.append(line,details);
+    return {row,input,control};
+  }
+  const essential = category(text("Nécessaire", "Necessary"), text("Affichage du site, demandes d’inscription et sécurité.", "Site delivery, requested signups and security."), [
+    text("Fournir le site et traiter les demandes que vous envoyez. Réutiliser les faits métier déjà enregistrés pour les comptages internes existants.", "Deliver the site and process requests you submit. Reuse existing business facts for existing internal counts."),
+    text("Choix de confidentialité, données de la demande envoyée et journaux indispensables. Aucun parcours facultatif ni mesure d’audience non qualifiée n’est ajouté à cette catégorie.", "Privacy choices, submitted request data and indispensable logs. No optional journeys or unqualified audience measurement are added to this category."),
+    text("AIMS Corp., hébergement et Supabase ; prestataires de notification pour les demandes, selon la politique.", "AIMS Corp., hosting and Supabase; notification providers for requests as described in the policy."),
+    text("Durées propres à chaque traitement dans la politique. Votre choix de mesure est conservé 180 jours dans ce navigateur.", "Processing-specific periods in the policy. Your measurement choice is kept for 180 days in this browser."),
+    text("Toujours actif. Refuser les options n’empêche pas d’utiliser le site ou d’envoyer une demande, et ne supprime pas les demandes déjà reçues.", "Always on. Rejecting optional choices does not prevent site use or submitting a request, and does not delete requests already received.")
+  ], true).row;
+  const analysis = category(text("Analyse", "Analytics"), text("Comprendre les pages consultées et l’acquisition, après votre accord.", "Understand viewed pages and acquisition after your permission."), [
+    text("Mesurer pages, sources d’acquisition UTM, confirmations d’inscription et clics sur de vrais téléchargements, sans publicité ni profilage publicitaire.", "Measure pages, UTM acquisition sources, signup confirmations and genuine download clicks, without advertising or advertising profiling."),
+    text("Quatre événements explicites, plateforme et identifiant aléatoire de visite. Aucun e-mail, contenu de formulaire, donnée sportive ou de santé, ni URL complète.", "Four explicit events, platform and random visit identifier. No email, form contents, sports or health data, or full URLs."),
+    text("AIMS Corp., Supabase et PostHog Inc. (projet EU), selon les garanties de transfert décrites dans la politique.", "AIMS Corp., Supabase and PostHog Inc. (EU project), with transfer safeguards described in the policy."),
+    text("Choix : 180 jours ; identifiant : 30 minutes d’inactivité dans cet onglet ; compteurs Supabase : 12 mois ; cible PostHog : 12 mois, sans garantie de purge automatique.", "Choice: 180 days; identifier: 30 minutes idle in this tab; Supabase counters: 12 months; PostHog target: 12 months, without automatic deletion guaranteed."),
+    text("Aucun SDK ni événement PostHog, aucun compteur facultatif avant accord. Le retrait arrête les futurs envois ; l’effacement des données déjà reçues se demande séparément.", "No PostHog SDK or events, and no optional counters before permission. Withdrawal stops future sends; erasure of already received data is requested separately.")
+  ]);
+  const label = analysis.row, toggle = analysis.input;
+  const perf = category(text("Performance", "Performance"), text("Aucune mesure active — option indisponible pour le moment.", "No measurement active — option currently unavailable."), [
+    text("Mesures techniques complémentaires distinctes des parcours, si elles sont proposées plus tard.", "Additional technical measurements separate from journeys, if offered later."),
+    text("Aucune donnée collectée dans cette catégorie.", "No data collected in this category."),
+    text("Aucun destinataire pour cette catégorie inactive.", "No recipient for this inactive category."),
+    text("Aucune donnée à conserver. Une future activation exigera une information et un choix propres.", "No data to retain. Future activation will require its own information and choice."),
+    text("Aucun effet sur Analyse ou sur l’accès au site.", "No effect on Analytics or website access.")
+  ]);
+  perf.input.disabled = true;
+  const unavailable = document.createElement("small"); unavailable.textContent = text("Aucune mesure active", "No measurement active"); perf.control.append(unavailable);
+  const performance = perf.row;
+  const details = document.createElement("p");
+  details.className = "privacy-category-help";
+  details.textContent = text("Ces boutons concernent uniquement les options de mesure disponibles, jamais l’IA externe. Vous pouvez retirer votre accord à tout moment dans ces préférences. Après un refus, les opérations demandées et leurs journaux nécessaires restent actifs. Accès et effacement : support@rockso.app. ", "These buttons affect available measurement options only, never external AI. You can withdraw consent at any time in these preferences. After refusal, requested operations and their necessary logs remain active. Access and erasure: support@rockso.app. ");
   const status = document.createElement("p");
   status.setAttribute("role", "status");
   const information = document.createElement("a");
@@ -384,14 +423,14 @@ function mountAnalytics() {
   accept.textContent = english ? "Accept all" : "Tout accepter";
   const refuse = document.createElement("button");
   refuse.type = "button";
-  refuse.textContent = english ? "Reject all optional" : "Tout refuser les options";
+  refuse.textContent = english ? "Reject all" : "Tout refuser";
   const close = document.createElement("button");
   close.type = "button";
   close.className = "analytics-consent-close";
   close.textContent = english ? "Close" : "Fermer";
   actions.append(accept, refuse);
   details.append(information);
-  dialog.append(heading, essential, label, description, status, actions, details, close);
+  dialog.append(heading, description, essential, label, performance, status, actions, details, close);
   document.body.append(dialog);
   let previousFocus;
   const policySection = document.getElementById(english ? "website-analytics" : "site-analytics");
@@ -403,7 +442,7 @@ function mountAnalytics() {
     policyPanel.tabIndex = -1;
     policyPanel.setAttribute("aria-labelledby", heading.id);
     // Deliberate, inline privacy settings, not another automatic popup.
-    policyPanel.append(heading, essential, label, description, status, actions, details);
+    policyPanel.append(heading, description, essential, label, performance, status, actions, details);
     const back = document.createElement("a");
     const target = new URL(english ? "index-en.html" : "index.html", window.location.href);
     for (const [key, value] of Object.entries(readUtm(window.location.search))) target.searchParams.set(key, value);

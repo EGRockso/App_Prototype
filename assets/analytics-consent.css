@@ -74,3 +74,28 @@
 .analytics-preference-toggle { display:flex; gap:12px; align-items:center; margin:16px 0; font-weight:600; cursor:pointer; }
 .analytics-preference-toggle input { width:24px; height:24px; flex-shrink:0; }
 .analytics-consent summary, .audience-settings summary { cursor:pointer; padding:12px 0; text-decoration:underline; }
+.privacy-category { border-top:1px solid #ded5c9; padding:14px 0; }
+.privacy-category-line { display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.privacy-category-line > div { flex:1; }
+.privacy-category h3 { margin:0; font-size:17px; }
+.privacy-category-line p { margin:4px 0; font-size:14px; color:#526359; }
+.privacy-category-control { display:flex; flex-direction:column; align-items:flex-end; gap:4px; min-width:92px; max-width:112px; font-size:12px; text-align:right; }
+.privacy-category input.privacy-category-switch { appearance:none; -webkit-appearance:none; position:relative; width:52px; height:32px; min-width:52px; padding:0; margin:0; border:0; border-radius:999px; background:#78847e; cursor:pointer; }
+.privacy-category-switch::before { content:''; position:absolute; left:4px; top:4px; width:24px; height:24px; border-radius:50%; background:white; }
+.privacy-category-switch:checked { background:#176343 !important; }
+.privacy-category-switch:checked::before { left:24px; }
+.privacy-category-switch:disabled { opacity:.5; cursor:default; }
+.privacy-category-switch:focus-visible { outline:3px solid #176343; outline-offset:3px; }
+.privacy-category summary { padding:10px 0; font-size:14px; }
+.privacy-category dl > div { margin:12px 0; }
+.privacy-category dt { font-weight:600; }
+.privacy-category dd { margin:4px 0; }
+.privacy-category-help { font-size:13px; }
+
+/* Keep both equal choices reachable while the category explanations scroll. */
+.analytics-consent > .analytics-consent-actions { position:sticky; bottom:-24px; z-index:1; padding:12px 0; background:#fdf7f0; }
+@media(max-width:420px) {
+ .analytics-consent > .analytics-consent-actions { bottom:-20px; }
+ .analytics-consent .privacy-category { padding:10px 0; }
+ .analytics-consent .privacy-category summary { padding:8px 0; }
+}

@@ -82,7 +82,7 @@ const events=async page=>{
 };
 const stored=(page,type,key)=>page.evaluate(({type,key})=>window[type].getItem(key),{type,key});
 async function accept(page,english=false){await page.getByRole('button',{name:english?'Accept all':'Tout accepter',exact:true}).click();}
-async function refuse(page,english=false){await page.getByRole('button',{name:english?'Reject all optional':'Tout refuser les options',exact:true}).click();}
+async function refuse(page,english=false){await page.getByRole('button',{name:english?'Reject all':'Tout refuser',exact:true}).click();}
 async function open(page){await page.evaluate(()=>window.RocksoAnalytics.openPreferences());}
 try {
  await check('public configuration has no inline key; runtime configuration is separately gated',async()=>{
@@ -291,14 +291,29 @@ try {
    assert.deepEqual(await events(page),[]);assert.equal(await stored(page,'sessionStorage',SESSION_KEY),null);
    assert.equal(await page.locator('.analytics-consent[open], #audience-preferences').count(),1);
    const dialogText=await page.locator('.analytics-consent').textContent();
+   const panel=page.locator('.analytics-consent');
+   assert.equal(await panel.getByRole('switch').count(),2);
+   assert.equal(await panel.getByRole('switch',{name:'Performance',exact:true}).isDisabled(),true);
+   assert.equal(await panel.getByRole('switch',{name:'Performance',exact:true}).isChecked(),false);
+   assert.equal(await panel.getByRole('switch',{name:english?'Analytics':'Analyse',exact:true}).isEnabled(),true);
+   assert.equal(await panel.locator('details').count(),3);
+   assert.equal(await panel.locator('dl dt').count(),15);
+   assert.equal(await panel.getByRole('switch',{name:english?'External AI':'IA externe',exact:true}).count(),0);
+
    assert.match(dialogText,english?/acquisition sources/:/sources d’acquisition/);
    assert.match(dialogText,english?/withdraw consent at any time/:/retirer votre accord à tout moment/);
    assert.equal(await page.locator('.analytics-consent a').getAttribute('href'),policy+(english?'#website-analytics':'#site-analytics'));
    for(const width of [320,390,1280]){
     await page.setViewportSize({width,height:800});
     assert.equal(await page.locator('.analytics-consent').evaluate(el=>el.scrollWidth<=el.clientWidth+1),true);
-    await page.getByRole('button',{name:english?'Reject all optional':'Tout refuser les options',exact:true}).scrollIntoViewIfNeeded();
-    assert.equal(await page.getByRole('button',{name:english?'Reject all optional':'Tout refuser les options',exact:true}).isVisible(),true);
+    await page.getByRole('button',{name:english?'Reject all':'Tout refuser',exact:true}).scrollIntoViewIfNeeded();
+    assert.equal(await page.getByRole('button',{name:english?'Reject all':'Tout refuser',exact:true}).isVisible(),true);
+   }
+   await page.setViewportSize({width:390,height:844});
+   await page.locator('.analytics-consent').evaluate(el=>el.scrollTop=0);
+   for (const name of [english?'Accept all':'Tout accepter',english?'Reject all':'Tout refuser']) {
+    const box=await page.getByRole('button',{name,exact:true}).boundingBox();
+    assert.ok(box && box.y>=0 && box.y+box.height<=844,'both choices must remain in the initial viewport');
    }
    if(process.env.ROCKSO_ANALYTICS_SCREENSHOT_DIR){
     await page.setViewportSize({width:390,height:844});
