@@ -1,12 +1,17 @@
 import { safeUtmValue, readUtm, classifySource, propagateUtm } from "./acquisition.js?v=20261024-privacy";
-import { analyticsConfig } from "./analytics-config.js?v=20261024-privacy";
+import { analyticsConfig } from "./analytics-config.js?v=20261028-engagement";
 
 export const SDK_URL = "https://eu-assets.i.posthog.com/static/1.380.0/array.js";
 export const SDK_INTEGRITY = "sha384-OkAZ5oESfzEQoGLu0RgDrWPX37oaUYIxe0S5PLKr1SzTEaTH9G6lHvizeuw6EM/y";
 export const CONSENT_KEY = "rockso_audience_consent_v1";
 export const SESSION_KEY = "rockso_audience_session_v1";
 export const TEST_KEY = "rockso_audience_local_test_v1";
-export const CONSENT_VERSION = "2026-10-20.2";
+export const ENGAGEMENT_CONSENT_VERSION = "2026-10-28.1";
+export const CONSENT_VERSION = analyticsConfig.engagementEnabled === true ? ENGAGEMENT_CONSENT_VERSION : "2026-10-20.2";
+export const CTA_KEY = "rockso_audience_cta_v1";
+const CTA_PLACEMENTS = new Set(["header", "hero", "features", "audience_athlete", "audience_coach", "audience_club", "closing"]);
+const SECTION_IDS = new Set(["how-it-works", "smart-ai", "features", "for-whom", "science", "data"]);
+const ENGAGEMENT_EVENTS = new Set(["landing_cta_clicked", "landing_section_viewed"]);
 const CONSENT_DURATION = 180 * 24 * 60 * 60 * 1000;
 const SESSION_DURATION = 30 * 60 * 1000;
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
@@ -25,6 +30,7 @@ const LEGAL_PAGES = new Set([
 ]);
 const EVENTS = new Set([
   "landing_page_viewed", "early_access_page_viewed", "early_access_submitted", "download_clicked",
+  ...ENGAGEMENT_EVENTS,
 ]);
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
@@ -51,6 +57,7 @@ export function filterSdkEvent(event, context) {
   const p = event.properties || {};
   const page = Object.values(PAGES).find(value => value[0] === p.page_id);
   if (!page || p.language !== page[1]) return null;
+  if (ENGAGEMENT_EVENTS.has(event.event) && (context.engagementAllowed !== true || !page[0].startsWith("home_"))) return null;
   if (event.event === "landing_page_viewed" && page[2] !== event.event) return null;
   if (event.event.startsWith("early_access_") && page[2] !== "early_access_page_viewed") return null;
   const properties = {
@@ -78,6 +85,15 @@ export function filterSdkEvent(event, context) {
     if (!["ios", "android"].includes(p.download_platform) || p.placement !== "footer") return null;
     properties.download_platform = p.download_platform;
     properties.placement = "footer";
+  }
+  if (event.event === "landing_cta_clicked") {
+    if (!CTA_PLACEMENTS.has(p.placement) || p.destination !== "early_access") return null;
+    properties.placement = p.placement;
+    properties.destination = "early_access";
+  }
+  if (event.event === "landing_section_viewed") {
+    if (!SECTION_IDS.has(p.section_id)) return null;
+    properties.section_id = p.section_id;
   }
   return { event: event.event, uuid: event.uuid, timestamp: event.timestamp, properties };
 }
@@ -160,6 +176,9 @@ function mountAnalytics() {
   let viewed = false;
   let expiryTimer;
   const testEvents = [];
+  const sectionsSeen = new Set();
+  const sectionTimers = new Map();
+  let sectionObserver = null;
 
   function readChoice() {
     try {
@@ -180,6 +199,7 @@ function mountAnalytics() {
     session = null;
     source = null;
     storage.remove("sessionStorage", SESSION_KEY);
+    storage.remove("sessionStorage", CTA_KEY);
   }
 
   function sessionData() {
@@ -206,10 +226,62 @@ function mountAnalytics() {
   }
 
   function context() {
-    return { allowed: allowed(), id: session?.id, environment: test ? "test" : "production", projectToken: test ? "" : projectToken };
+    return { allowed: allowed(), engagementAllowed: engagementAllowed(), id: session?.id, environment: test ? "test" : "production", projectToken: test ? "" : projectToken };
+  }
+
+  function engagementAllowed() {
+    return analyticsConfig.engagementEnabled === true && CONSENT_VERSION === ENGAGEMENT_CONSENT_VERSION && allowed();
+  }
+
+  function stopSections() {
+    sectionObserver?.disconnect();
+    sectionObserver = null;
+    for (const timer of sectionTimers.values()) clearTimeout(timer);
+    sectionTimers.clear();
+  }
+
+  function startSections() {
+    if (sectionObserver || !engagementAllowed() || !page?.[0].startsWith("home_") || document.visibilityState !== "visible" || typeof IntersectionObserver !== "function") return;
+    // Exposure of an existing section heading, not reading or scroll depth.
+    sectionObserver = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        const id = entry.target.closest("[data-analytics-section]")?.dataset.analyticsSection;
+        if (!SECTION_IDS.has(id) || sectionsSeen.has(id)) continue;
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.5) {
+          clearTimeout(sectionTimers.get(id));
+          sectionTimers.delete(id);
+        } else if (!sectionTimers.has(id)) {
+          sectionTimers.set(id, setTimeout(() => {
+            sectionTimers.delete(id);
+            if (!engagementAllowed() || document.visibilityState !== "visible") return;
+            const rect = entry.target.getBoundingClientRect();
+            const area = Math.max(0, Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)) * Math.max(0, Math.min(rect.right, innerWidth) - Math.max(rect.left, 0));
+            if (!rect.width || !rect.height || area < rect.width * rect.height * 0.5) return;
+            sectionsSeen.add(id);
+            record("landing_section_viewed", { section_id: id });
+          }, 1000));
+        }
+      }
+    }, { threshold: [0, 0.5, 1] });
+    for (const section of document.querySelectorAll("[data-analytics-section]")) {
+      const heading = section.querySelector("h2");
+      if (SECTION_IDS.has(section.dataset.analyticsSection) && heading) sectionObserver.observe(heading);
+    }
+  }
+
+  function takeCta() {
+    if (!engagementAllowed() || page?.[2] !== "early_access_page_viewed") return null;
+    let saved;
+    try { saved = JSON.parse(storage.get("sessionStorage", CTA_KEY)); } catch { /* No valid handoff. */ }
+    storage.remove("sessionStorage", CTA_KEY);
+    if (!saved || !CTA_PLACEMENTS.has(saved.placement) || saved.version !== CONSENT_VERSION || saved.choiceCreatedAt !== choice?.createdAt || !Number.isFinite(saved.clickedAt) || Date.now() < saved.clickedAt || Date.now() - saved.clickedAt > 10000) return null;
+    const home = Object.values(PAGES).find(p => p[0] === saved.page_id);
+    if (!home?.[0].startsWith("home_") || home[1] !== saved.language || saved.language !== page[1]) return null;
+    return saved;
   }
 
   function stop() {
+    stopSections();
     clearTimeout(expiryTimer);
     epoch++;
     pending = [];
@@ -284,9 +356,9 @@ function mountAnalytics() {
           if (epoch !== activeEpoch || !allowed() || activeController.signal.aborted) return;
           const safe = filterSdkEvent(event, context());
           if (!safe) return;
-          sdk.capture(event.event, event.properties, { send_instantly: true, transport: "fetch" });
+          sdk.capture(event.event, event.properties, { send_instantly: true, transport: "fetch", ...(ENGAGEMENT_EVENTS.has(event.event) ? { timestamp: new Date(event.timestamp) } : {}) });
           // Aggregate reference counts only. No visit ID, email, URL or form value.
-          if (configurationUrl) {
+          if (configurationUrl && !ENGAGEMENT_EVENTS.has(event.event)) {
             const properties = Object.fromEntries(Object.entries(safe.properties).filter(([key]) => ["page_id", "language", "download_platform", "placement", "traffic_channel", "traffic_source", ...UTM_KEYS].includes(key)));
             await fetch(configurationUrl, { method: "POST", headers: { "content-type": "application/json" }, credentials: "omit", referrerPolicy: "no-referrer", signal: activeController.signal,
               body: JSON.stringify({mode:"landing",surface:"landing",consent:true,consent_version:CONSENT_VERSION,events:[{id:event.uuid,event:event.event,platform:safe.properties.platform,properties}]}) });
@@ -298,10 +370,10 @@ function mountAnalytics() {
     } else if (pending.length < 20) pending.push(event);
   }
 
-  function record(name, extra = {}) {
+  function record(name, extra = {}, timestamp = Date.now()) {
     const data = sessionData();
     if (!data) return;
-    send({ uuid: crypto.randomUUID(), event: name, timestamp: new Date().toISOString(), properties: {
+    send({ uuid: crypto.randomUUID(), event: name, timestamp: new Date(timestamp).toISOString(), properties: {
       page_id: page[0], language: page[1], platform: platform(), ...data.utm, ...(source || {}), ...extra,
     } });
   }
@@ -318,8 +390,13 @@ function mountAnalytics() {
     const data = sessionData();
     if (!data) return;
     const activeEpoch = epoch;
-    if (!viewed) { viewed = true; record(page[2]); }
-    if (test) return;
+    if (!viewed) {
+      viewed = true;
+      const cta = takeCta();
+      if (cta) record("landing_cta_clicked", { page_id: cta.page_id, language: cta.language, placement: cta.placement, destination: "early_access" }, cta.clickedAt);
+      record(page[2]);
+    }
+    if (test) { startSections(); return; }
     try {
       controller?.abort();
       controller = new AbortController();
@@ -341,6 +418,7 @@ function mountAnalytics() {
       const queued = pending;
       pending = [];
       queued.forEach(send);
+      startSections();
     } catch { pending = []; viewed = false; /* Analytics must never affect signup or navigation. */ }
   }
 
@@ -351,7 +429,9 @@ function mountAnalytics() {
   heading.id = "analytics-consent-title";
   heading.textContent = english ? "Privacy preferences" : "Préférences de confidentialité";
   const description = document.createElement("p");
-  description.textContent = english
+  description.textContent = analyticsConfig.engagementEnabled === true
+    ? (english ? "Optional Analytics with PostHog EU: pages, acquisition sources, waitlist buttons and section exposure. Refusing does not affect access." : "Analyse facultative avec PostHog EU : pages, sources d’acquisition, boutons vers la liste d’attente et exposition des sections. Refuser ne change pas l’accès.")
+    : english
     ? "Optional Analytics with PostHog EU: pages and acquisition sources. Refusing does not affect access."
     : "Analyse facultative avec PostHog EU : pages et sources d’acquisition. Refuser ne change pas l’accès.";
   const text = (fr, en) => english ? en : fr;
@@ -391,10 +471,10 @@ function mountAnalytics() {
     text("Toujours actif. Refuser les options n’empêche pas d’utiliser le site ou d’envoyer une demande, et ne supprime pas les demandes déjà reçues.", "Always on. Rejecting optional choices does not prevent site use or submitting a request, and does not delete requests already received.")
   ], true).row;
   const analysis = category(text("Analyse", "Analytics"), text("Comprendre les pages consultées et l’acquisition, après votre accord.", "Understand viewed pages and acquisition after your permission."), [
-    text("Mesurer pages, sources d’acquisition UTM, confirmations d’inscription et clics sur de vrais téléchargements, sans publicité ni profilage publicitaire.", "Measure pages, UTM acquisition sources, signup confirmations and genuine download clicks, without advertising or advertising profiling."),
-    text("Quatre événements explicites, plateforme et identifiant aléatoire de visite. Aucun e-mail, contenu de formulaire, donnée sportive ou de santé, ni URL complète.", "Four explicit events, platform and random visit identifier. No email, form contents, sports or health data, or full URLs."),
+    analyticsConfig.engagementEnabled === true ? text("Mesurer les pages, campagnes, boutons vers la liste d’attente et titres de sections exposés, confirmations d’inscription et vrais téléchargements, sans publicité.", "Measure pages, campaigns, waitlist buttons and exposed section headings, signup confirmations and genuine downloads, without advertising.") : text("Mesurer pages, sources d’acquisition UTM, confirmations d’inscription et clics sur de vrais téléchargements, sans publicité ni profilage publicitaire.", "Measure pages, UTM acquisition sources, signup confirmations and genuine download clicks, without advertising or advertising profiling."),
+    analyticsConfig.engagementEnabled === true ? text("Six événements explicites, identifiant temporaire, plateforme, UTM validés et libellés prédéfinis de boutons et sections. Aucun e-mail, contenu de formulaire, donnée sportive ou de santé, ni URL complète.", "Six explicit events, temporary identifier, platform, validated UTMs and predefined button and section labels. No email, form contents, sports or health data, or full URLs.") : text("Quatre événements explicites, plateforme et identifiant aléatoire de visite. Aucun e-mail, contenu de formulaire, donnée sportive ou de santé, ni URL complète.", "Four explicit events, platform and random visit identifier. No email, form contents, sports or health data, or full URLs."),
     text("AIMS Corp., Supabase et PostHog Inc. (projet EU), selon les garanties de transfert décrites dans la politique.", "AIMS Corp., Supabase and PostHog Inc. (EU project), with transfer safeguards described in the policy."),
-    text("Choix : 180 jours ; identifiant : 30 minutes d’inactivité dans cet onglet ; compteurs Supabase : 12 mois ; cible PostHog : 12 mois, sans garantie de purge automatique.", "Choice: 180 days; identifier: 30 minutes idle in this tab; Supabase counters: 12 months; PostHog target: 12 months, without automatic deletion guaranteed."),
+    analyticsConfig.engagementEnabled === true ? text("Choix : 180 jours ; identifiant : 30 minutes d’inactivité ; relais de bouton : validité de 10 secondes dans cet onglet, après accord ; compteurs Supabase : 12 mois ; cible PostHog : 12 mois, sans garantie de purge automatique.", "Choice: 180 days; identifier: 30 minutes idle; button handoff: valid for 10 seconds in this tab, after consent; Supabase counters: 12 months; PostHog target: 12 months, without automatic deletion guaranteed.") : text("Choix : 180 jours ; identifiant : 30 minutes d’inactivité dans cet onglet ; compteurs Supabase : 12 mois ; cible PostHog : 12 mois, sans garantie de purge automatique.", "Choice: 180 days; identifier: 30 minutes idle in this tab; Supabase counters: 12 months; PostHog target: 12 months, without automatic deletion guaranteed."),
     text("Aucun SDK ni événement PostHog, aucun compteur facultatif avant accord. Le retrait arrête les futurs envois ; l’effacement des données déjà reçues se demande séparément.", "No PostHog SDK or events, and no optional counters before permission. Withdrawal stops future sends; erasure of already received data is requested separately.")
   ]);
   const label = analysis.row, toggle = analysis.input;
@@ -522,12 +602,28 @@ function mountAnalytics() {
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && choice?.accepted && !readChoice()?.accepted) { choice = null; stop(); }
+    if (document.visibilityState === "visible") startSections(); else stopSections();
   });
   window.addEventListener("rockso:early-access-confirmed", () => {
     if (page?.[2] === "early_access_page_viewed") record("early_access_submitted");
   });
   document.addEventListener("click", event => {
     if (!allowed() || event.defaultPrevented || event.button !== 0) return;
+    const ctaLink = event.target.closest?.("a[data-analytics-cta]");
+    if (engagementAllowed() && page?.[0].startsWith("home_") && ctaLink && CTA_PLACEMENTS.has(ctaLink.dataset.analyticsCta)) {
+      try {
+        const destination = new URL(ctaLink.href, window.location.href);
+        const targetPage = PAGES[destination.pathname];
+        if (destination.origin === window.location.origin && targetPage?.[2] === "early_access_page_viewed" && targetPage[1] === page[1] && !event.altKey) {
+          if (event.ctrlKey || event.metaKey || event.shiftKey || ctaLink.target === "_blank") {
+            record("landing_cta_clicked", { placement: ctaLink.dataset.analyticsCta, destination: "early_access" });
+          } else if (!ctaLink.target || ctaLink.target === "_self") {
+            // Same-tab navigation must not wait for Analytics. Deliver at the form.
+            storage.set("sessionStorage", CTA_KEY, JSON.stringify({ placement: ctaLink.dataset.analyticsCta, page_id: page[0], language: page[1], clickedAt: Date.now(), choiceCreatedAt: choice.createdAt, version: CONSENT_VERSION }));
+          }
+        }
+      } catch { /* Analytics never alters the link or its navigation. */ }
+    }
     const link = event.target.closest?.("a[data-analytics-download]");
     if (!link || link.dataset.analyticsPlacement !== "footer") return;
     const destination = downloadPlatform(link.getAttribute("href"), window.location.href);

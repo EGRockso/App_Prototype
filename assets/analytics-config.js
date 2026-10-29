@@ -2,6 +2,8 @@
 // Collection also requires consent and the server-side landing_enabled switch.
 export const analyticsConfig = Object.freeze({
   enabled: true,
+  // Prepared only. Requires publication approval and the updated consent handler.
+  engagementEnabled: false,
   minimalEnabled: false,
   // Prepared, not active: requires qualified SQL and updated purpose information.
   sourceClassificationEnabled: false,

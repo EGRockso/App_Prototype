@@ -2,6 +2,10 @@
 
 Date: 20 October 2026. Scope: the public website and its waitlist-notification function. The owner authorized production publication of the website and notification minimization; PostHog collection remains disabled and is not part of that activation approval.
 
+## Mise à jour du 28 octobre 2026
+
+Les sections historiques ci-dessous décrivent la préparation initiale du 20 octobre. En production, les quatre événements de base sont désormais activés sous consentement ; la clé publique est fournie par le collecteur Supabase, les profils strictement pseudonymes permettent la procédure d’effacement. La mesure minimale et les référents restent désactivés. Les deux événements supplémentaires de boutons/sections sont préparés mais désactivés ; voir le complément du 28 octobre dans `ANALYTICS_FINALISATION_2026_10_23.md` pour le contrat et la procédure sélective.
+
 ## Activation status
 
 The committed default in `assets/analytics-config.js` is **disabled**, with an empty project token. There is no invented token, private key, second project, or automatic fallback to a production token.

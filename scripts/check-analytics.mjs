@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import {
   safeUtmValue, readUtm, isNewSignup, downloadPlatform, filterSdkEvent, sdkOptions,
-  CONSENT_KEY, SESSION_KEY, TEST_KEY, CONSENT_VERSION, SDK_URL, SDK_INTEGRITY,
+  CONSENT_KEY, SESSION_KEY, TEST_KEY, CONSENT_VERSION, ENGAGEMENT_CONSENT_VERSION, CTA_KEY, SDK_URL, SDK_INTEGRITY,
 } from '../assets/analytics.js';
 import { analyticsConfig } from '../assets/analytics-config.js';
 const { chromium } = await import(process.env.ROCKSO_PLAYWRIGHT_MODULE || 'playwright');
@@ -38,7 +38,7 @@ if (sdkPath) {
 }
 const browser=await chromium.launch({headless:true,...(process.env.ROCKSO_BROWSER_PATH?{executablePath:process.env.ROCKSO_BROWSER_PATH}:{})});
 const stub=`window.__signupCalls=[]; window.__signupReply={data:{ok:true,alreadyRegistered:false},error:null}; window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'local-demo-fixture'}},error:null})},functions:{invoke:async(name,options)=>{window.__signupCalls.push({name,body:options.body}); if(window.__signupDelay)return await new Promise(resolve=>window.__signupResolve=resolve);return window.__signupReply;}}})};`;
-async function setup({test=true,production=false,token='',runtimeConfiguration=false,minimal=false,configurationEnabled=true,shippedConfiguration=false,sourceClassification=false}={}) {
+async function setup({test=true,production=false,token='',runtimeConfiguration=false,minimal=false,configurationEnabled=true,shippedConfiguration=false,sourceClassification=false,engagement=false}={}) {
  // PostHog excludes HeadlessChrome/automation as bots. Exercise the normal
  // visitor pipeline without weakening the SDK's production bot filter.
  const context=await browser.newContext({serviceWorkers:'block',userAgent:`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${browser.version()} Safari/537.36`});
@@ -62,13 +62,13 @@ async function setup({test=true,production=false,token='',runtimeConfiguration=f
   if(url.hostname==='cdn.jsdelivr.net')return route.fulfill({contentType:'application/javascript',body:stub});
   if(production && url.origin==='https://rockso.app'){
    if(url.pathname==='/assets/analytics-config.js' && shippedConfiguration){const response=await context.request.get(base+url.pathname);return route.fulfill({status:response.status(),headers:response.headers(),body:await response.body()});}
-   if(url.pathname==='/assets/analytics-config.js' && runtimeConfiguration)return route.fulfill({contentType:'application/javascript',body:`export const analyticsConfig=Object.freeze({enabled:true,minimalEnabled:${minimal},projectToken:"",configurationUrl:"https://hegtnyarfeoyapobysee.supabase.co/functions/v1/analytics-collect"});`});
+   if(url.pathname==='/assets/analytics-config.js' && runtimeConfiguration)return route.fulfill({contentType:'application/javascript',body:`export const analyticsConfig=Object.freeze({enabled:true,engagementEnabled:${engagement},minimalEnabled:${minimal},projectToken:"",configurationUrl:"https://hegtnyarfeoyapobysee.supabase.co/functions/v1/analytics-collect"});`});
    if(url.pathname==='/assets/analytics-config.js' && !token)return route.fulfill({contentType:'application/javascript',body:'export const analyticsConfig=Object.freeze({enabled:false,projectToken:""});'});
    if(url.pathname==='/assets/analytics-config.js' && token)return route.fulfill({contentType:'application/javascript',body:`export const analyticsConfig=Object.freeze({enabled:true,projectToken:${JSON.stringify(token)}});`});
    const response=await context.request.get(base+url.pathname);
    return route.fulfill({status:response.status(),headers:response.headers(),body:await response.body()});
   }
-  if(url.origin===base && url.pathname==='/assets/analytics-config.js' && sourceClassification)return route.fulfill({contentType:'application/javascript',body:'export const analyticsConfig=Object.freeze({enabled:false,projectToken:"",minimalEnabled:false,sourceClassificationEnabled:true});'});
+  if(url.origin===base && url.pathname==='/assets/analytics-config.js' && (sourceClassification || engagement))return route.fulfill({contentType:'application/javascript',body:`export const analyticsConfig=Object.freeze({enabled:false,projectToken:"",minimalEnabled:false,sourceClassificationEnabled:${sourceClassification},engagementEnabled:${engagement}});`});
   if(url.origin===base)return route.continue();
   return route.abort();
  });
@@ -550,6 +550,76 @@ try {
   }
   report.keyedSdkAudit='PASS: real token supplied externally; all SDK requests intercepted locally';
  }
+ await check('expanded events have fixed schemas and remain closed without their own activation',async()=>{
+  const id=crypto.randomUUID(),context={allowed:true,engagementAllowed:true,id,environment:'test',projectToken:''};
+  const baseEvent={event:'landing_cta_clicked',properties:{page_id:'home_fr',language:'fr',platform:'desktop',placement:'hero',destination:'early_access',email:'private@example.invalid',text:'private',url:'https://private.invalid'}};
+  const safe=filterSdkEvent(baseEvent,context);assert.equal(safe.properties.placement,'hero');assert.equal(safe.properties.destination,'early_access');assert.ok(!JSON.stringify(safe).includes('private'));
+  assert.equal(filterSdkEvent(baseEvent,{...context,engagementAllowed:false}),null);
+  assert.equal(filterSdkEvent({...baseEvent,properties:{...baseEvent.properties,placement:'free-text'}},context),null);
+  assert.equal(filterSdkEvent({...baseEvent,properties:{...baseEvent.properties,page_id:'early_access_fr'}},context),null);
+  assert.equal(filterSdkEvent({event:'landing_section_viewed',properties:{page_id:'home_en',language:'en',section_id:'science',contents:'private'}},context).properties.section_id,'science');
+  assert.equal(filterSdkEvent({event:'landing_section_viewed',properties:{page_id:'home_en',language:'en',section_id:'private'}},context),null);
+  assert.equal(analyticsConfig.engagementEnabled,false);
+ });
+ for(const english of [false,true])for(const width of [390,1280])await check(`expanded consent and heading exposure ${english?'EN':'FR'} ${width}px`,async()=>{
+  const s=await setup({engagement:true});await s.page.setViewportSize({width,height:900});const home=english?'index-en.html':'index.html';
+  await s.page.goto(s.origin+'/'+home);
+  if(process.env.ROCKSO_ANALYTICS_CAPTURE_DIR){await fs.mkdir(process.env.ROCKSO_ANALYTICS_CAPTURE_DIR,{recursive:true});await s.page.screenshot({path:path.join(process.env.ROCKSO_ANALYTICS_CAPTURE_DIR,`engagement-${english?'en':'fr'}-${width}.png`)});}
+  const heading=s.page.locator('[data-analytics-section="science"] h2');
+  await heading.scrollIntoViewIfNeeded();await s.page.waitForTimeout(1150);assert.deepEqual(await events(s.page),[]);assert.equal(await stored(s.page,'sessionStorage',CTA_KEY),null);
+  await s.page.evaluate(()=>window.scrollTo(0,0));await accept(s.page,english);assert.equal(JSON.parse(await stored(s.page,'localStorage',CONSENT_KEY)).version,ENGAGEMENT_CONSENT_VERSION);
+  assert.equal((await events(s.page)).filter(e=>e.event==='landing_section_viewed').length,0);
+  await heading.scrollIntoViewIfNeeded();await s.page.waitForTimeout(1150);
+  assert.equal((await events(s.page)).filter(e=>e.event==='landing_section_viewed'&&e.properties.section_id==='science').length,1);
+  await s.page.evaluate(()=>window.scrollTo(0,0));await heading.scrollIntoViewIfNeeded();await s.page.waitForTimeout(1150);
+  assert.equal((await events(s.page)).filter(e=>e.event==='landing_section_viewed'&&e.properties.section_id==='science').length,1);
+  await open(s.page);await refuse(s.page,english);assert.equal(await stored(s.page,'sessionStorage',CTA_KEY),null);
+  await s.page.locator('[data-analytics-section="features"] h2').scrollIntoViewIfNeeded();await s.page.waitForTimeout(1150);
+  assert.equal((await events(s.page)).filter(e=>e.event==='landing_section_viewed'&&e.properties.section_id==='features').length,0);
+  assert.deepEqual(s.posthogRequests,[]);await s.context.close();
+ });
+ for(const english of [false,true])await check(`all seven waitlist placements survive same-tab navigation ${english?'EN':'FR'}`,async()=>{
+  const s=await setup({engagement:true});const home=english?'index-en.html':'index.html';
+  for(const placement of ['header','hero','features','audience_athlete','audience_coach','audience_club','closing']){
+   await s.page.goto(s.origin+'/'+home+'?utm_source=validation&utm_medium=manual&utm_campaign=placement-test');if(!JSON.parse(await stored(s.page,'localStorage',CONSENT_KEY))?.accepted)await accept(s.page,english);
+   await s.page.locator(`[data-analytics-cta="${placement}"]`).click();await s.page.waitForURL('**/demo-login'+(english?'-en':'')+'.html?**');
+   const received=await events(s.page);assert.deepEqual(received.map(e=>e.event),['landing_cta_clicked','early_access_page_viewed']);
+   assert.equal(received[0].properties.placement,placement);assert.equal(received[0].properties.page_id,english?'home_en':'home_fr');assert.equal(received[0].properties.utm_campaign,'placement-test');
+   assert.equal(await stored(s.page,'sessionStorage',CTA_KEY),null);
+   await s.page.reload();assert.deepEqual((await events(s.page)).map(e=>e.event),['early_access_page_viewed']);
+  }
+  await s.context.close();
+ });
+ await check('expanded measurement asks existing visitors again and never replays a pre-consent click',async()=>{
+  const s=await setup({engagement:true});await s.context.addInitScript(({key,version})=>{const now=Date.now();localStorage.setItem(key,JSON.stringify({version,accepted:true,createdAt:now,expiresAt:now+180*86400000}));},{key:CONSENT_KEY,version:CONSENT_VERSION});
+  await s.page.goto(s.origin+'/');assert.deepEqual(await events(s.page),[]);await s.page.locator('[data-analytics-cta="hero"]').click();assert.equal(await stored(s.page,'sessionStorage',CTA_KEY),null);await accept(s.page);
+  assert.deepEqual((await events(s.page)).map(e=>e.event),['early_access_page_viewed']);await s.context.close();
+ });
+ await check('expired, tampered or changed-choice click handoffs are discarded',async()=>{
+  for(const kind of ['expired','placement','changed-choice']){
+   const s=await setup({engagement:true});await s.page.goto(s.origin+'/');await accept(s.page);
+   await s.page.evaluate(({key,consent,version,kind})=>{const c=JSON.parse(localStorage.getItem(consent));sessionStorage.setItem(key,JSON.stringify({placement:kind==='placement'?'private@example.invalid':'hero',page_id:'home_fr',language:'fr',clickedAt:Date.now()-(kind==='expired'?11000:0),choiceCreatedAt:c.createdAt+(kind==='changed-choice'?1:0),version}));},{key:CTA_KEY,consent:CONSENT_KEY,version:ENGAGEMENT_CONSENT_VERSION,kind});
+   await s.page.goto(s.origin+'/demo-login.html');assert.deepEqual((await events(s.page)).map(e=>e.event),['early_access_page_viewed']);assert.equal(await stored(s.page,'sessionStorage',CTA_KEY),null);await s.context.close();
+  }
+ });
+ await check('dark configuration records no CTA or section even with prior base consent',async()=>{
+  const s=await setup();await s.page.goto(s.origin+'/');await accept(s.page);await s.page.locator('[data-analytics-section="science"] h2').scrollIntoViewIfNeeded();await s.page.waitForTimeout(1150);assert.equal((await events(s.page)).some(e=>e.event==='landing_section_viewed'),false);
+  await s.page.locator('[data-analytics-cta="hero"]').click();assert.deepEqual((await events(s.page)).map(e=>e.event),['early_access_page_viewed']);assert.equal(await stored(s.page,'sessionStorage',CTA_KEY),null);await s.context.close();
+ });
+ await check('a short or background exposure never counts as a full visible second',async()=>{
+  const s=await setup({engagement:true});await s.page.goto(s.origin+'/');await accept(s.page);const heading=s.page.locator('[data-analytics-section="science"] h2');
+  await heading.scrollIntoViewIfNeeded();await s.page.waitForTimeout(350);await s.page.evaluate(()=>window.scrollTo(0,0));await s.page.waitForTimeout(850);assert.equal((await events(s.page)).some(e=>e.event==='landing_section_viewed'&&e.properties.section_id==='science'),false);
+  await heading.scrollIntoViewIfNeeded();await s.page.waitForTimeout(350);await s.page.evaluate(()=>{Object.defineProperty(document,'visibilityState',{configurable:true,get:()=> 'hidden'});document.dispatchEvent(new Event('visibilitychange'));});await s.page.waitForTimeout(1150);assert.equal((await events(s.page)).some(e=>e.event==='landing_section_viewed'&&e.properties.section_id==='science'),false);
+  await s.page.evaluate(()=>{delete document.visibilityState;document.dispatchEvent(new Event('visibilitychange'));});await s.page.waitForTimeout(1150);assert.equal((await events(s.page)).filter(e=>e.event==='landing_section_viewed'&&e.properties.section_id==='science').length,1);await s.context.close();
+ });
+ if(sdkSource&&realToken)await check('real SDK sends expanded events to PostHog only, all requests locally intercepted',async()=>{
+  const s=await setup({test:false,production:true,token:realToken,runtimeConfiguration:true,engagement:true});await s.page.goto(s.origin+'/?utm_source=validation&utm_campaign=expanded-sdk');await accept(s.page);
+  await s.page.locator('[data-analytics-section="science"] h2').scrollIntoViewIfNeeded();await s.page.waitForTimeout(1500);await s.page.locator('[data-analytics-cta="hero"]').click();await s.page.waitForTimeout(600);
+  const captures=s.posthogRequests.filter(r=>r.body).map(r=>{try{return JSON.parse(r.body)}catch{return null}}).filter(Boolean).flatMap(r=>Array.isArray(r)?r:[r]);
+  assert.ok(captures.some(e=>e.event==='landing_cta_clicked'&&e.properties.placement==='hero'));assert.ok(captures.some(e=>e.event==='landing_section_viewed'&&e.properties.section_id==='science'));
+  const aggregates=s.collectorRequests.filter(r=>r.method==='POST').map(r=>JSON.parse(r.body));assert.ok(aggregates.length>0);assert.ok(aggregates.every(r=>r.consent_version===ENGAGEMENT_CONSENT_VERSION&&r.events.every(e=>!['landing_cta_clicked','landing_section_viewed'].includes(e.event))));
+  assert.ok(captures.every(e=>!JSON.stringify(e).includes('example.invalid')));await s.context.close();
+ });
  console.log(`${passed} checks passed. No browser request was sent to PostHog or the real Supabase backend.`);
  if(process.env.ROCKSO_ANALYTICS_REPORT)await fs.writeFile(process.env.ROCKSO_ANALYTICS_REPORT,JSON.stringify(report,null,2));
  console.log(report.keyedSdkAudit);

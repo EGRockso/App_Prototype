@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="assets/styles-v2.css" />
   <link rel="stylesheet" href="assets/analytics-consent.css?v=20261024-privacy" />
-  <script type="module" src="assets/analytics.js?v=20261024-privacy"></script>
+  <script type="module" src="assets/analytics.js?v=20261028-engagement"></script>
   <script type="module" src="assets/minimal-audience.js?v=20261024-privacy"></script>
 </head>
 
@@ -32,7 +32,7 @@
         <a href="#science">Science</a>
         <a href="#data">Données &amp; confidentialité</a>
         <a href="index-en.html" class="lang-switch">EN</a>
-        <a href="demo-login.html" class="nav-cta">Rejoindre la liste d’attente</a>
+        <a href="demo-login.html" data-analytics-cta="header" class="nav-cta">Rejoindre la liste d’attente</a>
       </nav>
 
       <button class="nav-toggle-v2" type="button" aria-label="Ouvrir le menu" aria-controls="rockso-navigation" aria-expanded="false">
@@ -58,7 +58,7 @@
             semaine.
           </p>
           <div class="hero-v2-actions">
-            <a href="demo-login.html" class="btn-v2 green">Rejoindre la liste d’attente</a>
+            <a href="demo-login.html" data-analytics-cta="hero" class="btn-v2 green">Rejoindre la liste d’attente</a>
             <a href="#how-it-works" class="btn-v2 ghost">Découvrir la méthode</a>
           </div>
         </div>
@@ -148,7 +148,7 @@
     </section>
 
     <!-- ============ HOW IT WORKS ============ -->
-    <section id="how-it-works" class="section-v2">
+    <section id="how-it-works" data-analytics-section="how-it-works" class="section-v2">
       <div class="container">
         <span class="eyebrow-v2">Le principe</span>
         <h2 class="section-title-v2">Comment Rockso vous aide à garder le bon tempo</h2>
@@ -212,7 +212,7 @@
     </section>
 
     <!-- ============ IA COACH HERO ============ -->
-    <section id="smart-ai" class="ai-coach-hero">
+    <section id="smart-ai" data-analytics-section="smart-ai" class="ai-coach-hero">
       <div class="container ai-coach-inner">
         <div class="ai-coach-text">
           <span class="eyebrow-v2 ai-coach-eyebrow">IA · Messages et voix</span>
@@ -297,7 +297,7 @@
     </section>
 
     <!-- ============ FEATURES ============ -->
-    <section id="features" class="section-v2 section-features-bg">
+    <section id="features" data-analytics-section="features" class="section-v2 section-features-bg">
       <div class="section-features-bg-img">
         <img src="assets/img/Velo.avif" alt="" />
       </div>
@@ -361,7 +361,7 @@
 
         <div class="cta-band-v2">
           <p>Le bon entraînement n’est pas le plus dur. C’est celui que ton corps peut transformer en progrès.</p>
-          <a href="demo-login.html" class="btn-v2 green">Rejoindre la liste d’attente</a>
+          <a href="demo-login.html" data-analytics-cta="features" class="btn-v2 green">Rejoindre la liste d’attente</a>
         </div>
       </div>
     </section>
@@ -419,7 +419,7 @@
     </section>
 
     <!-- ============ FOR WHOM (cards avec image header) ============ -->
-    <section id="for-whom" class="section-v2 alt">
+    <section id="for-whom" data-analytics-section="for-whom" class="section-v2 alt">
       <div class="container">
         <span class="eyebrow-v2">Pour qui</span>
         <h2 class="section-title-v2">Pour ceux qui veulent durer et progresser</h2>
@@ -441,7 +441,7 @@
                 assimilable, ce qui t'use, et quand ajuster pour garder de la
                 régularité dans le temps.
               </p>
-              <a href="demo-login.html" class="fw-link">Construire une prépa durable <span>→</span></a>
+              <a href="demo-login.html" data-analytics-cta="audience_athlete" class="fw-link">Construire une prépa durable <span>→</span></a>
             </div>
           </article>
 
@@ -457,7 +457,7 @@
                 échanges, et arbitre plus vite sans perdre ta philosophie ni ton
                 exigence.
               </p>
-              <a href="demo-login.html" class="fw-link">Renforcer tes décisions <span>→</span></a>
+              <a href="demo-login.html" data-analytics-cta="audience_coach" class="fw-link">Renforcer tes décisions <span>→</span></a>
             </div>
           </article>
 
@@ -472,7 +472,7 @@
                 terrain, préparation physique et médical, et alignez les décisions autour
                 de la disponibilité, de la progression et de la continuité.
               </p>
-              <a href="demo-login.html" class="fw-link">Structurer la charge collective <span>→</span></a>
+              <a href="demo-login.html" data-analytics-cta="audience_club" class="fw-link">Structurer la charge collective <span>→</span></a>
             </div>
           </article>
         </div>
@@ -480,7 +480,7 @@
     </section>
 
     <!-- ============ SCIENCE / RESEARCH ============ -->
-    <section id="science" class="section-v2">
+    <section id="science" data-analytics-section="science" class="section-v2">
       <div class="container">
         <span class="eyebrow-v2">Science</span>
         <h2 class="section-title-v2">Une méthode ancrée dans le réel</h2>
@@ -538,7 +538,7 @@
     </section>
 
     <!-- ============ DATA & PRIVACY ============ -->
-    <section id="data" class="section-v2 alt">
+    <section id="data" data-analytics-section="data" class="section-v2 alt">
       <div class="container">
         <span class="eyebrow-v2">Confidentialité</span>
         <h2 class="section-title-v2">Vos données restent vos données</h2>
@@ -728,7 +728,7 @@
             à construire une progression qui dure.
           </p>
           <div class="bottom-cta-actions">
-            <a href="demo-login.html" class="btn-v2 green">Rejoindre la liste d’attente</a>
+            <a href="demo-login.html" data-analytics-cta="closing" class="btn-v2 green">Rejoindre la liste d’attente</a>
             <a href="mailto:hello@rockso.app?subject=Projet%20Rockso" class="btn-v2 ghost">
               Parlons de votre projet
             </a>

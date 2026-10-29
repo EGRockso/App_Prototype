@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="assets/styles-v2.css" />
   <link rel="stylesheet" href="assets/analytics-consent.css?v=20261024-privacy" />
-  <script type="module" src="assets/analytics.js?v=20261024-privacy"></script>
+  <script type="module" src="assets/analytics.js?v=20261028-engagement"></script>
   <script type="module" src="assets/minimal-audience.js?v=20261024-privacy"></script>
 </head>
 
@@ -32,7 +32,7 @@
         <a href="#science">Science</a>
         <a href="#data">Data &amp; privacy</a>
         <a href="index.html" class="lang-switch">FR</a>
-        <a href="demo-login-en.html" class="nav-cta">Join the waitlist</a>
+        <a href="demo-login-en.html" data-analytics-cta="header" class="nav-cta">Join the waitlist</a>
       </nav>
 
       <button class="nav-toggle-v2" type="button" aria-label="Open menu" aria-controls="rockso-navigation" aria-expanded="false">
@@ -57,7 +57,7 @@
             when to recover, and how to build progress that lasts week after week.
           </p>
           <div class="hero-v2-actions">
-            <a href="demo-login-en.html" class="btn-v2 green">Join the waitlist</a>
+            <a href="demo-login-en.html" data-analytics-cta="hero" class="btn-v2 green">Join the waitlist</a>
             <a href="#how-it-works" class="btn-v2 ghost">Discover the method</a>
           </div>
         </div>
@@ -146,7 +146,7 @@
     </section>
 
     <!-- ============ HOW IT WORKS ============ -->
-    <section id="how-it-works" class="section-v2">
+    <section id="how-it-works" data-analytics-section="how-it-works" class="section-v2">
       <div class="container">
         <span class="eyebrow-v2">The principle</span>
         <h2 class="section-title-v2">How Rockso helps you stay in the right rhythm</h2>
@@ -210,7 +210,7 @@
     </section>
 
     <!-- ============ IA COACH HERO ============ -->
-    <section id="smart-ai" class="ai-coach-hero">
+    <section id="smart-ai" data-analytics-section="smart-ai" class="ai-coach-hero">
       <div class="container ai-coach-inner">
         <div class="ai-coach-text">
           <span class="eyebrow-v2 ai-coach-eyebrow">Smart AI · Chat &amp; Voice</span>
@@ -294,7 +294,7 @@
     </section>
 
     <!-- ============ FEATURES ============ -->
-    <section id="features" class="section-v2 section-features-bg">
+    <section id="features" data-analytics-section="features" class="section-v2 section-features-bg">
       <div class="section-features-bg-img">
         <img src="assets/img/Velo.avif" alt="" />
       </div>
@@ -358,7 +358,7 @@
 
         <div class="cta-band-v2">
           <p>The right training is not the hardest. It is the one your body can turn into progress.</p>
-          <a href="demo-login-en.html" class="btn-v2 green">Join the waitlist</a>
+          <a href="demo-login-en.html" data-analytics-cta="features" class="btn-v2 green">Join the waitlist</a>
         </div>
       </div>
     </section>
@@ -414,7 +414,7 @@
     </section>
 
     <!-- ============ FOR WHOM (cards avec image header) ============ -->
-    <section id="for-whom" class="section-v2 alt">
+    <section id="for-whom" data-analytics-section="for-whom" class="section-v2 alt">
       <div class="container">
         <span class="eyebrow-v2">Who for</span>
         <h2 class="section-title-v2">For people who want to last and progress</h2>
@@ -434,7 +434,7 @@
                 A good preparation is one that fits your life. Understand what your load is truly producing, identify
                 what you can absorb, what wears you down, and when to adjust to stay consistent over time.
               </p>
-              <a href="demo-login-en.html" class="fw-link">Build sustainable preparation <span>→</span></a>
+              <a href="demo-login-en.html" data-analytics-cta="audience_athlete" class="fw-link">Build sustainable preparation <span>→</span></a>
             </div>
           </article>
 
@@ -448,7 +448,7 @@
                 Gain a clearer view of your athletes' real load, context and recovery. Visualise useful signals, follow
                 conversations and make decisions faster without losing your philosophy or standards.
               </p>
-              <a href="demo-login-en.html" class="fw-link">Strengthen your decisions <span>→</span></a>
+              <a href="demo-login-en.html" data-analytics-cta="audience_coach" class="fw-link">Strengthen your decisions <span>→</span></a>
             </div>
           </article>
 
@@ -462,7 +462,7 @@
                 Share a common reading of load, clarify decisions between the field, physical preparation and medical
                 teams, and align choices around availability, progress and continuity.
               </p>
-              <a href="demo-login-en.html" class="fw-link">Structure collective load <span>→</span></a>
+              <a href="demo-login-en.html" data-analytics-cta="audience_club" class="fw-link">Structure collective load <span>→</span></a>
             </div>
           </article>
         </div>
@@ -470,7 +470,7 @@
     </section>
 
     <!-- ============ SCIENCE / RESEARCH ============ -->
-    <section id="science" class="section-v2">
+    <section id="science" data-analytics-section="science" class="section-v2">
       <div class="container">
         <span class="eyebrow-v2">Science</span>
         <h2 class="section-title-v2">A method grounded in reality</h2>
@@ -527,7 +527,7 @@
     </section>
 
     <!-- ============ DATA & PRIVACY ============ -->
-    <section id="data" class="section-v2 alt">
+    <section id="data" data-analytics-section="data" class="section-v2 alt">
       <div class="container">
         <span class="eyebrow-v2">Privacy first</span>
         <h2 class="section-title-v2">Your data stays yours</h2>
@@ -704,7 +704,7 @@
             launches and start building progress that lasts.
           </p>
           <div class="bottom-cta-actions">
-            <a href="demo-login-en.html" class="btn-v2 green">Join the waitlist</a>
+            <a href="demo-login-en.html" data-analytics-cta="closing" class="btn-v2 green">Join the waitlist</a>
             <a href="mailto:hello@rockso.app?subject=Rockso%20project" class="btn-v2 ghost">
               Discuss your project
             </a>

@@ -1,7 +1,7 @@
 // Independent baseline, dormant until its collection scope is approved.
 // No visitor/session ID, cookies, localStorage, fingerprint or individual path.
-import { analyticsConfig } from './analytics-config.js?v=20261024-privacy';
-import { readUtm, downloadPlatform } from './analytics.js?v=20261024-privacy';
+import { analyticsConfig } from './analytics-config.js?v=20261028-engagement';
+import { readUtm, downloadPlatform } from './analytics.js?v=20261028-engagement';
 const pages={ '/':['home_fr','fr','landing_page_viewed'], '/index.html':['home_fr','fr','landing_page_viewed'], '/index-en.html':['home_en','en','landing_page_viewed'], '/demo-login.html':['early_access_fr','fr','early_access_page_viewed'], '/demo-login-en.html':['early_access_en','en','early_access_page_viewed'] };
 export async function mountMinimalAudience(){
  const page=pages[location.pathname];
