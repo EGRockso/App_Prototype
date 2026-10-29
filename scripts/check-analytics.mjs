@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import {
   safeUtmValue, readUtm, isNewSignup, downloadPlatform, filterSdkEvent, sdkOptions,
-  CONSENT_KEY, SESSION_KEY, TEST_KEY, CONSENT_VERSION, ENGAGEMENT_CONSENT_VERSION, CTA_KEY, SDK_URL, SDK_INTEGRITY,
+  CONSENT_KEY, SESSION_KEY, TEST_KEY, BASE_CONSENT_VERSION as CONSENT_VERSION, CONSENT_VERSION as RELEASE_CONSENT_VERSION, ENGAGEMENT_CONSENT_VERSION, CTA_KEY, SDK_URL, SDK_INTEGRITY,
 } from '../assets/analytics.js';
 import { analyticsConfig } from '../assets/analytics-config.js';
 const { chromium } = await import(process.env.ROCKSO_PLAYWRIGHT_MODULE || 'playwright');
@@ -68,7 +68,8 @@ async function setup({test=true,production=false,token='',runtimeConfiguration=f
    const response=await context.request.get(base+url.pathname);
    return route.fulfill({status:response.status(),headers:response.headers(),body:await response.body()});
   }
-  if(url.origin===base && url.pathname==='/assets/analytics-config.js' && (sourceClassification || engagement))return route.fulfill({contentType:'application/javascript',body:`export const analyticsConfig=Object.freeze({enabled:false,projectToken:"",minimalEnabled:false,sourceClassificationEnabled:${sourceClassification},engagementEnabled:${engagement}});`});
+  // Explicit test matrix, independent of the currently shipped rollout switch.
+  if(url.origin===base && url.pathname==='/assets/analytics-config.js')return route.fulfill({contentType:'application/javascript',body:`export const analyticsConfig=Object.freeze({enabled:false,projectToken:"",minimalEnabled:false,sourceClassificationEnabled:${sourceClassification},engagementEnabled:${engagement}});`});
   if(url.origin===base)return route.continue();
   return route.abort();
  });
@@ -90,7 +91,7 @@ try {
  });
  await check('disabled server prevents SDK and writes with the shipped configuration and an existing acceptance',async()=>{
   const s=await setup({test:false,production:true,token:realToken,shippedConfiguration:true,configurationEnabled:false});
-  await s.context.addInitScript(({key,version})=>{const now=Date.now();localStorage.setItem(key,JSON.stringify({version,accepted:true,createdAt:now,expiresAt:now+180*86400000}));},{key:CONSENT_KEY,version:CONSENT_VERSION});
+  await s.context.addInitScript(({key,version})=>{const now=Date.now();localStorage.setItem(key,JSON.stringify({version,accepted:true,createdAt:now,expiresAt:now+180*86400000}));},{key:CONSENT_KEY,version:RELEASE_CONSENT_VERSION});
   await s.page.goto(s.origin+'/');await s.page.waitForTimeout(350);
   assert.equal(s.posthogRequests.length,0);assert.equal(s.collectorRequests.filter(r=>r.method==='POST').length,0);assert.equal(s.collectorRequests.filter(r=>r.method==='GET').length,analyticsConfig.enabled?1:0);await s.context.close();
  });
@@ -559,7 +560,7 @@ try {
   assert.equal(filterSdkEvent({...baseEvent,properties:{...baseEvent.properties,page_id:'early_access_fr'}},context),null);
   assert.equal(filterSdkEvent({event:'landing_section_viewed',properties:{page_id:'home_en',language:'en',section_id:'science',contents:'private'}},context).properties.section_id,'science');
   assert.equal(filterSdkEvent({event:'landing_section_viewed',properties:{page_id:'home_en',language:'en',section_id:'private'}},context),null);
-  assert.equal(analyticsConfig.engagementEnabled,false);
+  assert.equal(typeof analyticsConfig.engagementEnabled,'boolean');
  });
  for(const english of [false,true])for(const width of [390,1280])await check(`expanded consent and heading exposure ${english?'EN':'FR'} ${width}px`,async()=>{
   const s=await setup({engagement:true});await s.page.setViewportSize({width,height:900});const home=english?'index-en.html':'index.html';

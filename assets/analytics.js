@@ -7,7 +7,8 @@ export const CONSENT_KEY = "rockso_audience_consent_v1";
 export const SESSION_KEY = "rockso_audience_session_v1";
 export const TEST_KEY = "rockso_audience_local_test_v1";
 export const ENGAGEMENT_CONSENT_VERSION = "2026-10-28.1";
-export const CONSENT_VERSION = analyticsConfig.engagementEnabled === true ? ENGAGEMENT_CONSENT_VERSION : "2026-10-20.2";
+export const BASE_CONSENT_VERSION = "2026-10-20.2";
+export const CONSENT_VERSION = analyticsConfig.engagementEnabled === true ? ENGAGEMENT_CONSENT_VERSION : BASE_CONSENT_VERSION;
 export const CTA_KEY = "rockso_audience_cta_v1";
 const CTA_PLACEMENTS = new Set(["header", "hero", "features", "audience_athlete", "audience_coach", "audience_club", "closing"]);
 const SECTION_IDS = new Set(["how-it-works", "smart-ai", "features", "for-whom", "science", "data"]);
@@ -514,6 +515,7 @@ function mountAnalytics() {
   document.body.append(dialog);
   let previousFocus;
   const policySection = document.getElementById(english ? "website-analytics" : "site-analytics");
+  policySection?.setAttribute("data-analytics-policy-version", CONSENT_VERSION);
   let policyPanel = null;
   if (policySection && /\/privacy(?:-en)?\.html$/.test(window.location.pathname)) {
     policyPanel = document.createElement("section");
