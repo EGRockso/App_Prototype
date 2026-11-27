@@ -1,7 +1,7 @@
 // Run against a local HTTP server. Uses the caller's existing Playwright installation.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-const { chromium } = await import(process.env.ROCKSO_PLAYWRIGHT_MODULE || 'playwright');
+const { chromium, devices } = await import(process.env.ROCKSO_PLAYWRIGHT_MODULE || 'playwright');
 const browser = await chromium.launch({
   headless: true,
   ...(process.env.ROCKSO_BROWSER_PATH ? { executablePath: process.env.ROCKSO_BROWSER_PATH } : {}),
@@ -81,6 +81,12 @@ async function checkProductGallery(page, file, width) {
   }, target, { timeout: 3000 });
 
   if (width < 900) {
+    const hint = page.locator('#product-gallery-hint');
+    assert.equal(await hint.textContent(), english ? 'Swipe horizontally' : 'Balayez horizontalement');
+    assert.equal(await track.getAttribute('aria-describedby'), 'product-gallery-hint');
+    const nav = await gallery.locator('.product-gallery-nav').boundingBox();
+    const rail = await track.boundingBox();
+    assert.ok(nav && rail && nav.y + nav.height <= rail.y + 1, `${label}: controls must precede the previews`);
     await track.focus();
     assert.equal(await track.getAttribute('tabindex'), '0', `${label}: rail not reachable by keyboard`);
     await page.keyboard.press('Home');
@@ -204,6 +210,31 @@ try {
       }
     }
     console.log(`${file}: ${widths.length} widths and navigation OK`);
+  }
+  for (const device of ['iPhone 13', 'Pixel 7']) {
+    const touch = await browser.newContext({...devices[device], reducedMotion:'reduce'});
+    await touch.route('**/*', route => new URL(route.request().url()).origin === new URL(baseURL).origin
+      ? route.continue() : route.abort());
+    const mobile = await touch.newPage();
+    const cdp = await touch.newCDPSession(mobile);
+    for (const file of ['index.html', 'index-en.html']) {
+      await mobile.goto(`${baseURL}/${file}`);
+      const track = mobile.locator('[data-gallery-track]');
+      await track.scrollIntoViewIfNeeded();
+      const box = await track.boundingBox();
+      const y = box.y + box.height / 2;
+      const point = fraction => [{x:box.x + box.width * fraction, y}];
+      await cdp.send('Input.dispatchTouchEvent', {type:'touchStart', touchPoints:point(.85)});
+      for (const fraction of [.7, .55, .4, .25]) {
+        await cdp.send('Input.dispatchTouchEvent', {type:'touchMove', touchPoints:point(fraction)});
+      }
+      await cdp.send('Input.dispatchTouchEvent', {type:'touchEnd', touchPoints:[]});
+      await mobile.waitForFunction(() => document.querySelector('[data-gallery-track]').scrollLeft > 50
+        && !document.querySelector('[data-gallery-previous]').disabled
+        && !document.querySelector('[data-gallery-position]').textContent.includes('1'));
+      console.log(`${file}: ${device} native touch swipe OK`);
+    }
+    await touch.close();
   }
   if (process.env.ROCKSO_REPORT_PATH) await fs.writeFile(process.env.ROCKSO_REPORT_PATH, JSON.stringify(results, null, 2));
   console.log(`${results.length} page/viewport checks passed.`);

@@ -9,10 +9,10 @@
     content="Rockso est un assistant d’entraînement multisport qui t'aide à rester dans le bon tempo : capter les bons moments pour pousser, les bons moments pour récupérer, et construire une progression qui dure, semaine après semaine." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="assets/styles-v2.css" />
-  <link rel="stylesheet" href="assets/analytics-consent.css?v=20261024-privacy" />
-  <script type="module" src="assets/analytics.js?v=20261028-engagement"></script>
-  <script type="module" src="assets/minimal-audience.js?v=20261024-privacy"></script>
+  <link rel="stylesheet" href="assets/styles-v2.css?v=20261126-ux" />
+  <link rel="stylesheet" href="assets/analytics-consent.css?v=20261126-ux" />
+  <script type="module" src="assets/analytics.js?v=20261126-ux"></script>
+  <script type="module" src="assets/minimal-audience.js?v=20261126-ux"></script>
 </head>
 
 <body>
@@ -107,6 +107,18 @@
           </p>
 
           <div class="product-gallery" data-product-gallery>
+            <div class="product-gallery-nav">
+              <p id="product-gallery-hint" class="product-gallery-hint">Balayez horizontalement</p>
+              <div class="product-gallery-controls">
+                <button type="button" class="gallery-arrow" data-gallery-previous aria-controls="product-screens" aria-label="Aperçu précédent">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
+                </button>
+                <span data-gallery-position aria-live="polite" aria-atomic="true">Aperçu 1 sur 5</span>
+                <button type="button" class="gallery-arrow" data-gallery-next aria-controls="product-screens" aria-label="Aperçu suivant">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+                </button>
+              </div>
+            </div>
             <div class="screens-row" id="product-screens" data-gallery-track tabindex="0" role="region"
               aria-label="Aperçus de l'application Rockso" aria-describedby="product-gallery-hint">
               <figure class="screen-mockup" data-gallery-slide>
@@ -129,18 +141,6 @@
                 <img src="assets/img/mockup_semaine_pro.png" alt="Écran semaine" />
                 <figcaption>Semaine</figcaption>
               </figure>
-            </div>
-            <div class="product-gallery-footer">
-              <p id="product-gallery-hint" class="product-gallery-hint">Faites défiler pour découvrir les cinq aperçus</p>
-              <div class="product-gallery-controls">
-                <button type="button" class="gallery-arrow" data-gallery-previous aria-controls="product-screens" aria-label="Aperçu précédent">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 6-6 6 6 6" /></svg>
-                </button>
-                <span data-gallery-position aria-live="polite" aria-atomic="true">Aperçu 1 sur 5</span>
-                <button type="button" class="gallery-arrow" data-gallery-next aria-controls="product-screens" aria-label="Aperçu suivant">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
-                </button>
-              </div>
             </div>
           </div>
         </div>
