@@ -1,0 +1,47 @@
+# Cloudflare — décision de clôture du 27 novembre 2026
+
+**Avis opérationnel : GO pour le proxy temporaire, après publication autorisée des mentions FR/EN et GO explicite du fondateur. GO distinct pour l’exploitation manuelle du compteur après recette de ses filtres.** Aucun risque critique non maîtrisé imposant une migration immédiate n’est démontré par les preuves reçues. Cet avis ne constitue ni une activation ni une certification de conformité.
+
+Complément aux évaluations de la [PR #1](https://github.com/EGRockso/App_Prototype/pull/1), sans nouvel audit : [juridique et EFVP](https://github.com/EGRockso/App_Prototype/blob/de7c65d02e828361858f0e801b570a0771eec9f1/docs/privacy/cloudflare/ANALYSE_JURIDIQUE.md), [fournisseur/transferts](https://github.com/EGRockso/App_Prototype/blob/de7c65d02e828361858f0e801b570a0771eec9f1/docs/privacy/cloudflare/PRESTATAIRE_TRANSFERTS_CONSERVATION.md), [architecture](https://github.com/EGRockso/App_Prototype/blob/de7c65d02e828361858f0e801b570a0771eec9f1/docs/privacy/cloudflare/AUDIT_SEPARATION_VITRINE_2026_11_26.md), [P0](https://github.com/EGRockso/App_Prototype/blob/de7c65d02e828361858f0e801b570a0771eec9f1/docs/privacy/cloudflare/ARBITRAGE_P0_2026_11_26.md). Leurs réserves préparatoires sont réévaluées ici, sans effacement de l’historique.
+
+## Contrôles réceptionnés
+
+Réception Global et déclarations du fondateur du 27 novembre : MFA actif, administrateur unique, adresse professionnelle, compte **AIMS Corp. / Rockso** ; Web Analytics non configuré, Zaraz inactif, Bot Fight Mode et Under Attack Mode désactivés ; aucune Cache Rule active ni Worker raccordé selon l’Overview. DNS/HTTPS restent reçus ; cible Full (strict), proxy limité à l’apex/www. Aucune nouvelle inspection du compte. L’absence effective d’injection sera vérifiée après activation autorisée.
+
+## Contrat, transferts et conservation
+
+**DPA v6.4 retenu applicable au Self-Serve Free examiné.** Les [conditions Self-Serve](https://www.cloudflare.com/terms/) du 12 septembre 2025 autorisent l’acceptation par usage pour l’entité représentée et incorporent le DPA (§6.1). Le [DPA](https://www.cloudflare.com/cloudflare-customer-dpa/), v6.4 du 3 avril 2026, vise Self-Serve sans exclusion Free. Le fondateur utilise le service pour l’activité d’AIMS Corp. : cette qualité fonde raisonnablement l’identification du client, plutôt que le seul renommage. L’identité contractuelle historique n’est pas formellement attestée par le fournisseur ; aucun transfert d’un contrat personnel n’est affirmé. Une confirmation du support n’est pas requise sans preuve contraire d’une souscription exclusivement personnelle nécessitant régularisation.
+
+AIMS Corp. est responsable ; Cloudflare est sous-traitant pour ses opérations déléguées, avec des usages propres de données réseau distincts. Les politiques l’expliquent et lient les [sous-traitants](https://www.cloudflare.com/gdpr/subprocessors/cloudflare-services/) et la [confidentialité](https://www.cloudflare.com/privacypolicy/). Réseau mondial, sans résidence exclusivement UE. CCT et annexes prévues pour les transferts restreints (DPA §6.2–6.3) ; DPF déclaré contractuellement (§6.4), sans vérification individuelle du registre dans ce lot. La conclusion ne dépend pas exclusivement du DPF. Conservation : critères du DPA annexe 1 et de la politique §11, sans déduire une purge de l’historique visible ni inventer de délai ou garantie Enterprise.
+
+## Conclusion des évaluations existantes
+
+**Mise en balance RGPD favorable (art. 6.1.f)** pour les deux finalités distinctes : distribution/sécurité et comptage d’acquisition. Le besoin est un compteur d’accueil indépendant de PostHog, sans équivalent actuellement reçu avec GitHub Pages. Le volume prévu est de quelques dizaines ou centaines de visiteurs ; seuls des totaux jour/langue sont exploités. Absence d’export individuel, de profilage, de jointure et accès unique avec MFA réduisent l’atteinte. Le faible volume ne dispense pas des obligations. IP et URL restent personnelles en amont ; le droit d’opposition demeure applicable.
+
+**ePrivacy/article 82 : pas de consentement supplémentaire retenu pour ce seul comptage** de requêtes ordinaires, sans lecture/écriture supplémentaire du terminal, identifiant, déduplication IP ou suivi transversal. Ce n’est ni une exemption générale de Cloudflare ni une labellisation CNIL ; l’intérêt légitime ne remplace pas ce test. Une injection ou collecte dédiée changerait la conclusion. PostHog conserve son consentement propre. **AIPD art. 35 : aucune obligation d’étude complète identifiée** pour ce lot ; aucun suivi systématique à grande échelle n’est établi.
+
+**EFVP projet et hors Québec (art. 3.3/17 si applicables) : conclusion favorable pour l’expérimentation limitée.** Les évaluations existantes sont complétées par les contrôles reçus et le DPA : données techniques et paramètres d’accès possibles, réseau mondial dont les États-Unis, risques d’accès par des autorités/tiers et conservation, clauses, confidentialité, accès restreints et droits. Cloudflare termine TLS : le chiffrement ne lui masque pas les requêtes et ne neutralise pas les risques d’accès étrangers. Les garanties, la faible granularité et les limitations d’usage permettent de retenir une protection adéquate dans ce périmètre, sous les mesures ci-dessous. Le responsable accepte cette conclusion avec le GO propriétaire, sans nouveau formulaire.
+
+**LPRPDE si applicable :** aucune transposition de l’intérêt légitime européen. La prestation technique conserve sa finalité ; le compteur interne se limite aux totaux sans profilage ni nouvelle collecte sur le terminal. Information explicite, limitation et garanties sont retenues comme proportionnées aux attentes raisonnables pour cet usage ; cela n’autorise aucune réutilisation individuelle nouvelle. Les droits canadiens publiés sont maintenus. L’incertitude territoriale seule ne fonde pas un STOP ; les garanties québécoises sont appliquées au lot par prudence.
+
+## Dernières actions indispensables et décision
+
+| Sujet | Obligation ou condition | Fait restant et action minimale |
+| --- | --- | --- |
+| Information avant nouveau traitement | RGPD art. 13 ; information québécoise art. 8 si applicable | Les mentions Cloudflare de cette PR ne sont pas encore publiées. Obtenir le GO de publication, puis publier les deux pages avant réactivation. Aucun autre texte public à réécrire. |
+| Décision du responsable | Responsabilité RGPD art. 5.2/24 ; acceptation de l’EFVP proportionnée si applicable ; mandat propriétaire | Le présent avis n’est pas un GO de production. Consigner le GO explicite du fondateur pour le proxy et son acceptation des risques de cette note. Pas de nouveau dossier fournisseur exigé. |
+| Compteur réellement exploitable | Respect du périmètre et des garanties de cette décision | Après activation autorisée : vérifier absence de nouvelle injection/script/cookie et filtres des seuls chargements HTML qualifiés des accueils FR/EN ; compter par jour/langue. Puis GO distinct du compteur. Si la recette échoue, ne pas exploiter ce compteur ; aucune modification implicite du consentement. |
+
+**Aucun autre obstacle réglementaire avéré non satisfait n’est identifié sur les éléments reçus.** Le proxy reste une recommandation favorable temporaire jusqu’au **30 novembre à 12 h, America/Toronto**, avec revue de sa fenêtre selon Global. La revue juridique complémentaire à deux ou trois semaines ne prolonge pas tacitement cette fenêtre. Aucune nouvelle activation n’est effectuée dans ce mandat.
+
+## Risques acceptables sous conditions et suites
+
+Risques reçus : paramètres d’accès sur la vitrine, journaux/usages réseau du fournisseur, accès internationaux et purge non chiffrée par catégorie. Mesures compensatoires : MFA et accès unique ; aucun export/partage de détails d’authentification, IP ou URL, aucune jointure aux comptes, UTM, visiteurs uniques ou sessions ; aucune instrumentation supplémentaire ; arrêt de l’usage concerné en cas d’incident significatif ou de recette incompatible. Totaux conservés seulement tant qu’utiles aux comparaisons, réexaminés lors de la revue, sans listes de requêtes pour ce KPI.
+
+Test du **26 novembre exclu des KPI officiels** selon l’exclusion conservatrice de la PR #1 ; bornes effectives inconnues. Ne pas exploiter des totaux mêlés au test s’ils sont inséparables.
+
+Suivi canonique : [Global #2](https://github.com/EGRockso/App_Prototype/issues/2). Semaine du 30 novembre : revue de fenêtre, mandat de séparation bêta/auth, relais/partenaires et réconciliation des entrypoints, sans en faire de nouveaux préalables. Du **11 au 18 décembre** : revue juridique complémentaire des usages, conservation et pièces contractuelles disponibles ; registre DPF si utile, sans ticket support systématique. Intégration Growth hors mandat.
+
+## Vérification documentaire
+
+Mentions demandées → complément Cloudflare FR/EN ; garanties et droits → liens officiels et audits figés. Scripts, styles, versions `data-*` et compléments PostHog/Mobile/Coach conservés à l’identique. Structure HTML, ancres, diff limité et absence de secrets/URL d’accès réels contrôlés avant PR ; aucune source brute ni donnée de visiteur jointe. Science, calculs sportifs, benchmark, représentations, doublons et parcours N1/N2/N3 sont sans transformation dans ce lot juridique ; aucune note de version Mobile/Coach concernée. Ces contrôles locaux ne valent pas recette de production.
