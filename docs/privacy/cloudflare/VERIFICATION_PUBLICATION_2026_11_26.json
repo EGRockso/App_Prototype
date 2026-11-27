@@ -1,0 +1,73 @@
+{
+  "scope": "Current files of this documentation publication only; prior Git history is preserved",
+  "status": "pass",
+  "methods": [
+    "targeted credential and personal-data scan",
+    "manual review of report content and source-versus-event claims",
+    "JSON parsing and relative-link resolution",
+    "documents-only allowlist"
+  ],
+  "individual_visitor_or_athlete_data_found": false,
+  "auth_tokens_or_secret_keys_found": false,
+  "individual_names_and_private_conversation_links_removed": true,
+  "functional_public_contacts_retained": [
+    "privacy@rockso.app"
+  ],
+  "relative_links_checked": 25,
+  "source_material_excluded": [
+    "raw hosted function downloads",
+    "browser and backend logs",
+    "live auth links",
+    "screenshots",
+    "account records",
+    "private conversation identifiers"
+  ],
+  "security_evidence": "Only evidence already collected in the two preceding audits; no new hosted security observations",
+  "canonical_backlog": "https://github.com/EGRockso/App_Prototype/issues/2",
+  "files": [
+    {
+      "path": "docs/privacy/cloudflare/ANALYSE_JURIDIQUE.md",
+      "sha256": "351723b94125212af83a8b4ae29ad1e37e9dcfb5b7ad99d8b0313d9f8b1fb732"
+    },
+    {
+      "path": "docs/privacy/cloudflare/ARBITRAGE_P0_2026_11_26.md",
+      "sha256": "4110bdb644fc2398d1c13c5a2f97af150fc8e98b9f0f913bcc3313619d53b3fd"
+    },
+    {
+      "path": "docs/privacy/cloudflare/AUDIT_SEPARATION_VITRINE_2026_11_26.md",
+      "sha256": "1100dfa235870cf3bfa2f4097a3382de0579cd0dbd8bec6c63cf9f5573da82e1"
+    },
+    {
+      "path": "docs/privacy/cloudflare/CARTOGRAPHIE_ET_REGISTRE.md",
+      "sha256": "24019071ec7512cce9bbe5a7d15c606a2e3c6e8bccff4d52d0ff880c96100c1e"
+    },
+    {
+      "path": "docs/privacy/cloudflare/INVENTAIRE_SOURCES.json",
+      "sha256": "25ff922b96f556249f26dad2cab46cb64a65c9a715b63adf474f66a6b1a1c59a"
+    },
+    {
+      "path": "docs/privacy/cloudflare/POLITIQUES_FR_EN.md",
+      "sha256": "a317e3f1e5ac9676685d8b630c7605707b9833b6c928bb3f62bd4791113f27cb"
+    },
+    {
+      "path": "docs/privacy/cloudflare/PRESTATAIRE_TRANSFERTS_CONSERVATION.md",
+      "sha256": "13264725b1bf1901a36ee02ad6f0e2a8e17cc5e13f810c6a28bc3b90ff30de60"
+    },
+    {
+      "path": "docs/privacy/cloudflare/PREUVES_AUDIT_ARCHITECTURE.json",
+      "sha256": "6e421faae015ab2a471c60da0a0fe2519fe84ff381f9b96274db7bfd45e53ade"
+    },
+    {
+      "path": "docs/privacy/cloudflare/PREUVES_ET_DECISION.md",
+      "sha256": "a847cb2f6c409b60c11fa385a08607c1d25d563fbf8489543695a14de15e85c5"
+    },
+    {
+      "path": "docs/privacy/cloudflare/README.md",
+      "sha256": "c67c5ef465add59ebad2454480a4e96a8dff8d84303f5f1e023ae42cffbb614c"
+    }
+  ],
+  "public_technical_literals_retained": [
+    "1.1.1.1 (public DNS resolver address)",
+    "asset filenames ending in @2x.png, @3x.png or @4x.png (not email addresses)"
+  ]
+}
