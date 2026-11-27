@@ -29,7 +29,6 @@
     "exact_start_utc": null,
     "exact_traffic_end_utc": null,
     "excluded_from_official_kpi": true,
-    "source_chat": "https://chatgpt.com/c/6aff027d-ab14-83e9-9987-0e90d3ab7fb5",
     "message_anchors": [
       {
         "utc": "2026-11-27T01:39:15.396Z",
@@ -53,7 +52,8 @@
         "2026-11-27"
       ],
       "extend_if_evidence_requires": true
-    }
+    },
+    "source_evidence": "Growth report previously collected; private conversation identifier omitted from public copy"
   },
   "tracked_file_count": 154,
   "html_count": 31,

@@ -1,6 +1,6 @@
 # Preuves manquantes et décision opérationnelle
 
-**26 novembre 2026 — STOP pour la réactivation.** La liste ci-dessous rend la qualification terminable sans demander au fondateur de réauditer tout Rockso. Aucune étape n’exige une nouvelle activation du proxy.
+**26 novembre 2026 — cadre initial de qualification, antérieur à l’arbitrage P0.** Pour la décision de sécurité à court terme, voir [l’arbitrage P0](ARBITRAGE_P0_2026_11_26.md) ; les réserves juridiques restent distinguées de cet avis. La liste ci-dessous rend la qualification terminable sans demander au fondateur de réauditer tout Rockso. Aucune étape n’exige une nouvelle activation du proxy.
 
 ## Pièces à recueillir dans le compte Cloudflare
 
@@ -18,13 +18,13 @@ Une réponse fournisseur refusant tout délai chiffré n’est pas automatiqueme
 
 ## Période temporaire du 26 novembre
 
-Source : [chat Growth](https://chatgpt.com/c/6aff027d-ab14-83e9-9987-0e90d3ab7fb5), cinq échanges récents relus via l’outil de lecture des chats. Les images jointes n’étaient pas accessibles ; les constats qui en découlent sont **rapportés dans le chat**, sans contrôle direct des pixels. Les heures ci-dessous sont les horodatages des messages, pas ceux des bascules DNS.
+Source : compte rendu Growth déjà reçu, cinq échanges relus lors du premier audit. La référence de conversation privée est omise de la version publiée. Les images jointes n’étaient pas accessibles ; les constats qui en découlent sont **rapportés dans le chat**, sans contrôle direct des pixels. Les heures ci-dessous sont les horodatages des messages, pas ceux des bascules DNS.
 
 | Message | America/Toronto | UTC | Ce qu’il établit |
 | --- | --- | --- | --- |
 | Envoi de captures de statistiques, commentaire sur IP/User-Agent | 26 novembre 20:39:15 | 27 novembre 01:39:15Z | Des statistiques sont rapportées ; ne fixe pas le début de l’activation |
 | Captures DNS/filtres, commentaire apex/www proxifiés | 26 novembre 20:42:05 | 27 novembre 01:42:05Z | État actif rapporté sur les captures antérieures au commentaire ; pas d’heure de changement vérifiée |
-| Étienne : « Je suis en DNS Only il faut faire la fin » | 26 novembre 20:43:58 | 27 novembre 01:43:58Z | Retour DNS only déclaré au plus tard dans cet échange, sans preuve de fin de tout trafic |
+| Retour DNS only confirmé dans le compte rendu | 26 novembre 20:43:58 | 27 novembre 01:43:58Z | Retour DNS only déclaré au plus tard dans cet échange, sans preuve de fin de tout trafic |
 
 **Début exact : inconnu. Fin exacte du trafic proxifié : inconnue.** Ne pas transformer 20:42–20:43 en durée du test. Les champs restent `null` dans l’inventaire. La date locale du test est le 26 novembre, mais les messages de fin sont le 27 en UTC.
 

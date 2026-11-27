@@ -1,0 +1,284 @@
+{
+  "status": "audit_and_proposal_only",
+  "date_local": "2026-11-26",
+  "timezone": "America/Toronto",
+  "user_decision": "Avoid the HTTP proxy managed in the Rockso zone; qualify supplier infrastructure separately",
+  "repository_references": {
+    "website": "74ad7df0a1a309e1ce4653a1ab8601ecde00fe39",
+    "website_documentation_pr": "https://github.com/EGRockso/App_Prototype/pull/1",
+    "website_documentation_head": "b2d8779c320ffbf2fb80b2774e93554e5f7b8500",
+    "mobile_coach_main": "6bbe213801504f0b7ca93d4bc7f5e14037a25cf2",
+    "mobile_local": "d03a5201a9146b5fb8b2c2c1fbcbd64ed5a3820c",
+    "mobile_remote_shared_branch": "4350749dd01dce76c3c1bb983453b7949ded5152"
+  },
+  "production_changes": false,
+  "repository_changes": false,
+  "pr_changes": false,
+  "hosted_functions": [
+    {
+      "slug": "oauth-callback",
+      "version": 98,
+      "status": "ACTIVE",
+      "verify_jwt": false,
+      "bundle_sha256": "f8058fb55c027a2cfe227ea17f67fa21961492570859d0c9bddb3344749d95b4",
+      "entrypoint_sha256": "ccaa7cd14529d4872ba410198c6eb5d5072e36a9174a663e602c80eeb51140f6",
+      "entrypoint_matches_mobile_main_blob": false,
+      "entrypoint_matches_d03a5201": true
+    },
+    {
+      "slug": "suunto-oauth-connect",
+      "version": 41,
+      "status": "ACTIVE",
+      "verify_jwt": true,
+      "bundle_sha256": "85b98051006cf8ab7a45394e55f01e997c55971d4193ca9b6957be9aaa73c86c",
+      "entrypoint_sha256": "de1ca448b1a6de28c627bfdd8532543833dd2352493e78723465f6f8b2a43e02",
+      "entrypoint_matches_mobile_main_blob": false,
+      "entrypoint_matches_d03a5201": true
+    },
+    {
+      "slug": "suunto-oauth-callback",
+      "version": 142,
+      "status": "ACTIVE",
+      "verify_jwt": false,
+      "bundle_sha256": "7310ff702f798e9cb8ce8c0079055fbae202f17d361c1f59181c49b5a5b97af4",
+      "entrypoint_sha256": "3fa7138db70a3759fb3ff9263a9493960f38e502238eff6a7e63f03b85294f30",
+      "entrypoint_matches_mobile_main_blob": false,
+      "entrypoint_matches_d03a5201": true
+    },
+    {
+      "slug": "polar-oauth-connect",
+      "version": 33,
+      "status": "ACTIVE",
+      "verify_jwt": true,
+      "bundle_sha256": "affd67b13ead9d444105e193e17e5c3d003d2eb6bbe0da604ae51d3fe733a2f3",
+      "entrypoint_sha256": "8d72dabbd56389ce74b027bda290bf57b449cc5033e91f3c5bb2bfcd0b0b569e",
+      "entrypoint_matches_mobile_main_blob": false,
+      "entrypoint_matches_d03a5201": true
+    },
+    {
+      "slug": "polar-oauth-callback",
+      "version": 96,
+      "status": "ACTIVE",
+      "verify_jwt": false,
+      "bundle_sha256": "2025c57ca4d1a50d518e076a839f3f3d585477ad8a6273a85e4d4b5bdb2ad567",
+      "entrypoint_sha256": "899fcec03397391528538fbc6e63a646506c02648cd4ff447c6e52cee49e5512",
+      "entrypoint_matches_mobile_main_blob": false,
+      "entrypoint_matches_d03a5201": true
+    },
+    {
+      "slug": "coros-oauth-connect",
+      "version": 20,
+      "status": "ACTIVE",
+      "verify_jwt": true,
+      "bundle_sha256": "576170151226b1a24535a3f317d458ffab6b849158c35d949bdc26f00d784dfc",
+      "entrypoint_sha256": "3eface84232bf3128860c7cc93171ede7759d96732b120ab1e47abfa5073e778",
+      "entrypoint_matches_mobile_main_blob": true,
+      "entrypoint_matches_d03a5201": true
+    },
+    {
+      "slug": "coros-oauth-callback",
+      "version": 21,
+      "status": "ACTIVE",
+      "verify_jwt": false,
+      "bundle_sha256": "f670614741fd2a02dce8260a55a4788eb783415e47fceb2e182e19c0688f49f2",
+      "entrypoint_sha256": "7eb4fd1ac3e4a0cfa16ea3b86a6072153c8c842ea234f0e4f318af900c307dd1",
+      "entrypoint_matches_mobile_main_blob": true,
+      "entrypoint_matches_d03a5201": true
+    },
+    {
+      "slug": "promote-prospect",
+      "version": 37,
+      "status": "ACTIVE",
+      "verify_jwt": true,
+      "bundle_sha256": "b549a69932899eb7685501548f4b8ce39ecb232547a27ccd0051c5ef436f665e",
+      "entrypoint_sha256": "0919d4d3adbc0d30450c63cc7dac1db6313a63848d0c3361be740063c76f3c60",
+      "entrypoint_matches_mobile_main_blob": false,
+      "entrypoint_matches_d03a5201": true
+    },
+    {
+      "slug": "request-beta-access",
+      "version": 88,
+      "status": "ACTIVE",
+      "verify_jwt": false,
+      "bundle_sha256": "a8695f2d99af5202635d6d2fb7975f4566e281c947f6412c5e56d64bb0b78001",
+      "entrypoint_sha256": "e5881f52c422467efe18a7afbc6bcad1731800815fe32c2ae8bb7a041b19a4dd",
+      "entrypoint_matches_mobile_main_blob": true,
+      "entrypoint_matches_d03a5201": true
+    }
+  ],
+  "source_files": [
+    {
+      "reference_group": "vitrine",
+      "path": "README-APP-DEMO.md",
+      "sha256": "22d8d25bc6651001303c7bc0acaa6c1a45cd60f0613a0d8ddc2da06052bb78f2"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "assets/acquisition.js",
+      "sha256": "7245e95e7a95219434f57cfb61a3482e644a92e8a9ec09d7413b75aff458b02a"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "assets/analytics-config.js",
+      "sha256": "1dced6bf15112a461546fce5a79a02217bad4483d6746407288ca2128b5b11bd"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "assets/analytics.js",
+      "sha256": "f87876134a797e521a4dd37287d73a2d61020401fdb4d3b7cd4dd6889992c553"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "beta-access.html",
+      "sha256": "6a9816722e83cefa7d9acdee0351f854e8e66cc149a97e7602be6cad397d1677"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "demo-app.html",
+      "sha256": "10027220c56fcfb6f8bb63a673c95a623f1e25a71360884a286878bfd98dcfd2"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "demo-login-en.html",
+      "sha256": "27a51849510b5ff422450f1d2418b1e10d39cef5b4edd1a501bf2fd56ba9dda7"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "demo-login.html",
+      "sha256": "1f0ea2586a5f21838bf8070ccef1e90002cf7d41047820c1a2dca8fa7aa9bf61"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "index-en-old.html",
+      "sha256": "48bfe74db02fa4ea9a7adaeb3d15572a0b9fb22bc4dc78d3b57adf46f2233a82"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "index-en.html",
+      "sha256": "c8ac2d09c56f2f1051e39311310c784bfbcb3b23592e90bda026bff0b489babe"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "index-old.html",
+      "sha256": "75094a6765f75ab3b5c4acf2f180a5fd1bb78c8a43353b5bb9ed61ff52c8675e"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "index.html",
+      "sha256": "ea2c65bc38309d4dcb9897df0d79053fd591df3e9438cd6b3ca7945670f0b935"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "oauth/coros/callback/index.html",
+      "sha256": "5cd94ca8dbaa3e3cc4fbcd42564a8ba9d09a83d64f683b3bab57723681ecbe37"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "oauth/garmin/callback/index.html",
+      "sha256": "ba96c94982b8dae85889c9b6b9ed0b2c2c1ff57e5790f7e09b33c2ecbecc47c9"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "oauth/polar/callback/index.html",
+      "sha256": "0a36fb819a55655d196b2324ba4d4f238ef1a3b5b9b69a70397efd0cfc71ae78"
+    },
+    {
+      "reference_group": "vitrine",
+      "path": "oauth/suunto/callback/index.html",
+      "sha256": "687fd0cee4dda7a226f2fbf52e838af16da171d9dbfe2779e1de4be31cc70e28"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "app.json",
+      "sha256": "edb0a2b60d0339a64c686ba9410f821597cc4c59e461c098017919d4316434c4"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "lib/screens/connections/useConnectionsScreen.ts",
+      "sha256": "e155334b3db112028415f01c210f1ca4aed52a32be4a66e82503d708066fb58d"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "lib/services/integrationsService.ts",
+      "sha256": "294b0b59a802fa893088eaa851d11f2f1b8c99e05d20ad6fe573317a69583ab7"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "lib/utils/authLinks.ts",
+      "sha256": "ee14ccdae025b869b599ae3a0692eefae12f759fd999cafda30caa67bc90a703"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "supabase/functions/oauth-callback/index.ts",
+      "sha256": "ff8d63ff41cbe43bb726a93318fca59162832bceea28c74ed9388c3571ddb183"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "supabase/functions/polar-oauth-callback/index.ts",
+      "sha256": "ed97b65685bb18fe22909b0458cf1ecc96a1d072edd6314c72a3166de7f5e092"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "supabase/functions/polar-oauth-connect/index.ts",
+      "sha256": "6e78fbf9f469bc756eb21a537915ecf15b86bd2f24dd96e2d056a5f016eb6154"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "supabase/functions/promote-prospect/index.ts",
+      "sha256": "0a684a2d0b0ae2bbd8c07601f6c6d073a6596ec786e60d131d9b3db8ceaa1164"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "supabase/functions/request-beta-access/index.ts",
+      "sha256": "e5881f52c422467efe18a7afbc6bcad1731800815fe32c2ae8bb7a041b19a4dd"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "supabase/functions/suunto-oauth-callback/index.ts",
+      "sha256": "9c7e16460e80f0556149c555e0dfe4d8400b2dc7d3c762fcc9e0b5a694fcb731"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "supabase/functions/suunto-oauth-connect/index.ts",
+      "sha256": "e9d7f4ad00a0f5b69ea97a71deff4a78e2565e62919630d29709774c8c5dacb4"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "web/src/App.tsx",
+      "sha256": "9b6b5ca47bff9719ede297489b5b6fd7f65801e453d4b9dd86080023e97a8be4"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "web/src/auth/AuthProvider.tsx",
+      "sha256": "0a4b09592f18a19967014f42fbfe9c257d02027c4a7769b3eca3efe1a77a8bcf"
+    },
+    {
+      "reference_group": "mobile-main",
+      "path": "web/src/lib/authRedirect.ts",
+      "sha256": "bca9dc1330bb5680536ae38ec2b0c4924399d170aabf6ec73424448ac6fe0c28"
+    }
+  ],
+  "evidence_limits": [
+    "No partner portal, secret values or hosted Auth configuration inspected.",
+    "No login, invite, OAuth connect, callback or token exchange invoked.",
+    "No recent usage demonstrated by the targeted aggregate function-log queries over the default last-24-hours window; not proof of abandonment.",
+    "No GitHub Pages access-log coverage or certified installed-binary source parity."
+  ],
+  "supplier_layer": {
+    "public_probe_host": "hegtnyarfeoyapobysee.supabase.co",
+    "public_probe_path": "/",
+    "method": "HEAD",
+    "http_status": 404,
+    "server": "cloudflare",
+    "cf_ray_present": true,
+    "raw_request_or_response_identifiers_saved": false,
+    "official_subprocessor_list": "https://supabase.com/legal/subprocessor-list/October-12-2026.pdf"
+  },
+  "proposed_frontend_host": "access.rockso.app (not provisioned, availability unverified)",
+  "proposed_architecture": "retain existing server OAuth callbacks; isolate beta activation frontend; retire historical published demos only after dependency and owner checks",
+  "original_audit_report_sha256": "23c321d8ee6414623844ea4eddce812801a1f09f368c685c3df11f94099a4423",
+  "published_report_sha256": "1100dfa235870cf3bfa2f4097a3382de0579cd0dbd8bec6c63cf9f5573da82e1",
+  "publication_note": "Public sanitized report copy; repository_changes=false and pr_changes=false describe the initial audit, not this later documentation publication.",
+  "original_audit_report_words": 3143,
+  "published_report_words": 3195
+}

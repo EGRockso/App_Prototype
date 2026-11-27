@@ -1,6 +1,6 @@
 # Qualification Cloudflare de la vitrine Rockso
 
-**26 novembre 2026, America/Toronto — proposition documentaire pour décision du fondateur. Recommandation : STOP pour la réactivation du proxy.** Le DNS only est l’état déclaré par Étienne ; aucune modification de production n’est incluse. Cette recommandation ne conclut pas à une interdiction générale de Cloudflare Free. Elle constate que les conditions de notre configuration ne sont pas encore toutes démontrées.
+**26 novembre 2026, America/Toronto — proposition documentaire pour décision du fondateur. Recommandation : STOP pour la réactivation du proxy.** Le DNS only est l’état déclaré par le pilotage ; aucune modification de production n’est incluse. Cette recommandation ne conclut pas à une interdiction générale de Cloudflare Free. Elle constate que les conditions de notre configuration ne sont pas encore toutes démontrées.
 
 ## Périmètre et état des preuves
 
@@ -9,6 +9,8 @@ La cible autorisée à l’étude est Cloudflare Free DNS et reverse proxy pour 
 Source applicative de référence : [App_Prototype à 74ad7df0](https://github.com/EGRockso/App_Prototype/tree/74ad7df0a1a309e1ce4653a1ab8601ecde00fe39), HEAD distant lu pour ce lot. GitHub Pages est configuré sur `main`, racine, domaine `rockso.app`, HTTPS imposé, statut `built` à la lecture API. Cette configuration ne prouve pas l’identité octet par octet du site servi. Le checkout vitrine local `5032af12` diffère de cette référence par deux logos et les politiques FR/EN : les politiques distantes ont donc été relues. Les modifications locales étrangères sont préservées. Aucun fichier Mobile ou Coach n’est modifié.
 
 Les conclusions DNS/HTTPS/mail/Coach et la disponibilité des filtres Free sont **reçues du fondateur et de Growth**, pas refaites ici. Le compte Cloudflare et les captures d’origine ne sont pas directement consultés ; les documents publics sont distingués de la preuve contractuelle du compte.
+
+**Lecture P0 ultérieure :** le [nouvel arbitrage de sécurité](ARBITRAGE_P0_2026_11_26.md) recommande un GO temporaire borné sous préconditions ciblées. Il ne déclare pas close la qualification juridique ci-dessous. L’[audit architectural reçu](AUDIT_SEPARATION_VITRINE_2026_11_26.md) et ses [empreintes](PREUVES_AUDIT_ARCHITECTURE.json) sont désormais conservés dans ce même dossier. La séparation minimale est validée comme cible, sans autorisation de réalisation.
 
 ## Dossier maintenable
 
@@ -23,7 +25,7 @@ Les conclusions DNS/HTTPS/mail/Coach et la disponibilité des filtres Free sont 
 
 Ces entrées concernent exclusivement la vitrine. Elles complètent [le suivi Analytics existant](../../ANALYTICS_POSTHOG.md) et [sa finalisation](../../ANALYTICS_FINALISATION_2026_10_23.md), sans créer de backlog général de conformité. Responsable proposé pour la tenue : président d’AIMS Corp., fonction déjà indiquée dans les politiques actuelles ; acceptation et clôture des réserves à dater par lui.
 
-## Décision et classification
+## Classification initiale de qualification juridique
 
 | Classe | Élément | Condition de clôture |
 | --- | --- | --- |
@@ -55,3 +57,13 @@ Le contrôle §6.2 a précédé la rédaction : [point d’entrée](https://gith
 ## Note de changement du lot
 
 26 novembre 2026 : qualification documentaire Cloudflare, registre vitrine, évaluations préparées, textes FR/EN et contrat du futur KPI. Impact utilisateur actuel : aucun changement du site ou de la collecte. Vérifications : référence Git distante, configuration Pages en lecture seule, inventaire des fichiers, consommateurs et appels directs, sources officielles, liens locaux et périmètre de la PR. Limites : aucun compte Cloudflare, réseau navigateur authentifié, effacement fournisseur, test API Cloudflare ou recette hébergée. Pas de version Mobile/Coach créée pour un lot documentaire vitrine.
+
+## Suivi Global
+
+[Backlog canonique pour la semaine du 30 novembre — issue #2](https://github.com/EGRockso/App_Prototype/issues/2). L’issue ne vaut pas autorisation de mise en œuvre.
+
+## Publication durable des audits
+
+26 novembre 2026 : ajout de l’audit architectural reçu, du manifeste expurgé, de l’arbitrage P0 et du lien vers le suivi Global. Le premier audit reste ci-dessus et dans ses documents liés ; ses réserves initiales ne sont pas réécrites comme des vulnérabilités démontrées. Les versions courantes retirent le prénom et le lien de chat interne ; les sources brutes et données de visiteurs ne sont pas publiées. Les adresses fonctionnelles publiques des politiques restent utiles à l’exercice des droits. Aucune donnée métier, application ou configuration hébergée n’est changée.
+
+Le contrôle de publication couvre les fichiers de ce lot ; il ne réécrit pas l’historique Git antérieur.
