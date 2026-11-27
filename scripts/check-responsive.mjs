@@ -1,7 +1,7 @@
 // Run against a local HTTP server. Uses the caller's existing Playwright installation.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-const { chromium } = await import(process.env.ROCKSO_PLAYWRIGHT_MODULE || 'playwright');
+const { chromium, devices } = await import(process.env.ROCKSO_PLAYWRIGHT_MODULE || 'playwright');
 const browser = await chromium.launch({
   headless: true,
   ...(process.env.ROCKSO_BROWSER_PATH ? { executablePath: process.env.ROCKSO_BROWSER_PATH } : {}),
@@ -29,10 +29,10 @@ async function checkProductGallery(page, file, width) {
     return rail.tabIndex === (compact ? 0 : -1);
   }, width < 900, { timeout: 3000 });
   assert.deepEqual(
-    await gallery.locator('[data-gallery-slide] figcaption').allTextContents(),
-    english ? ['Activity', 'Injury', 'AI assistant', 'Map', 'Week']
-      : ['Activité', 'Blessure', 'Assistant IA', 'Carte', 'Semaine'],
-    `${label}: five localized captions required`,
+    await gallery.locator('[data-gallery-slide] img').evaluateAll(images => images.map(image => image.alt)),
+    english ? ['Rockso activity screen', 'Injury screen', 'AI coach assistant screen', 'Map screen', 'Week screen']
+      : ['Écran activité Rockso', 'Écran blessure', 'Écran assistant coach IA', 'Écran carte', 'Écran semaine'],
+    `${label}: five localized image descriptions required`,
   );
   assert.equal(await track.getAttribute('role'), 'region', `${label}: labelled region required`);
   assert.equal(await track.getAttribute('aria-label'), english
@@ -67,66 +67,67 @@ async function checkProductGallery(page, file, width) {
         const cardRect = card.getBoundingClientRect();
         return cardRect.left < rect.right - 1 && cardRect.right > rect.right + 1;
       }),
-      captionsFit: cards.every(card => {
-        const caption = card.querySelector('figcaption').getBoundingClientRect();
-        const cardRect = card.getBoundingClientRect();
-        return caption.left >= cardRect.left - 1 && caption.right <= cardRect.right + 1;
-      }),
       imagesLoaded: cards.every(card => card.querySelector('img').naturalWidth > 0),
     };
   });
-  const waitForScroll = target => page.waitForFunction(expected => {
-    const rail = document.querySelector('[data-gallery-track]');
-    return Math.abs(rail.scrollLeft - expected) <= 2;
-  }, target, { timeout: 3000 });
-
+  assert.equal(await gallery.locator('figcaption, #product-gallery-hint').count(), 0);
+  const nav = gallery.locator('.product-gallery-nav');
   if (width < 900) {
+    const navBox = await nav.boundingBox();
+    const railBox = await track.boundingBox();
+    assert.ok(navBox && railBox && navBox.y >= railBox.y + railBox.height - 1, `${label}: controls must follow previews`);
+    assert.equal((await nav.innerText()).trim(), await position.textContent());
+    assert.equal(await position.evaluate(el => getComputedStyle(el).clipPath), 'inset(50%)');
+    const dots = nav.locator('.gallery-dots > span');
+    assert.equal(await dots.count(), 5);
+    assert.equal(await nav.locator('.gallery-dots').getAttribute('aria-hidden'), 'true');
+
+    // Verify the dot and live announcement when the actual slide reaches its snap point.
+    const waitForSlide = index => page.waitForFunction(({index, text}) => {
+      const rail = document.querySelector('[data-gallery-track]');
+      const card = rail.children[index].getBoundingClientRect();
+      const railBox = rail.getBoundingClientRect();
+      const centered = rail.scrollLeft + card.left + card.width / 2 - railBox.left - rail.clientWidth / 2;
+      const offset = Math.max(0, Math.min(rail.scrollWidth - rail.clientWidth, centered));
+      const active = document.querySelectorAll('.gallery-dots .is-active');
+      return Math.abs(rail.scrollLeft - offset) <= 2 && active.length === 1
+        && active[0] === document.querySelector('.gallery-dots').children[index]
+        && document.querySelector('[data-gallery-position]').textContent === text;
+    }, {index, text:english ? `Preview ${index+1} of 5` : `Aperçu ${index+1} sur 5`}, {timeout:3000});
+
     await track.focus();
-    assert.equal(await track.getAttribute('tabindex'), '0', `${label}: rail not reachable by keyboard`);
     await page.keyboard.press('Home');
-    await waitForScroll(0);
+    await waitForSlide(0);
     const start = await geometry();
-    assert.ok(start.limit > 1 && ['auto', 'scroll'].includes(start.overflowX), `${label}: compact rail does not scroll`);
-    assert.ok(start.fullCards >= 1 && start.fullCards <= 2, `${label}: compact layout must show one or two full previews`);
-    assert.ok(start.partialNext, `${label}: no visible next preview to suggest scrolling`);
-    assert.ok(start.firstFullyVisible && start.captionsFit && start.imagesLoaded, `${label}: first preview or captions clipped`);
-    assert.ok(await previous.isVisible() && await next.isVisible(), `${label}: scrolling buttons hidden`);
-    const stride = Math.min(start.step, start.limit);
-    assert.ok(stride > 0, `${label}: no usable card stride`);
+    assert.ok(start.limit > 1 && ['auto', 'scroll'].includes(start.overflowX), `${label}: rail does not scroll`);
+    assert.ok(start.fullCards >= 1 && start.fullCards <= 2, `${label}: one or two complete previews expected`);
+    assert.ok(start.firstFullyVisible && start.partialNext && start.imagesLoaded, `${label}: first slide or partial next slide missing`);
+    assert.ok(await previous.isDisabled() && await next.isEnabled());
     await page.keyboard.press('ArrowRight');
-    await waitForScroll(stride);
+    await waitForSlide(1);
     await page.keyboard.press('ArrowLeft');
-    await waitForScroll(0);
+    await waitForSlide(0);
     await page.keyboard.press('End');
-    await waitForScroll(start.limit);
-    assert.ok((await geometry()).lastFullyVisible, `${label}: final preview unreachable by keyboard`);
-    await page.waitForFunction(expected =>
-      document.querySelector('[data-gallery-position]').textContent === expected,
-    english ? 'Preview 5 of 5' : 'Aperçu 5 sur 5', { timeout: 3000 });
+    await waitForSlide(4);
+    assert.ok((await geometry()).lastFullyVisible && await next.isDisabled());
     await page.keyboard.press('Home');
-    await waitForScroll(0);
-    await next.click();
-    await waitForScroll(stride);
-    await previous.click();
-    await waitForScroll(0);
-    assert.ok((await geometry()).firstFullyVisible, `${label}: previous button cannot return to first preview`);
-    for (let index = 0; index < 4; index += 1) {
-      const before = await geometry();
-      if (before.limit - before.scrollLeft <= 2) break;
+    await waitForSlide(0);
+    for (let i = 1; i < 5; i++) {
       await next.click();
-      await waitForScroll(Math.min(before.scrollLeft + before.step, before.limit));
+      await waitForSlide(i);
     }
-    assert.ok((await geometry()).lastFullyVisible, `${label}: final preview unreachable by next button`);
-    await track.focus();
-    await page.keyboard.press('Home');
-    await waitForScroll(0);
+    for (let i = 3; i >= 0; i--) {
+      await previous.click();
+      await waitForSlide(i);
+    }
     await page.evaluate(() => window.scrollTo(0, 0));
-    return { ...start, keyboardAndButtons: true, buttonsReachLast: true };
+    return { ...start, keyboardAndButtons: true, allFiveDots: true };
   }
 
   const desktop = await geometry();
   assert.ok(!['auto', 'scroll'].includes(desktop.overflowX) && desktop.columns === 5 && desktop.fullCards === 5, `${label}: desktop must show all five previews in one grid`);
-  assert.ok(desktop.captionsFit && desktop.imagesLoaded, `${label}: desktop previews or captions clipped`);
+  assert.ok(desktop.imagesLoaded, `${label}: desktop preview missing`);
+  assert.ok(!await nav.isVisible(), `${label}: desktop navigation must be hidden`);
   assert.ok(!await previous.isVisible() && !await next.isVisible(), `${label}: desktop scrolling buttons should be hidden`);
   assert.equal(await track.getAttribute('tabindex'), '-1', `${label}: desktop region is an unnecessary keyboard stop`);
   return desktop;
@@ -147,11 +148,6 @@ try {
         const visible = e => e.getBoundingClientRect().height > 0 && getComputedStyle(e).visibility !== 'hidden';
         const clippedContent = [...document.querySelectorAll('a, button, h1, h2, h3, p, nav, input, select, figcaption')]
           .filter(visible).filter(e => {
-            // Off-rail captions are intentional only inside a real scroll container.
-            // The gallery-specific checks below verify their fit and reachability.
-            const rail = e.closest('[data-gallery-track]');
-            if (rail && rail.scrollWidth > rail.clientWidth + 1
-              && ['auto', 'scroll'].includes(getComputedStyle(rail).overflowX)) return false;
             const r = e.getBoundingClientRect();
             return r.left < -1 || r.right > innerWidth + 1;
           }).map(e => `${e.tagName}.${e.className}: ${e.textContent.trim().slice(0, 40)}`);
@@ -204,6 +200,39 @@ try {
       }
     }
     console.log(`${file}: ${widths.length} widths and navigation OK`);
+  }
+  for (const device of ['iPhone 13', 'Pixel 7']) {
+    const touch = await browser.newContext({...devices[device], reducedMotion:'reduce'});
+    await touch.route('**/*', route => new URL(route.request().url()).origin === new URL(baseURL).origin
+      ? route.continue() : route.abort());
+    const mobile = await touch.newPage();
+    const cdp = await touch.newCDPSession(mobile);
+    for (const file of ['index.html', 'index-en.html']) {
+      await mobile.goto(`${baseURL}/${file}`);
+      const track = mobile.locator('[data-gallery-track]');
+      await track.scrollIntoViewIfNeeded();
+      const box = await track.boundingBox();
+      const y = box.y + box.height / 2;
+      const point = fraction => [{x:box.x + box.width * fraction, y}];
+      await cdp.send('Input.dispatchTouchEvent', {type:'touchStart', touchPoints:point(.85)});
+      for (const fraction of [.7, .55, .4, .25]) {
+        await cdp.send('Input.dispatchTouchEvent', {type:'touchMove', touchPoints:point(fraction)});
+      }
+      await cdp.send('Input.dispatchTouchEvent', {type:'touchEnd', touchPoints:[]});
+      await mobile.waitForFunction(() => {
+        const track = document.querySelector('[data-gallery-track]');
+        const active = document.querySelector('.gallery-dots .is-active');
+        const i = [...document.querySelector('.gallery-dots').children].indexOf(active);
+        if (i < 1 || track.scrollLeft < 50) return false;
+        const card = track.children[i].getBoundingClientRect();
+        const center = track.getBoundingClientRect().left + track.clientWidth / 2;
+        const atEnd = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+        return (Math.abs(card.left + card.width / 2 - center) <= 2 || (atEnd && i === 4))
+          && document.querySelector('[data-gallery-position]').textContent.includes(String(i + 1));
+      });
+      console.log(`${file}: ${device} native touch swipe OK`);
+    }
+    await touch.close();
   }
   if (process.env.ROCKSO_REPORT_PATH) await fs.writeFile(process.env.ROCKSO_REPORT_PATH, JSON.stringify(results, null, 2));
   console.log(`${results.length} page/viewport checks passed.`);

@@ -11,7 +11,7 @@ import {
   CONSENT_KEY, SESSION_KEY, TEST_KEY, BASE_CONSENT_VERSION as CONSENT_VERSION, CONSENT_VERSION as RELEASE_CONSENT_VERSION, ENGAGEMENT_CONSENT_VERSION, CTA_KEY, SDK_URL, SDK_INTEGRITY,
 } from '../assets/analytics.js';
 import { analyticsConfig } from '../assets/analytics-config.js';
-const { chromium } = await import(process.env.ROCKSO_PLAYWRIGHT_MODULE || 'playwright');
+const { chromium, devices } = await import(process.env.ROCKSO_PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(fileURLToPath(new URL('../', import.meta.url)));
 const mime = {'.html':'text/html', '.js':'application/javascript', '.css':'text/css', '.svg':'image/svg+xml', '.png':'image/png', '.avif':'image/avif', '.jpg':'image/jpeg', '.woff2':'font/woff2'};
 const server = http.createServer(async (req, res) => {
@@ -27,7 +27,7 @@ const server = http.createServer(async (req, res) => {
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base = `http://127.0.0.1:${server.address().port}`;
 let passed=0;
-const report={checks:[], sdkAudit:null, keyedSdkAudit:'NOT RUN: real public project token not provided; no fictitious token used'};
+const report={checks:[], consentJourneys:[], sdkAudit:null, keyedSdkAudit:'NOT RUN: real public project token not provided; no fictitious token used'};
 async function check(name, fn) { await fn(); passed++; report.checks.push(name); console.log('PASS '+name); }
 const sdkPath = process.env.ROCKSO_POSTHOG_SDK_PATH;
 const realToken = process.env.ROCKSO_POSTHOG_PUBLIC_KEY || '';
@@ -38,10 +38,10 @@ if (sdkPath) {
 }
 const browser=await chromium.launch({headless:true,...(process.env.ROCKSO_BROWSER_PATH?{executablePath:process.env.ROCKSO_BROWSER_PATH}:{})});
 const stub=`window.__signupCalls=[]; window.__signupReply={data:{ok:true,alreadyRegistered:false},error:null}; window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'local-demo-fixture'}},error:null})},functions:{invoke:async(name,options)=>{window.__signupCalls.push({name,body:options.body}); if(window.__signupDelay)return await new Promise(resolve=>window.__signupResolve=resolve);return window.__signupReply;}}})};`;
-async function setup({test=true,production=false,token='',runtimeConfiguration=false,minimal=false,configurationEnabled=true,shippedConfiguration=false,sourceClassification=false,engagement=false}={}) {
+async function setup({test=true,production=false,token='',runtimeConfiguration=false,minimal=false,configurationEnabled=true,shippedConfiguration=false,sourceClassification=false,engagement=false,deviceOptions={}}={}) {
  // PostHog excludes HeadlessChrome/automation as bots. Exercise the normal
  // visitor pipeline without weakening the SDK's production bot filter.
- const context=await browser.newContext({serviceWorkers:'block',userAgent:`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${browser.version()} Safari/537.36`});
+ const context=await browser.newContext({serviceWorkers:'block',userAgent:`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${browser.version()} Safari/537.36`, ...deviceOptions});
  await context.addInitScript(version=>{
   Object.defineProperty(Navigator.prototype,'webdriver',{get:()=>false});
   if(navigator.userAgentData)Object.defineProperty(Object.getPrototypeOf(navigator.userAgentData),'brands',{get:()=>[{brand:'Chromium',version},{brand:'Google Chrome',version}]});
@@ -120,6 +120,110 @@ try {
    await s.context.close();
   });
  }
+ for (const english of [false, true]) {
+  const lang = english ? 'en' : 'fr';
+  const form = english ? 'demo-login-en.html' : 'demo-login.html';
+  const policy = english ? 'privacy-en.html' : 'privacy.html';
+  for (const [device, width, height] of [['iPhone 13',390,844], ['Pixel 7',412,915], ['Desktop Chrome',1440,900]]) {
+   await check(`consent draft, dismissal, explicit save and stored choices: ${lang} ${device} ${width}x${height}`, async () => {
+    const s = await setup({production:true, test:false, shippedConfiguration:true,
+     token:realToken, deviceOptions:{...devices[device], viewport:{width,height}, locale:lang}});
+    const {page, context, collectorRequests, posthogRequests} = s;
+    const analytics = p => p.getByRole('switch', {name:english ? 'Analytics' : 'Analyse', exact:true});
+    const save = p => p.getByRole('button', {name:english ? 'Save my preferences' : 'Enregistrer mes préférences'});
+    const receipt = () => stored(page, 'localStorage', CONSENT_KEY);
+    const confirmSignup = () => page.evaluate(() => window.dispatchEvent(new Event('rockso:early-access-confirmed')));
+    const traffic = () => ({posthog:posthogRequests.length, collector:collectorRequests.length});
+    await page.goto(s.origin+'/'+form);
+    assert.ok(await page.locator('#analytics-consent-title').evaluate(el => el === document.activeElement));
+    await analytics(page).check();
+    assert.ok(await page.getByRole('dialog').isVisible());
+    assert.ok(await analytics(page).isChecked());
+    await confirmSignup();
+    const beforeSave = traffic();
+    assert.deepEqual(beforeSave, {posthog:0, collector:0});
+    assert.equal(await receipt(), null);
+    assert.equal(await stored(page, 'sessionStorage', SESSION_KEY), null);
+    await page.getByRole('button', {name:english ? 'Close' : 'Fermer', exact:true}).click();
+    await open(page);
+    assert.equal(await analytics(page).isChecked(), false);
+    await analytics(page).check();
+    await refuse(page, english);
+    const rejected = await receipt();
+    assert.equal(JSON.parse(rejected).accepted, false);
+    await page.reload();
+    await confirmSignup();
+    assert.equal(await page.getByRole('dialog').count(), 0);
+    await open(page);
+    assert.equal(await analytics(page).isChecked(), false);
+    await analytics(page).check();
+    await page.keyboard.press('Escape');
+    assert.equal(await receipt(), rejected);
+    assert.equal(await stored(page, 'sessionStorage', SESSION_KEY), null);
+    const afterRejection = traffic();
+    assert.deepEqual(afterRejection, beforeSave);
+    await open(page);
+    await analytics(page).check();
+    const capture = realToken && sdkSource ? Promise.all(['/analytics-collect', 'eu.i.posthog.com/e/'].map(
+     endpoint => page.waitForResponse(r => r.request().method() === 'POST' && r.url().includes(endpoint))
+    )) : null;
+    await save(page).click();
+    const accepted = await receipt();
+    const choice = JSON.parse(accepted);
+    assert.ok(choice.accepted);
+    assert.equal(choice.version, RELEASE_CONSENT_VERSION);
+    assert.equal(choice.expiresAt-choice.createdAt, 180*86400000);
+    if (capture) {
+     await capture;
+     assert.equal(posthogRequests.filter(r => r.method === 'POST').length, 1);
+    }
+    // The footer is the public re-entry point. Keep the consented form open in another tab.
+    const settings = await context.newPage();
+    await settings.goto(s.origin+(english ? '/legal-notice-en.html' : '/mentions-legales.html'));
+    await settings.locator('[data-analytics-preferences]').click();
+    await settings.waitForURL('**/'+policy+'#audience-preferences');
+    assert.ok(await analytics(settings).isChecked());
+    await analytics(settings).uncheck();
+    await settings.reload();
+    assert.ok(await analytics(settings).isChecked());
+    assert.equal(await receipt(), accepted);
+    await analytics(settings).uncheck();
+    await save(settings).click();
+    await page.waitForFunction(key => sessionStorage.getItem(key) === null, SESSION_KEY);
+    const atWithdrawal = traffic();
+    await confirmSignup();
+    await page.reload();
+    await confirmSignup();
+    await page.waitForTimeout(200);
+    const afterWithdrawal = traffic();
+    assert.deepEqual(afterWithdrawal, atWithdrawal);
+    report.consentJourneys.push({lang, device, width, height, beforeSave, afterRejection,
+     acceptedPostHogEvents:posthogRequests.filter(r => r.method === 'POST').length,
+     acceptedAggregateWrites:collectorRequests.filter(r => r.method === 'POST').length,
+     subsequentRequests:{posthog:afterWithdrawal.posthog-atWithdrawal.posthog, collector:afterWithdrawal.collector-atWithdrawal.collector}});
+
+    assert.equal(JSON.parse(await receipt()).accepted, false);
+    await settings.reload();
+    assert.equal(await analytics(settings).isChecked(), false);
+    await context.close();
+   });
+  }
+ }
+ await check('existing October consent receipts survive switching languages without renewing their expiry', async () => {
+  const s = await setup({production:true, test:false, shippedConfiguration:true});
+  const createdAt = Date.now() - 30*86400000;
+  for (const accepted of [true, false]) {
+   const receipt = JSON.stringify({version:'2026-10-28.1', accepted, createdAt, expiresAt:createdAt+180*86400000});
+   await s.page.goto(s.origin+'/privacy.html');
+   await s.page.evaluate(([key, value]) => localStorage.setItem(key, value), [CONSENT_KEY, receipt]);
+   await s.page.goto(s.origin+'/index-en.html');
+   assert.equal(await s.page.getByRole('dialog').count(), 0);
+   await s.page.locator('[data-analytics-preferences]').click();
+   assert.equal(await s.page.getByRole('switch', {name:'Analytics', exact:true}).isChecked(), accepted);
+   assert.equal(await stored(s.page, 'localStorage', CONSENT_KEY), receipt);
+  }
+  await s.context.close();
+ });
  await check('five UTM fields accept new experiment slugs without a campaign list',async()=>{
   assert.deepEqual(readUtm('?utm_source=New-Partner&utm_medium=social&utm_campaign=launch-2041-z&utm_content=creative_b&utm_term=multisport'),{
    utm_source:'new-partner',utm_medium:'social',utm_campaign:'launch-2041-z',utm_content:'creative_b',utm_term:'multisport'});
@@ -294,11 +398,13 @@ try {
    const dialogText=await page.locator('.analytics-consent').textContent();
    const panel=page.locator('.analytics-consent');
    assert.equal(await panel.getByRole('switch').count(),2);
-   assert.equal(await panel.getByRole('switch',{name:'Performance',exact:true}).isDisabled(),true);
-   assert.equal(await panel.getByRole('switch',{name:'Performance',exact:true}).isChecked(),false);
+   const necessary = panel.getByRole('switch', {name: english ? 'Necessary' : 'Nécessaire'});
+   assert.ok(await necessary.isDisabled() && await necessary.isChecked());
+   assert.ok(await panel.getByText(english ? 'Always on' : 'Toujours actif', {exact:true}).isVisible());
+   assert.equal(await panel.getByRole('region', {name:'Performance'}).count(), 0);
    assert.equal(await panel.getByRole('switch',{name:english?'Analytics':'Analyse',exact:true}).isEnabled(),true);
-   assert.equal(await panel.locator('details').count(),3);
-   assert.equal(await panel.locator('dl dt').count(),15);
+   assert.equal(await panel.locator('details').count(),2);
+   assert.equal(await panel.locator('dl dt').count(),10);
    assert.equal(await panel.getByRole('switch',{name:english?'External AI':'IA externe',exact:true}).count(),0);
 
    assert.match(dialogText,english?/acquisition sources/:/sources d’acquisition/);

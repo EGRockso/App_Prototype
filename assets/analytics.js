@@ -429,12 +429,6 @@ function mountAnalytics() {
   const heading = document.createElement("h2");
   heading.id = "analytics-consent-title";
   heading.textContent = english ? "Privacy preferences" : "Préférences de confidentialité";
-  const description = document.createElement("p");
-  description.textContent = analyticsConfig.engagementEnabled === true
-    ? (english ? "Optional Analytics with PostHog EU: pages, acquisition sources, waitlist buttons and section exposure. Refusing does not affect access." : "Analyse facultative avec PostHog EU : pages, sources d’acquisition, boutons vers la liste d’attente et exposition des sections. Refuser ne change pas l’accès.")
-    : english
-    ? "Optional Analytics with PostHog EU: pages and acquisition sources. Refusing does not affect access."
-    : "Analyse facultative avec PostHog EU : pages et sources d’acquisition. Refuser ne change pas l’accès.";
   const text = (fr, en) => english ? en : fr;
   function category(title, brief, values, fixed = false) {
     const row = document.createElement("section");
@@ -448,21 +442,28 @@ function mountAnalytics() {
     content.append(name, note); line.append(content);
     const control = document.createElement("span");
     control.className = "privacy-category-control";
-    let input = null;
-    if (fixed) control.textContent = text("Toujours actif", "Always on");
-    else {
-      input = document.createElement("input"); input.type = "checkbox";
-      input.className = "privacy-category-switch"; input.setAttribute("role", "switch"); input.setAttribute("aria-label", title);
-      control.append(input);
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.className = "privacy-category-switch";
+    input.setAttribute("role", "switch");
+    input.setAttribute("aria-label", title);
+    control.append(input);
+    if (fixed) {
+      input.checked = true;
+      input.disabled = true;
+      const caption = document.createElement("small");
+      caption.textContent = text("Toujours actif", "Always on");
+      control.append(caption);
     }
     line.append(control);
     const details = document.createElement("details"), summary = document.createElement("summary");
-    summary.textContent = text("En savoir plus", "Learn more") + " — " + title;
+    summary.textContent = text("En savoir plus", "Learn more");
+    summary.setAttribute("aria-label", summary.textContent + " — " + title);
     const list = document.createElement("dl");
     const names = [text("Finalités", "Purposes"),text("Données", "Data"),text("Destinataires", "Recipients"),text("Conservation", "Retention"),text("En cas de refus", "If declined")];
     values.forEach((value,index)=>{ const group=document.createElement("div"),dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=names[index];dd.textContent=value;group.append(dt,dd);list.append(group); });
     details.append(summary,list); row.append(line,details);
-    return {row,input,control};
+    return {row, input, details};
   }
   const essential = category(text("Nécessaire", "Necessary"), text("Affichage du site, demandes d’inscription et sécurité.", "Site delivery, requested signups and security."), [
     text("Fournir le site et traiter les demandes que vous envoyez. Réutiliser les faits métier déjà enregistrés pour les comptages internes existants.", "Deliver the site and process requests you submit. Reuse existing business facts for existing internal counts."),
@@ -471,27 +472,16 @@ function mountAnalytics() {
     text("Durées propres à chaque traitement dans la politique. Votre choix de mesure est conservé 180 jours dans ce navigateur.", "Processing-specific periods in the policy. Your measurement choice is kept for 180 days in this browser."),
     text("Toujours actif. Refuser les options n’empêche pas d’utiliser le site ou d’envoyer une demande, et ne supprime pas les demandes déjà reçues.", "Always on. Rejecting optional choices does not prevent site use or submitting a request, and does not delete requests already received.")
   ], true).row;
-  const analysis = category(text("Analyse", "Analytics"), text("Comprendre les pages consultées et l’acquisition, après votre accord.", "Understand viewed pages and acquisition after your permission."), [
+  const analysis = category(text("Analyse", "Analytics"), text("Pages consultées et sources d’acquisition.", "Page visits and acquisition sources."), [
     analyticsConfig.engagementEnabled === true ? text("Mesurer les pages, campagnes, boutons vers la liste d’attente et titres de sections exposés, confirmations d’inscription et vrais téléchargements, sans publicité.", "Measure pages, campaigns, waitlist buttons and exposed section headings, signup confirmations and genuine downloads, without advertising.") : text("Mesurer pages, sources d’acquisition UTM, confirmations d’inscription et clics sur de vrais téléchargements, sans publicité ni profilage publicitaire.", "Measure pages, UTM acquisition sources, signup confirmations and genuine download clicks, without advertising or advertising profiling."),
     analyticsConfig.engagementEnabled === true ? text("Six événements explicites, identifiant temporaire, plateforme, UTM validés et libellés prédéfinis de boutons et sections. Aucun e-mail, contenu de formulaire, donnée sportive ou de santé, ni URL complète.", "Six explicit events, temporary identifier, platform, validated UTMs and predefined button and section labels. No email, form contents, sports or health data, or full URLs.") : text("Quatre événements explicites, plateforme et identifiant aléatoire de visite. Aucun e-mail, contenu de formulaire, donnée sportive ou de santé, ni URL complète.", "Four explicit events, platform and random visit identifier. No email, form contents, sports or health data, or full URLs."),
     text("AIMS Corp., Supabase et PostHog Inc. (projet EU), selon les garanties de transfert décrites dans la politique.", "AIMS Corp., Supabase and PostHog Inc. (EU project), with transfer safeguards described in the policy."),
     analyticsConfig.engagementEnabled === true ? text("Choix : 180 jours ; identifiant : 30 minutes d’inactivité ; relais de bouton : validité de 10 secondes dans cet onglet, après accord ; compteurs Supabase : 12 mois ; cible PostHog : 12 mois, sans garantie de purge automatique.", "Choice: 180 days; identifier: 30 minutes idle; button handoff: valid for 10 seconds in this tab, after consent; Supabase counters: 12 months; PostHog target: 12 months, without automatic deletion guaranteed.") : text("Choix : 180 jours ; identifiant : 30 minutes d’inactivité dans cet onglet ; compteurs Supabase : 12 mois ; cible PostHog : 12 mois, sans garantie de purge automatique.", "Choice: 180 days; identifier: 30 minutes idle in this tab; Supabase counters: 12 months; PostHog target: 12 months, without automatic deletion guaranteed."),
     text("Aucun SDK ni événement PostHog, aucun compteur facultatif avant accord. Le retrait arrête les futurs envois ; l’effacement des données déjà reçues se demande séparément.", "No PostHog SDK or events, and no optional counters before permission. Withdrawal stops future sends; erasure of already received data is requested separately.")
   ]);
-  const label = analysis.row, toggle = analysis.input;
-  const perf = category(text("Performance", "Performance"), text("Aucune mesure active — option indisponible pour le moment.", "No measurement active — option currently unavailable."), [
-    text("Mesures techniques complémentaires distinctes des parcours, si elles sont proposées plus tard.", "Additional technical measurements separate from journeys, if offered later."),
-    text("Aucune donnée collectée dans cette catégorie.", "No data collected in this category."),
-    text("Aucun destinataire pour cette catégorie inactive.", "No recipient for this inactive category."),
-    text("Aucune donnée à conserver. Une future activation exigera une information et un choix propres.", "No data to retain. Future activation will require its own information and choice."),
-    text("Aucun effet sur Analyse ou sur l’accès au site.", "No effect on Analytics or website access.")
-  ]);
-  perf.input.disabled = true;
-  const unavailable = document.createElement("small"); unavailable.textContent = text("Aucune mesure active", "No measurement active"); perf.control.append(unavailable);
-  const performance = perf.row;
-  const details = document.createElement("p");
-  details.className = "privacy-category-help";
-  details.textContent = text("Ces boutons concernent uniquement les options de mesure disponibles, jamais l’IA externe. Vous pouvez retirer votre accord à tout moment dans ces préférences. Après un refus, les opérations demandées et leurs journaux nécessaires restent actifs. Accès et effacement : support@rockso.app. ", "These buttons affect available measurement options only, never external AI. You can withdraw consent at any time in these preferences. After refusal, requested operations and their necessary logs remain active. Access and erasure: support@rockso.app. ");
+  const toggle = analysis.input;
+  const help = document.createElement("p");
+  help.textContent = text("Vous pouvez retirer votre accord à tout moment dans ces préférences. Votre choix concerne uniquement la mesure d’audience. L’IA externe se gère séparément. Accès et effacement : support@rockso.app. ", "You can withdraw consent at any time in these preferences. Your choice applies only to audience measurement. External AI is managed separately. For access or erasure: support@rockso.app. ");
   const status = document.createElement("p");
   status.setAttribute("role", "status");
   const information = document.createElement("a");
@@ -508,10 +498,22 @@ function mountAnalytics() {
   const close = document.createElement("button");
   close.type = "button";
   close.className = "analytics-consent-close";
-  close.textContent = english ? "Close" : "Fermer";
-  actions.append(accept, refuse);
-  details.append(information);
-  dialog.append(heading, description, essential, label, performance, status, actions, details, close);
+  close.setAttribute("aria-label", text("Fermer", "Close"));
+  close.textContent = "×";
+  const save = document.createElement("button");
+  save.type = "button";
+  save.className = "analytics-consent-save";
+  save.textContent = text("Enregistrer mes préférences", "Save my preferences");
+  actions.append(accept, refuse, save);
+  help.append(information);
+  analysis.details.append(help);
+  const header = document.createElement("div");
+  header.className = "analytics-consent-header";
+  header.append(heading, close);
+  const categories = document.createElement("div");
+  categories.className = "analytics-consent-categories";
+  categories.append(essential, analysis.row, status);
+  dialog.append(header, categories, actions);
   document.body.append(dialog);
   let previousFocus;
   const policySection = document.getElementById(english ? "website-analytics" : "site-analytics");
@@ -524,15 +526,18 @@ function mountAnalytics() {
     policyPanel.tabIndex = -1;
     policyPanel.setAttribute("aria-labelledby", heading.id);
     // Deliberate, inline privacy settings, not another automatic popup.
-    policyPanel.append(heading, description, essential, label, performance, status, actions, details);
+    policyPanel.append(heading, categories, actions);
     const back = document.createElement("a");
     const target = new URL(english ? "index-en.html" : "index.html", window.location.href);
     for (const [key, value] of Object.entries(readUtm(window.location.search))) target.searchParams.set(key, value);
     back.href = target.href;
     back.textContent = english ? "Return to home" : "Retour à l’accueil";
     policyPanel.append(back);
-    policySection.prepend(policyPanel);
+    policySection.before(policyPanel);
     dialog.remove();
+  } else {
+    heading.tabIndex = -1;
+    heading.autofocus = true;
   }
 
   function updatePreferenceStatus() {
@@ -540,13 +545,12 @@ function mountAnalytics() {
     const current = readChoice();
     toggle.checked = current?.accepted === true;
     toggle.disabled = !ready;
+    save.disabled = !ready;
     status.textContent = !ready
       ? (english ? "Audience measurement is currently disabled." : "La mesure d’audience est actuellement désactivée.")
       : test
         ? (english ? "Local test: events stay in this browser. Nothing is sent to PostHog." : "Test local : les événements restent dans ce navigateur. Aucun envoi à PostHog.")
-        : current?.accepted === true
-          ? (english ? "Current choice: accepted. You can withdraw by choosing Refuse." : "Choix actuel : accepté. Pour retirer votre accord, choisissez Refuser.")
-          : (english ? "Without your agreement, no audience measurement takes place." : "Sans votre accord, aucune mesure d’audience n’est effectuée.");
+        : "";
   }
 
   function openPreferences() {
@@ -557,10 +561,9 @@ function mountAnalytics() {
       return;
     }
     previousFocus = document.activeElement;
-    if (!dialog.open) dialog.show();
     // Banner blockers can hide this element after it opens. A non-modal
     // dialog never makes the rest of the site inert in that case.
-    accept.focus({ preventScroll: true });
+    if (!dialog.open) dialog.show();
   }
 
   function decide(accepted) {
@@ -577,10 +580,16 @@ function mountAnalytics() {
     if (accepted) activate(); else stop();
     dialog.close();
     updatePreferenceStatus();
+    if (policyPanel && saved) {
+      status.textContent = accepted
+        ? text("Préférences enregistrées. Analyse activée.", "Preferences saved. Analytics is on.")
+        : text("Préférences enregistrées. Analyse désactivée.", "Preferences saved. Analytics is off.");
+    }
   }
   accept.addEventListener("click", () => decide(true));
   refuse.addEventListener("click", () => decide(false));
-  toggle.addEventListener("change", () => decide(toggle.checked));
+  save.addEventListener("click", () => decide(toggle.checked));
+  toggle.addEventListener("change", () => { status.textContent = ""; });
   close.addEventListener("click", () => dialog.close());
   dialog.addEventListener("close", () => previousFocus?.focus());
   document.addEventListener("keydown", event => {
@@ -600,7 +609,11 @@ function mountAnalytics() {
   window.addEventListener("storage", event => {
     if (event.key !== CONSENT_KEY && event.key !== null) return;
     choice = readChoice();
+    updatePreferenceStatus();
     if (choice?.accepted === true) activate(); else stop();
+  });
+  window.addEventListener("pageshow", event => {
+    if (event.persisted) updatePreferenceStatus();
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && choice?.accepted && !readChoice()?.accepted) { choice = null; stop(); }
