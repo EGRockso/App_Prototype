@@ -2456,8 +2456,12 @@ h5 {
   }
 
   .section-screens-hero .screen-mockup img {
-    width: 160%;
-    margin-inline: -30%;
+    /* Keep the phone at its original scale; only the PNG's transparent sides are cropped. */
+    width: 100%;
+    aspect-ratio: 1 / 2;
+    object-fit: cover;
+    margin-inline: 0;
+    filter: none;
   }
 
   .section-screens-hero .screen-mockup {

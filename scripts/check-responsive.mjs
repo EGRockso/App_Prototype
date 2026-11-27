@@ -73,6 +73,13 @@ async function checkProductGallery(page, file, width) {
   assert.equal(await gallery.locator('figcaption, #product-gallery-hint').count(), 0);
   const nav = gallery.locator('.product-gallery-nav');
   if (width < 900) {
+    const imagesInsideSlides = await gallery.locator('[data-gallery-slide]').evaluateAll(slides =>
+      slides.every(slide => {
+        const card = slide.getBoundingClientRect();
+        const image = slide.querySelector('img').getBoundingClientRect();
+        return image.left >= card.left - 1 && image.right <= card.right + 1;
+      }));
+    assert.ok(imagesInsideSlides, `${label}: mobile image boxes must stay inside their slides`);
     const navBox = await nav.boundingBox();
     const railBox = await track.boundingBox();
     assert.ok(navBox && railBox && navBox.y >= railBox.y + railBox.height - 1, `${label}: controls must follow previews`);

@@ -1,0 +1,422 @@
+{
+  "avant": {
+    "webkit": [
+      {
+        "viewport": "390x844",
+        "langue": "fr",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 191.52,
+        "largeurImageCSS": 306.42,
+        "defilementCSS": [
+          0,
+          128,
+          332,
+          535,
+          713
+        ],
+        "navigation": "horizontal wheel",
+        "pointApresGeste": 4,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 23.01,
+        "imagesEchantillonneesPendantGeste": 16,
+        "imagesAvecAplatVertDetecte": 0
+      },
+      {
+        "viewport": "390x844",
+        "langue": "en",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 191.52,
+        "largeurImageCSS": 306.42,
+        "defilementCSS": [
+          0,
+          128,
+          332,
+          535,
+          713
+        ],
+        "navigation": "horizontal wheel",
+        "pointApresGeste": 3,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 24.64,
+        "imagesEchantillonneesPendantGeste": 16,
+        "imagesAvecAplatVertDetecte": 0
+      },
+      {
+        "viewport": "393x852",
+        "langue": "fr",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 193.19,
+        "largeurImageCSS": 309.09,
+        "defilementCSS": [
+          0,
+          129,
+          334,
+          540,
+          719
+        ],
+        "navigation": "horizontal wheel",
+        "pointApresGeste": 3,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 26.98,
+        "imagesEchantillonneesPendantGeste": 18,
+        "imagesAvecAplatVertDetecte": 0
+      },
+      {
+        "viewport": "393x852",
+        "langue": "en",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 193.19,
+        "largeurImageCSS": 309.09,
+        "defilementCSS": [
+          0,
+          129,
+          334,
+          540,
+          719
+        ],
+        "navigation": "horizontal wheel",
+        "pointApresGeste": 3,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 28.71,
+        "imagesEchantillonneesPendantGeste": 18,
+        "imagesAvecAplatVertDetecte": 0
+      },
+      {
+        "viewport": "1440x900",
+        "langue": "fr",
+        "densite": 1,
+        "positions": 1,
+        "largeurCarteCSS": 225.59,
+        "largeurImageCSS": 315.83,
+        "defilementCSS": [
+          0
+        ]
+      },
+      {
+        "viewport": "1440x900",
+        "langue": "en",
+        "densite": 1,
+        "positions": 1,
+        "largeurCarteCSS": 225.59,
+        "largeurImageCSS": 315.83,
+        "defilementCSS": [
+          0
+        ]
+      }
+    ],
+    "chromium": [
+      {
+        "viewport": "390x844",
+        "langue": "fr",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 191.52,
+        "largeurImageCSS": 306.42,
+        "defilementCSS": [
+          0,
+          128,
+          332,
+          535,
+          713
+        ],
+        "navigation": "touch",
+        "pointApresGeste": 2,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 32.72
+      },
+      {
+        "viewport": "390x844",
+        "langue": "en",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 191.52,
+        "largeurImageCSS": 306.42,
+        "defilementCSS": [
+          0,
+          128,
+          332,
+          535,
+          713
+        ],
+        "navigation": "touch",
+        "pointApresGeste": 2,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 27.35
+      },
+      {
+        "viewport": "393x852",
+        "langue": "fr",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 193.19,
+        "largeurImageCSS": 309.09,
+        "defilementCSS": [
+          0,
+          129,
+          334,
+          540,
+          719
+        ],
+        "navigation": "touch",
+        "pointApresGeste": 2,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 27.24
+      },
+      {
+        "viewport": "393x852",
+        "langue": "en",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 193.19,
+        "largeurImageCSS": 309.09,
+        "defilementCSS": [
+          0,
+          129,
+          334,
+          540,
+          719
+        ],
+        "navigation": "touch",
+        "pointApresGeste": 2,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 26.9
+      },
+      {
+        "viewport": "1440x900",
+        "langue": "fr",
+        "densite": 1,
+        "positions": 1,
+        "largeurCarteCSS": 225.59,
+        "largeurImageCSS": 315.83,
+        "defilementCSS": [
+          0
+        ]
+      },
+      {
+        "viewport": "1440x900",
+        "langue": "en",
+        "densite": 1,
+        "positions": 1,
+        "largeurCarteCSS": 225.59,
+        "largeurImageCSS": 315.83,
+        "defilementCSS": [
+          0
+        ]
+      }
+    ]
+  },
+  "apres": {
+    "webkit": [
+      {
+        "viewport": "390x844",
+        "langue": "fr",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 191.52,
+        "largeurImageCSS": 191.52,
+        "defilementCSS": [
+          0,
+          128,
+          332,
+          535,
+          664
+        ],
+        "navigation": "horizontal wheel",
+        "pointApresGeste": 5,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 23.04,
+        "imagesEchantillonneesPendantGeste": 17,
+        "imagesAvecAplatVertDetecte": 0
+      },
+      {
+        "viewport": "390x844",
+        "langue": "en",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 191.52,
+        "largeurImageCSS": 191.52,
+        "defilementCSS": [
+          0,
+          128,
+          332,
+          535,
+          664
+        ],
+        "navigation": "horizontal wheel",
+        "pointApresGeste": 3,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 24.73,
+        "imagesEchantillonneesPendantGeste": 18,
+        "imagesAvecAplatVertDetecte": 0
+      },
+      {
+        "viewport": "393x852",
+        "langue": "fr",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 193.19,
+        "largeurImageCSS": 193.19,
+        "defilementCSS": [
+          0,
+          129,
+          334,
+          540,
+          669
+        ],
+        "navigation": "horizontal wheel",
+        "pointApresGeste": 3,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 27.27,
+        "imagesEchantillonneesPendantGeste": 21,
+        "imagesAvecAplatVertDetecte": 0
+      },
+      {
+        "viewport": "393x852",
+        "langue": "en",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 193.19,
+        "largeurImageCSS": 193.19,
+        "defilementCSS": [
+          0,
+          129,
+          334,
+          540,
+          669
+        ],
+        "navigation": "horizontal wheel",
+        "pointApresGeste": 3,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 28.83,
+        "imagesEchantillonneesPendantGeste": 21,
+        "imagesAvecAplatVertDetecte": 0
+      },
+      {
+        "viewport": "1440x900",
+        "langue": "fr",
+        "densite": 1,
+        "positions": 1,
+        "largeurCarteCSS": 225.59,
+        "largeurImageCSS": 315.83,
+        "defilementCSS": [
+          0
+        ]
+      },
+      {
+        "viewport": "1440x900",
+        "langue": "en",
+        "densite": 1,
+        "positions": 1,
+        "largeurCarteCSS": 225.59,
+        "largeurImageCSS": 315.83,
+        "defilementCSS": [
+          0
+        ]
+      }
+    ],
+    "chromium": [
+      {
+        "viewport": "390x844",
+        "langue": "fr",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 191.52,
+        "largeurImageCSS": 191.52,
+        "defilementCSS": [
+          0,
+          128,
+          332,
+          535,
+          664
+        ],
+        "navigation": "touch",
+        "pointApresGeste": 2,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 32.5
+      },
+      {
+        "viewport": "390x844",
+        "langue": "en",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 191.52,
+        "largeurImageCSS": 191.52,
+        "defilementCSS": [
+          0,
+          128,
+          332,
+          535,
+          664
+        ],
+        "navigation": "touch",
+        "pointApresGeste": 2,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 27.3
+      },
+      {
+        "viewport": "393x852",
+        "langue": "fr",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 193.19,
+        "largeurImageCSS": 193.19,
+        "defilementCSS": [
+          0,
+          129,
+          334,
+          540,
+          669
+        ],
+        "navigation": "touch",
+        "pointApresGeste": 2,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 27.07
+      },
+      {
+        "viewport": "393x852",
+        "langue": "en",
+        "densite": 3,
+        "positions": 5,
+        "largeurCarteCSS": 193.19,
+        "largeurImageCSS": 193.19,
+        "defilementCSS": [
+          0,
+          129,
+          334,
+          540,
+          669
+        ],
+        "navigation": "touch",
+        "pointApresGeste": 2,
+        "blocs16pxCompares": 2640,
+        "maxEcartRVBMoyenParBloc": 27.13
+      },
+      {
+        "viewport": "1440x900",
+        "langue": "fr",
+        "densite": 1,
+        "positions": 1,
+        "largeurCarteCSS": 225.59,
+        "largeurImageCSS": 315.83,
+        "defilementCSS": [
+          0
+        ]
+      },
+      {
+        "viewport": "1440x900",
+        "langue": "en",
+        "densite": 1,
+        "positions": 1,
+        "largeurCarteCSS": 225.59,
+        "largeurImageCSS": 315.83,
+        "defilementCSS": [
+          0
+        ]
+      }
+    ]
+  }
+}
