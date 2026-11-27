@@ -2345,18 +2345,35 @@ h5 {
   min-width: 0;
 }
 
-.section-screens-hero figcaption {
-  width: 100%;
-  margin-top: 8px;
-  color: #fff;
-  text-align: center;
-  font-size: 13px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
 .product-gallery-nav {
   display: none;
+}
+
+.gallery-position {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.gallery-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.gallery-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 64%);
+}
+
+.gallery-dots .is-active {
+  background: var(--accent-green);
+  transform: scale(1.4);
 }
 
 .gallery-arrow {
@@ -2434,9 +2451,8 @@ h5 {
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: 8px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, .7) rgba(255, 255, 255, .15);
-    padding: 12px 8px 24px;
+    scrollbar-width: none;
+    padding: 12px 8px 0;
   }
 
   .section-screens-hero .screen-mockup img {
@@ -2445,49 +2461,20 @@ h5 {
   }
 
   .section-screens-hero .screen-mockup {
-    scroll-snap-align: start;
+    scroll-snap-align: center;
   }
 
   .section-screens-hero .screen-mockup:hover {
     transform: none;
   }
 
-  .product-gallery-nav {
+  [data-gallery-scrollable="true"] .product-gallery-nav {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     width: fit-content;
-    max-width: 100%;
     margin: 0 auto;
-    padding-inline-start: 12px;
-    border-radius: 24px;
-    background: rgba(15, 40, 31, .76);
-    color: #fff;
-  }
-
-  .product-gallery-hint {
-    margin: 0;
-    font-size: 13px;
-    text-align: center;
-  }
-
-  .product-gallery-controls {
-    display: none;
-  }
-
-  [data-gallery-scrollable="true"] .product-gallery-controls {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    flex-shrink: 0;
-  }
-
-  [data-gallery-position] {
-    font-variant-numeric: tabular-nums;
-    text-align: center;
-    font-size: 13px;
   }
 }
 

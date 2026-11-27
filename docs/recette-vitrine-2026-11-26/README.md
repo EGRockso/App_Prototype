@@ -1,19 +1,19 @@
 # Recette de la vitrine · 26 novembre 2026
 
-Le panneau français passe de 883 à 420 px sur le profil Android. Les deux décisions globales et l’enregistrement de la sélection tiennent dans la fenêtre dès l’ouverture. Le carrousel indique le balayage avant la première capture et laisse entrevoir la suivante sur mobile. Les cinq aperçus sont visibles ensemble sur desktop.
+Sur mobile, la navigation se trouve sous les captures. Deux flèches encadrent cinq points, dont un vert pour l’écran actif. Sur desktop, les cinq captures sont visibles ensemble. Les descriptions des images restent accessibles aux lecteurs d’écran.
 
 ## Captures avant et après
 
-La colonne gauche de chaque image montre `main` au commit `74ad7df`. La colonne droite montre le correctif. Les hauteurs sont mesurées en pixels CSS avec les détails repliés. Les comparaisons mobiles du carrousel sont cadrées sur la galerie.
+Chaque comparaison oppose la première version de la PR (`935dd40`, à gauche) à la version révisée (à droite). Sur mobile, les comparatifs du carrousel sont cadrés sur la galerie. Les hauteurs du panneau de confidentialité sont mesurées en pixels CSS, détails repliés. Le nouveau libellé Analyse ajoute une ligne sur les deux profils mobiles. Les trois actions restent visibles sans défilement dans les deux langues.
 
 | Profil Playwright | Langue | Hauteur avant → après | Confidentialité | Carrousel |
 | --- | --- | ---: | --- | --- |
-| iPhone 13 · 390 × 844 | FR | 812 → 424 px | [Panneau](iphone-fr-consent.webp) | [Aperçus](iphone-fr-gallery.webp) |
-| iPhone 13 · 390 × 844 | EN | 812 → 400 px | [Panneau](iphone-en-consent.webp) | [Aperçus](iphone-en-gallery.webp) |
-| Pixel 7 · 412 × 915 | FR | 883 → 420 px | [Panneau](android-fr-consent.webp) | [Aperçus](android-fr-gallery.webp) |
-| Pixel 7 · 412 × 915 | EN | 883 → 400 px | [Panneau](android-en-consent.webp) | [Aperçus](android-en-gallery.webp) |
-| Desktop · 1440 × 900 | FR | 868 → 400 px | [Panneau](desktop-fr-consent.webp) | [Aperçus](desktop-fr-gallery.webp) |
-| Desktop · 1440 × 900 | EN | 857 → 379 px | [Panneau](desktop-en-consent.webp) | [Aperçus](desktop-en-gallery.webp) |
+| iPhone 13 · 390 × 844 | FR | 424 → 445 px | [Panneau](iphone-fr-consent.webp) | [Aperçus](iphone-fr-gallery.webp) |
+| iPhone 13 · 390 × 844 | EN | 400 → 420 px | [Panneau](iphone-en-consent.webp) | [Aperçus](iphone-en-gallery.webp) |
+| Pixel 7 · 412 × 915 | FR | 420 → 440 px | [Panneau](android-fr-consent.webp) | [Aperçus](android-fr-gallery.webp) |
+| Pixel 7 · 412 × 915 | EN | 400 → 420 px | [Panneau](android-en-consent.webp) | [Aperçus](android-en-gallery.webp) |
+| Desktop · 1440 × 900 | FR | 400 → 420 px | [Panneau](desktop-fr-consent.webp) | [Aperçus](desktop-fr-gallery.webp) |
+| Desktop · 1440 × 900 | EN | 379 → 400 px | [Panneau](desktop-en-consent.webp) | [Aperçus](desktop-en-gallery.webp) |
 
 ## Consentement Analytics
 
@@ -33,7 +33,7 @@ La recette relit aussi un accord et un refus au format déjà publié le 28 octo
 
 ## Carrousel et accessibilité
 
-**238 combinaisons page × largeur réussies** sur 14 pages, de 320 à 2560 px. Les flèches et les touches de direction permettent de parcourir les cinq aperçus. Début et Fin atteignent les extrémités. Le repère de position est annoncé dans la langue de la page. Quatre balayages tactiles injectés dans Chromium ont déplacé le carrousel et mis à jour son repère sur les profils iPhone et Android, en FR et EN. [Script Playwright](../../scripts/check-responsive.mjs)
+**238 combinaisons page × largeur réussies** sur 14 pages, de 320 à 2560 px. Les flèches parcourent les cinq aperçus dans les deux sens. Les tests vérifient la position de la capture, l’unicité du point actif et l’annonce de position en FR et EN à chaque étape. Les touches de direction, Début et Fin restent disponibles lorsque le carrousel a le focus. Quatre balayages tactiles injectés dans Chromium ont déplacé le carrousel et mis à jour son repère sur les profils iPhone et Android, en FR et EN. [Script Playwright](../../scripts/check-responsive.mjs)
 
 Le focus initial se place sur le titre du panneau. Les deux actions globales ont les mêmes dimensions et le même style. Les informations détaillées et leurs liens restent accessibles après dépliage, y compris à 320 × 568 et 844 × 390 px.
 
