@@ -1,0 +1,1050 @@
+{
+  "schema_version": 1,
+  "status": "proposal_not_production_approval",
+  "review_date_local": "2026-11-26",
+  "timezone": "America/Toronto",
+  "repository": "EGRockso/App_Prototype",
+  "source_commit": "74ad7df0a1a309e1ce4653a1ab8601ecde00fe39",
+  "local_source_commit": "5032af12135b7aae220c77a2bde1383dfd1dfccf",
+  "cloudflare_account_inspected": false,
+  "pages_configuration_read_only": {
+    "build_type": "legacy",
+    "source_branch": "main",
+    "source_path": "/",
+    "cname": "rockso.app",
+    "https_enforced": true,
+    "status": "built",
+    "served_bytes_verified": false
+  },
+  "production_changes": false,
+  "kpi_implemented": false,
+  "posthog_consent_changed": false,
+  "minimal_enabled": {
+    "frontend_source": false,
+    "backend_required": false,
+    "backend_queried": false
+  },
+  "temporary_test": {
+    "date_local": "2026-11-26",
+    "exact_start_utc": null,
+    "exact_traffic_end_utc": null,
+    "excluded_from_official_kpi": true,
+    "source_chat": "https://chatgpt.com/c/6aff027d-ab14-83e9-9987-0e90d3ab7fb5",
+    "message_anchors": [
+      {
+        "utc": "2026-11-27T01:39:15.396Z",
+        "meaning": "screenshots sent; statistics reported; images not directly available"
+      },
+      {
+        "utc": "2026-11-27T01:42:05.007Z",
+        "meaning": "screenshots sent; proxied DNS reported; not an activation timestamp"
+      },
+      {
+        "utc": "2026-11-27T01:43:58.298Z",
+        "meaning": "founder reports DNS only; not proof of traffic end"
+      }
+    ],
+    "conservative_exclusion_proposal": {
+      "from_utc_inclusive": "2026-11-26T05:00:00Z",
+      "until_utc_exclusive": "2026-11-27T05:00:00Z",
+      "is_actual_test_interval": false,
+      "exclude_unsplittable_utc_day_buckets": [
+        "2026-11-26",
+        "2026-11-27"
+      ],
+      "extend_if_evidence_requires": true
+    }
+  },
+  "tracked_file_count": 154,
+  "html_count": 31,
+  "examined_sources": [
+    {
+      "path": "CNAME",
+      "sha256": "57bd22fe949bbb7d8694e4eab87adc5c24df12a9b6c9169bb710daaf732c044b",
+      "git_blob_sha1": "ca2decaa1d55bf7e3ba3bfaa3501a12aa99d7d8a",
+      "review": "source inspected"
+    },
+    {
+      "path": "assets/analytics-config.js",
+      "sha256": "1dced6bf15112a461546fce5a79a02217bad4483d6746407288ca2128b5b11bd",
+      "git_blob_sha1": "c65ef15502b0164d0b94ea4ea1cfa120d67341ab",
+      "review": "source inspected"
+    },
+    {
+      "path": "assets/analytics.js",
+      "sha256": "f87876134a797e521a4dd37287d73a2d61020401fdb4d3b7cd4dd6889992c553",
+      "git_blob_sha1": "e44d11bfe577074c9e41bfeeea85f4b7154e0470",
+      "review": "source inspected"
+    },
+    {
+      "path": "assets/minimal-audience.js",
+      "sha256": "bb3eec2833bdf304ed2c83e29813fb1d7155a72c2181b551988bb4fafa818dda",
+      "git_blob_sha1": "f6e5692ea6e7fce2e1b7e2a76bb5663f92bc9611",
+      "review": "source inspected"
+    },
+    {
+      "path": "assets/acquisition.js",
+      "sha256": "7245e95e7a95219434f57cfb61a3482e644a92e8a9ec09d7413b75aff458b02a",
+      "git_blob_sha1": "ab48ed70d7b0277bedccc2088eb64ab7e557c5ce",
+      "review": "source inspected"
+    },
+    {
+      "path": "assets/styles-v2.css",
+      "sha256": "18870cbeb0f1e6b86c2d7f7bbf6b2aa3e0467f3f5393b0a9b60a0b54499a235d",
+      "git_blob_sha1": "2defa81cb77d6830b583cb22d3c3cc7dcc219c6c",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo-login.html",
+      "sha256": "1f0ea2586a5f21838bf8070ccef1e90002cf7d41047820c1a2dca8fa7aa9bf61",
+      "git_blob_sha1": "2ce9ea09d9808b5031acaa5c12168094b7498d49",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo-login-en.html",
+      "sha256": "27a51849510b5ff422450f1d2418b1e10d39cef5b4edd1a501bf2fd56ba9dda7",
+      "git_blob_sha1": "433282870a7bddce1991b30802292d95ea0fa6f4",
+      "review": "source inspected"
+    },
+    {
+      "path": "beta-access.html",
+      "sha256": "6a9816722e83cefa7d9acdee0351f854e8e66cc149a97e7602be6cad397d1677",
+      "git_blob_sha1": "546537b04e2a35d3af7dd39caafc3ccf7b5ec908",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo-app.html",
+      "sha256": "10027220c56fcfb6f8bb63a673c95a623f1e25a71360884a286878bfd98dcfd2",
+      "git_blob_sha1": "121677e413501c359f2fb84404a0d7f867ad7d83",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo/index.html",
+      "sha256": "bf00c726793d74eeff64c00c55dff8d0f00faf61ab7eb90a9b7d851590a12b17",
+      "git_blob_sha1": "a4599cd796b03c6d4bff34b67b1be4a89bba1be4",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo/activities.html",
+      "sha256": "59dba42965e71814aabb48d9d820b087f903b7c37b664c5b3478d3a69515f1cb",
+      "git_blob_sha1": "54a3cdf1e8aef0e9e6cc00737a4b39c4422a193e",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo/activity.html",
+      "sha256": "ca7598e8158f3c28f747b7e2f83b7358d3028e461f9d9c219305fb48a7c017c5",
+      "git_blob_sha1": "919b631890d2bdf70156f67ea4fb096bd20e0754",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo/profile.html",
+      "sha256": "29fa4d78637675b129fe7683ca3d86b3332db937b9177a36fcf6fac3c048461d",
+      "git_blob_sha1": "f5dcc0369940002224b1288f6d7c3e40ee10ed85",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo/sync.html",
+      "sha256": "c8e62805b846b811c112644e9482c55a2f48821089dc20dc09fe90deb1ca48c2",
+      "git_blob_sha1": "b6e254aa6d0788a5df15e538e05c452bfb832578",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo/training-entrainement.html",
+      "sha256": "42723ae770b16dcead0b689414696baba5e3b617ca87520fc0f95df9d91f13b1",
+      "git_blob_sha1": "3cb893d2da7d356e1ccce80f0d4d7f52b48376e2",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo/training-quotidien.html",
+      "sha256": "cb53d77f38c427d78fa5798db4a37993d42ae77fd13054b87ab4be1e301965c2",
+      "git_blob_sha1": "72f5a209b490f4b2f5def93161dfa01a45df5074",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo/training-recuperation.html",
+      "sha256": "43a715c78776734cb84e29a9c094ca4f37bf668c033f9da9e32b0b71b14df24e",
+      "git_blob_sha1": "b0eb0ca5937ba15d3d7878b4eddb4eae94e1e4fe",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo/training-tendance.html",
+      "sha256": "6a63db10fd831ed09a04ac0352a86253b501d3e3caefda935940c555db160bd1",
+      "git_blob_sha1": "14075e42cb370038fd948cfad61388f99b6658a1",
+      "review": "source inspected"
+    },
+    {
+      "path": "demo/app.js",
+      "sha256": "40032208ca22607bb926c32a5a46185f82a5de23df22441a351462245696e598",
+      "git_blob_sha1": "7951830d96ff28e122060fec1a91dbc6028e57c9",
+      "review": "source inspected"
+    },
+    {
+      "path": "app-demo/index.html",
+      "sha256": "9176ebab740a721b4a138b72c204618bf0843cbecb2efba9bcdccd825e429986",
+      "git_blob_sha1": "d4f4c9063dc0480541ce5b073d5e2e22e783fa96",
+      "review": "static strings and dependency references only; runtime unverified"
+    },
+    {
+      "path": "app-demo/metadata.json",
+      "sha256": "aa5f19cc84d41c0f8c70ececb2bc82e863227ea1e121632aca879eb616056991",
+      "git_blob_sha1": "8a878a6f66c7ed7b7c1cfaf6d8dab49ff37a0546",
+      "review": "static strings and dependency references only; runtime unverified"
+    },
+    {
+      "path": "app-demo/_expo/static/js/web/index-de6d28647a541ee2e862c7c253ed516b.js",
+      "sha256": "67629cad1ad4d57cee53f33379e54c02df9d9b695e2a34cbdd58439338b34c1a",
+      "git_blob_sha1": "a15581e60fb10284c3d0fd7dde92c8f03308f9d2",
+      "review": "static strings and dependency references only; runtime unverified"
+    },
+    {
+      "path": "privacy.html",
+      "sha256": "c9a800e3494025895760899276e6a8e5952c72dadf6d805592c4d5fc6f202ed2",
+      "git_blob_sha1": "c21bb12d9c5f515c1e7baf18a33f8a822ddae20c",
+      "review": "source inspected"
+    },
+    {
+      "path": "privacy-en.html",
+      "sha256": "5e84183a69e7cfa899f4966f9551ece131cb43dcb2a8de2637d5e31d4b27b5ee",
+      "git_blob_sha1": "54ec188cb38637512ecf3db92b95dacad7284456",
+      "review": "source inspected"
+    },
+    {
+      "path": "account-deletion.html",
+      "sha256": "63b41b02c6faac717f338e8f3a54652b41879af1f23b3c9c9e00ebee2465764a",
+      "git_blob_sha1": "ef5e0340bab6f44126e665c66ebef9b2b51d7f6f",
+      "review": "source inspected"
+    },
+    {
+      "path": "account-deletion-en.html",
+      "sha256": "58c8b4fc94f89cfbd759d36664f65cbc788b485af53c2d856d0b763022e9ec6c",
+      "git_blob_sha1": "e245d51305fcdda56abb5efa2c7bdbc8b57d927e",
+      "review": "source inspected"
+    },
+    {
+      "path": "docs/privacy-policy.html",
+      "sha256": "a563dc27a5580ebf28b5b1332b9f4363dfcef76d8f459a7a0e069e942b0dad71",
+      "git_blob_sha1": "24d72281b6fcc81e72eba6df653a58e2acee3327",
+      "review": "source inspected"
+    },
+    {
+      "path": "mentions-legales.html",
+      "sha256": "27ca27475a03e457c852c0c0142d3cbe933e1e4f7045f88e2cd6f11aa13b584f",
+      "git_blob_sha1": "06ce699ccb24de7985ae40792648e72d562d4a2c",
+      "review": "source inspected"
+    },
+    {
+      "path": "legal-notice-en.html",
+      "sha256": "3edfae78f55f983ca7af622acb97bae38de7f1582846ae17bb5b349baa51fc0c",
+      "git_blob_sha1": "1f06b4b608ccf82196f3c3733fd2eb60847bd104",
+      "review": "source inspected"
+    },
+    {
+      "path": "docs/ANALYTICS_POSTHOG.md",
+      "sha256": "5636aba0e6fd8dd8551387a0b0f2f09a6e808478809a3cbcac0d52f4d331f80d",
+      "git_blob_sha1": "ae0e28f172fc6e96230b5374f6c4daa696d64cab",
+      "review": "source inspected"
+    },
+    {
+      "path": "docs/ANALYTICS_FINALISATION_2026_10_23.md",
+      "sha256": "426869b3f137173c41fec7f10459b5b1967b5ec53b1d9dae2753004070f69d54",
+      "git_blob_sha1": "0f2646edfc9787e16901ece4468ef43e8c4db825",
+      "review": "source inspected"
+    },
+    {
+      "path": "oauth/garmin/callback/index.html",
+      "sha256": "ba96c94982b8dae85889c9b6b9ed0b2c2c1ff57e5790f7e09b33c2ecbecc47c9",
+      "git_blob_sha1": "1291527e0aa3a6fec8b7569ca72e7a1b374dd99e",
+      "review": "source inspected"
+    },
+    {
+      "path": "oauth/coros/callback/index.html",
+      "sha256": "5cd94ca8dbaa3e3cc4fbcd42564a8ba9d09a83d64f683b3bab57723681ecbe37",
+      "git_blob_sha1": "1ad8a197bc376f2b4b135c308525138227b40c5b",
+      "review": "source inspected"
+    },
+    {
+      "path": "oauth/polar/callback/index.html",
+      "sha256": "0a36fb819a55655d196b2324ba4d4f238ef1a3b5b9b69a70397efd0cfc71ae78",
+      "git_blob_sha1": "1c81988db692ee8b4410de22aa1a18071427bf61",
+      "review": "source inspected"
+    },
+    {
+      "path": "oauth/suunto/callback/index.html",
+      "sha256": "687fd0cee4dda7a226f2fbf52e838af16da171d9dbfe2779e1de4be31cc70e28",
+      "git_blob_sha1": "b03436208cfc3f0c299ee6284a4ac36b67a4d7df",
+      "review": "source inspected"
+    }
+  ],
+  "tracked_files": [
+    {
+      "path": ".DS_Store",
+      "git_blob_sha1": "e60ce3ea37fec8599795a5452254787f1c794a2a",
+      "bytes": 8196
+    },
+    {
+      "path": "CNAME",
+      "git_blob_sha1": "ca2decaa1d55bf7e3ba3bfaa3501a12aa99d7d8a",
+      "bytes": 10
+    },
+    {
+      "path": "README-APP-DEMO.md",
+      "git_blob_sha1": "b719b3b41a3e3cdd453953d6282501208691dd14",
+      "bytes": 2305
+    },
+    {
+      "path": "account-deletion-en.html",
+      "git_blob_sha1": "e245d51305fcdda56abb5efa2c7bdbc8b57d927e",
+      "bytes": 7173
+    },
+    {
+      "path": "account-deletion.html",
+      "git_blob_sha1": "ef5e0340bab6f44126e665c66ebef9b2b51d7f6f",
+      "bytes": 8444
+    },
+    {
+      "path": "app-demo/_expo/static/js/web/index-de6d28647a541ee2e862c7c253ed516b.js",
+      "git_blob_sha1": "a15581e60fb10284c3d0fd7dde92c8f03308f9d2",
+      "bytes": 4663636
+    },
+    {
+      "path": "app-demo/assets/assets/images/rockso_banner.1919cd86127714cdfe94498850bbeecb.png",
+      "git_blob_sha1": "a0c6be61dfd66aadf1d1999885a7edffc8c5cd7e",
+      "bytes": 1352643
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/AntDesign.3f78af31cca60105799838a1a7a59fbd.ttf",
+      "git_blob_sha1": "53c6483afbf819502f747d5af70d99443e94c463",
+      "bytes": 130484
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Entypo.31b5ffea3daddc69dd01a1f3d6cf63c5.ttf",
+      "git_blob_sha1": "76d91cb9895982d66c398f9da3daa61470488fb6",
+      "bytes": 66200
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/EvilIcons.140c53a7643ea949007aa9a282153849.ttf",
+      "git_blob_sha1": "6868f7bb64ba71b131690286ddc82aa0f542293e",
+      "bytes": 13456
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Feather.ca4b48e04dc1ce10bfbddb262c8b835f.ttf",
+      "git_blob_sha1": "38e346c039cece509d7608fb10f12bbce4b2383e",
+      "bytes": 55596
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome.b06871f281fee6b241d60582ae9369b9.ttf",
+      "git_blob_sha1": "35acda2fa1196aad98c2adf4378a7611dd713aa3",
+      "bytes": 165548
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Brands.3b89dd103490708d19a95adcae52210e.ttf",
+      "git_blob_sha1": "fc567cd2f11d83683d9eb4ca1a5fdc912f7d417c",
+      "bytes": 134040
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Regular.1f77739ca9ff2188b539c36f30ffa2be.ttf",
+      "git_blob_sha1": "d1ac9ba1169e4076832034c5585e1c5bf9d6f83c",
+      "bytes": 33736
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome5_Solid.605ed7926cf39a2ad5ec2d1f9d391d3d.ttf",
+      "git_blob_sha1": "f33e8162997aaa9da582aa81428ee87aa48953a6",
+      "bytes": 202744
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Brands.56c8d80832e37783f12c05db7c8849e2.ttf",
+      "git_blob_sha1": "08362f3424c6932efba0af7041f531553f4de176",
+      "bytes": 209376
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Regular.370dd5af19f8364907b6e2c41f45dbbf.ttf",
+      "git_blob_sha1": "7f9b53c1df7819291be2cdd89d703cb6fa88bb06",
+      "bytes": 67976
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/FontAwesome6_Solid.adec7d6f310bc577f05e8fe06a5daccf.ttf",
+      "git_blob_sha1": "e7e2ecfa341157f2a42ec210bf82cc0156a5540b",
+      "bytes": 423676
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Fontisto.b49ae8ab2dbccb02c4d11caaacf09eab.ttf",
+      "git_blob_sha1": "96e2e81a3d1e00f2638000e2110075d3af23cfbe",
+      "bytes": 313528
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Foundation.e20945d7c929279ef7a6f1db184a4470.ttf",
+      "git_blob_sha1": "6cce217ddc2efe3411dc9fa34e294e48e4cdf4f5",
+      "bytes": 56976
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.b4eb097d35f44ed943676fd56f6bdc51.ttf",
+      "git_blob_sha1": "f9d33a732b7b9dd5566e9a9b5fc4e44d9b219259",
+      "bytes": 389724
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.6e435534bd35da5fef04168860a9b8fa.ttf",
+      "git_blob_sha1": "bba7dcf6c6e6a8352938d681a39aa4aead4f33ed",
+      "bytes": 1307660
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialIcons.4e85bc9ebe07e0340c9c4fc2f6c38908.ttf",
+      "git_blob_sha1": "9d09b0feb85c35beeaddd31246be0b7c8e0e69a4",
+      "bytes": 356840
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Octicons.871378c6eab492a3e689a9385dc45a12.ttf",
+      "git_blob_sha1": "713a1a9fb111252808014f48ddefc9f064961462",
+      "bytes": 69436
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/SimpleLineIcons.d2285965fe34b05465047401b8595dd0.ttf",
+      "git_blob_sha1": "6ecb68683477ecc5aed38ec3fc8910d9bb66276c",
+      "bytes": 54056
+    },
+    {
+      "path": "app-demo/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Zocial.1681f34aaca71b8dfb70756bca331eb2.ttf",
+      "git_blob_sha1": "e2b5fbb02fd0ce400780207ac39d203a319af7bb",
+      "bytes": 25788
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/back-icon-mask.0a328cd9c1afd0afe8e3b1ec5165b1b4.png",
+      "git_blob_sha1": "7c1fd8493d91711b33e87bd36d6e9ae4363ed656",
+      "bytes": 653
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/back-icon.35ba0eaec5a4f5ed12ca16fabeae451d.png",
+      "git_blob_sha1": "17e52e8550e5668f7117bcb755beb70c3a21c9e9",
+      "bytes": 207
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/clear-icon.c94f6478e7ae0cdd9f15de1fcb9e5e55.png",
+      "git_blob_sha1": "01a7b6365ff7b18cc92aebac3b40a0c5138ef37c",
+      "bytes": 220
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/clear-icon.c94f6478e7ae0cdd9f15de1fcb9e5e55@2x.png",
+      "git_blob_sha1": "c852b6ba50fd2ed8b46ad189685664bac454bf82",
+      "bytes": 334
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/clear-icon.c94f6478e7ae0cdd9f15de1fcb9e5e55@3x.png",
+      "git_blob_sha1": "5f44c5464f7ea1331a49cd4709cfdd06b4517ec1",
+      "bytes": 502
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/clear-icon.c94f6478e7ae0cdd9f15de1fcb9e5e55@4x.png",
+      "git_blob_sha1": "d9af7b68070ef97abf8b805a32b99bdb7e2c340d",
+      "bytes": 645
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/close-icon.808e1b1b9b53114ec2838071a7e6daa7.png",
+      "git_blob_sha1": "4e3e31b8c10f677b1acc8374da60dbd114c6159d",
+      "bytes": 141
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/close-icon.808e1b1b9b53114ec2838071a7e6daa7@2x.png",
+      "git_blob_sha1": "12981d865dff2856895900be499751454c9528f7",
+      "bytes": 201
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/close-icon.808e1b1b9b53114ec2838071a7e6daa7@3x.png",
+      "git_blob_sha1": "b4f5127fdaace81e584b0087bff62afd10bc6847",
+      "bytes": 266
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/close-icon.808e1b1b9b53114ec2838071a7e6daa7@4x.png",
+      "git_blob_sha1": "34396d478f85572dd50c67a708cd3a752d785005",
+      "bytes": 332
+    },
+    {
+      "path": "app-demo/assets/node_modules/@react-navigation/elements/lib/module/assets/search-icon.286d67d3f74808a60a78d3ebf1a5fb57.png",
+      "git_blob_sha1": "87a30caff95ccb0bc812f8ee77abbe8a7a8f0ac6",
+      "bytes": 928
+    },
+    {
+      "path": "app-demo/assets/node_modules/expo-router/assets/arrow_down.017bc6ba3fc25503e5eb5e53826d48a8.png",
+      "git_blob_sha1": "f81adec02af440824e7d722dead33c3dd8ca1a7f",
+      "bytes": 9456
+    },
+    {
+      "path": "app-demo/assets/node_modules/expo-router/assets/error.d1ea1496f9057eb392d5bbf3732a61b7.png",
+      "git_blob_sha1": "13dfd1036a883a2fcd0014072cd4685bb048a74e",
+      "bytes": 469
+    },
+    {
+      "path": "app-demo/assets/node_modules/expo-router/assets/file.19eeb73b9593a38f8e9f418337fc7d10.png",
+      "git_blob_sha1": "f8441bc4f8c5ceed1c7dda29b5578ab302e3aa8f",
+      "bytes": 138
+    },
+    {
+      "path": "app-demo/assets/node_modules/expo-router/assets/forward.d8b800c443b8972542883e0b9de2bdc6.png",
+      "git_blob_sha1": "2a5bc8e77129da741157c757ad32d6afea9e1f95",
+      "bytes": 188
+    },
+    {
+      "path": "app-demo/assets/node_modules/expo-router/assets/pkg.ab19f4cbc543357183a20571f68380a3.png",
+      "git_blob_sha1": "828e6322aaa3f44cda9483e9917473a82e08fb7f",
+      "bytes": 364
+    },
+    {
+      "path": "app-demo/assets/node_modules/expo-router/assets/sitemap.412dd9275b6b48ad28f5e3d81bb1f626.png",
+      "git_blob_sha1": "8e3297fc67665cb61e5f4b0b84819c9cac7c2546",
+      "bytes": 465
+    },
+    {
+      "path": "app-demo/assets/node_modules/expo-router/assets/unmatched.20e71bdf79e3a97bf55fd9e164041578.png",
+      "git_blob_sha1": "ca8d666e4034705257bd2165771f56610101c4ea",
+      "bytes": 4752
+    },
+    {
+      "path": "app-demo/favicon.ico",
+      "git_blob_sha1": "46ae41228b0819c7b89a0cfc1f2f6bfc509ddb7c",
+      "bytes": 14510
+    },
+    {
+      "path": "app-demo/index.html",
+      "git_blob_sha1": "d4f4c9063dc0480541ce5b073d5e2e22e783fa96",
+      "bytes": 1212
+    },
+    {
+      "path": "app-demo/metadata.json",
+      "git_blob_sha1": "8a878a6f66c7ed7b7c1cfaf6d8dab49ff37a0546",
+      "bytes": 49
+    },
+    {
+      "path": "assets/.DS_Store",
+      "git_blob_sha1": "a7d45d4795841fa2ea5d715023c9aafa5586fb62",
+      "bytes": 8196
+    },
+    {
+      "path": "assets/acquisition.js",
+      "git_blob_sha1": "ab48ed70d7b0277bedccc2088eb64ab7e557c5ce",
+      "bytes": 4011
+    },
+    {
+      "path": "assets/analytics-config.js",
+      "git_blob_sha1": "c65ef15502b0164d0b94ea4ea1cfa120d67341ab",
+      "bytes": 594
+    },
+    {
+      "path": "assets/analytics-consent.css",
+      "git_blob_sha1": "5d5d873619708fee5559e68737683bc64bf190ac",
+      "bytes": 4375
+    },
+    {
+      "path": "assets/analytics.js",
+      "git_blob_sha1": "e44d11bfe577074c9e41bfeeea85f4b7154e0470",
+      "bytes": 38389
+    },
+    {
+      "path": "assets/img/.DS_Store",
+      "git_blob_sha1": "5008ddfcf53c02e82d7eee2e57c38e5672ef89f6",
+      "bytes": 6148
+    },
+    {
+      "path": "assets/img/Badge Stores/Android/GetItOnGooglePlay_Badge_Web_color_English.svg",
+      "git_blob_sha1": "cc15f9bc33d7a1dd5fa8dbcc6f3234ef04b27aad",
+      "bytes": 5078
+    },
+    {
+      "path": "assets/img/Badge Stores/Android/GetItOnGooglePlay_Badge_Web_color_French.svg",
+      "git_blob_sha1": "65b4621d22122fdc7e57ea91159848ca4487ee45",
+      "bytes": 7807
+    },
+    {
+      "path": "assets/img/Badge Stores/IOS/FR/Download_on_App_Store/Black_lockup/SVG/Download_on_the_App_Store_Badge_FR_RGB_blk_100517.svg",
+      "git_blob_sha1": "329e8dc3967723f5925a843e18c98acb54830a3e",
+      "bytes": 12638
+    },
+    {
+      "path": "assets/img/Badge Stores/IOS/US/Download_on_App_Store/Black_lockup/SVG/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg",
+      "git_blob_sha1": "072b425a1ab785ee7143f0f0fba305f55bfb9678",
+      "bytes": 10804
+    },
+    {
+      "path": "assets/img/Baniere.png",
+      "git_blob_sha1": "b9fbbd375cc6013d0805131788d7231d77a001fb",
+      "bytes": 1341149
+    },
+    {
+      "path": "assets/img/Basket.avif",
+      "git_blob_sha1": "b0aa2cd786340a2079feb70c0fbcba15e77ca918",
+      "bytes": 900141
+    },
+    {
+      "path": "assets/img/Graph_data.png",
+      "git_blob_sha1": "5d3ffb51f4461228c1bc0b42ffbd7fbfc7284d4a",
+      "bytes": 830767
+    },
+    {
+      "path": "assets/img/Gravel.avif",
+      "git_blob_sha1": "05e27f32d531bd4718dc1547f8b56cf1164077b9",
+      "bytes": 336807
+    },
+    {
+      "path": "assets/img/Hyrox.avif",
+      "git_blob_sha1": "4f6e25fa0ed6741f41f5fe1f95014762f0a3632c",
+      "bytes": 220002
+    },
+    {
+      "path": "assets/img/IMG_4622.jpeg",
+      "git_blob_sha1": "3befb69445772ec80098e9ff37d265926737cb53",
+      "bytes": 3215291
+    },
+    {
+      "path": "assets/img/Logos/Rockso_vert_bis copie_sans_fond.png",
+      "git_blob_sha1": "e8821c537fffef482d35f867f4e426c786a8c2e4",
+      "bytes": 42902
+    },
+    {
+      "path": "assets/img/Logos/rockso_logo_E7DECF.png",
+      "git_blob_sha1": "a426ea377988a0201235e4f6f0e1174b694a93cd",
+      "bytes": 10109
+    },
+    {
+      "path": "assets/img/Mon_Rythme.png",
+      "git_blob_sha1": "edd5d631b86ee3eee9e1c5421cf9fec01c1df958",
+      "bytes": 3892034
+    },
+    {
+      "path": "assets/img/Natation.avif",
+      "git_blob_sha1": "af900fcac74a151cf0e7744fd4c163f90d27ef9f",
+      "bytes": 145503
+    },
+    {
+      "path": "assets/img/Natation_2.avif",
+      "git_blob_sha1": "ae989e98d5adfcc4158e02bb39cea5232a44c9fe",
+      "bytes": 210881
+    },
+    {
+      "path": "assets/img/Padel_Coach.avif",
+      "git_blob_sha1": "e91567649f48a848176e35def20729db8b83c0d1",
+      "bytes": 195756
+    },
+    {
+      "path": "assets/img/Partners/Polar-logo.png",
+      "git_blob_sha1": "323853229a41c18977e6ce3c29e2b118a81352e7",
+      "bytes": 10403
+    },
+    {
+      "path": "assets/img/Partners/Suunto_Logo_black.webp",
+      "git_blob_sha1": "ccb0c24aa8373ddd586cc27255e801f5480f85d3",
+      "bytes": 20186
+    },
+    {
+      "path": "assets/img/Partners/coros logo.png",
+      "git_blob_sha1": "5de8ce768dc7634b695c7302ea08b76e4313005c",
+      "bytes": 20786
+    },
+    {
+      "path": "assets/img/Partners/p-1699-3-apple-watch-logo-png-transparent-logo-820097204032.png",
+      "git_blob_sha1": "3f727d0dae6c63118d36eaa2cf7840e203735aba",
+      "bytes": 16705
+    },
+    {
+      "path": "assets/img/Rockso_vert_bis.pdf",
+      "git_blob_sha1": "eb5a071dd35a25f844b3eeb042e429861bd07b26",
+      "bytes": 3564
+    },
+    {
+      "path": "assets/img/Rockso_vert_bis.png",
+      "git_blob_sha1": "18e67480a5de3effea6f65ae38d0c443d6eb4450",
+      "bytes": 22987
+    },
+    {
+      "path": "assets/img/Track.png",
+      "git_blob_sha1": "fc3b3caf82d85fd11cdc07ba96e913a70057ebbd",
+      "bytes": 1440786
+    },
+    {
+      "path": "assets/img/Trail_Femme.avif",
+      "git_blob_sha1": "1e10993119d9cab3af59adc7cfe353990774b6a2",
+      "bytes": 143514
+    },
+    {
+      "path": "assets/img/Velo.avif",
+      "git_blob_sha1": "b49b48f22ef4d1b3cc0b4cf988920fce824b613d",
+      "bytes": 308850
+    },
+    {
+      "path": "assets/img/club.avif",
+      "git_blob_sha1": "7971c2d831398a057d655dfac1c304815026e7a5",
+      "bytes": 69416
+    },
+    {
+      "path": "assets/img/coach_chat.png",
+      "git_blob_sha1": "cd68321d8822e0c195f8af029c908eefc7b8e573",
+      "bytes": 865528
+    },
+    {
+      "path": "assets/img/hero-rockso-mockup - Data.png",
+      "git_blob_sha1": "9837c4500a328a0a4e6d18899a92d5ae5c7f09d8",
+      "bytes": 684512
+    },
+    {
+      "path": "assets/img/hero-rockso-mockup - copie.png",
+      "git_blob_sha1": "37bc9ae2496b8dee9a5e3498f45305946ce86c65",
+      "bytes": 1144013
+    },
+    {
+      "path": "assets/img/hero-rockso-mockup.png",
+      "git_blob_sha1": "584ad8a6a90641b69341db19e8f33a4a69882a46",
+      "bytes": 980752
+    },
+    {
+      "path": "assets/img/mockup_activite.png",
+      "git_blob_sha1": "1774aa3dbe5a19faf84407399c177c2e182444e8",
+      "bytes": 523607
+    },
+    {
+      "path": "assets/img/mockup_blessure.png",
+      "git_blob_sha1": "755fe728d62adc8beca749b0191c003fe0d8d642",
+      "bytes": 576163
+    },
+    {
+      "path": "assets/img/mockup_coach_ia.png",
+      "git_blob_sha1": "ec0ab25160b40e82638d67e00f60a86f79aedff6",
+      "bytes": 601003
+    },
+    {
+      "path": "assets/img/mockup_map.png",
+      "git_blob_sha1": "b99afdd634749fa1a0949eb7b70e7f74891d5bcf",
+      "bytes": 727628
+    },
+    {
+      "path": "assets/img/mockup_semaine_pro.png",
+      "git_blob_sha1": "d98bf24814f59047a123a9b0111fa58f36d979a9",
+      "bytes": 575963
+    },
+    {
+      "path": "assets/img/physiologist-jack-daniels.avif",
+      "git_blob_sha1": "3870ce6e57055264e2866ee750765319aba7c35d",
+      "bytes": 155680
+    },
+    {
+      "path": "assets/img/rockso-garmin-192.png",
+      "git_blob_sha1": "d543f77b3a038b34fa5eda4778d662c9c68242b7",
+      "bytes": 8349
+    },
+    {
+      "path": "assets/img/rockso-garmin-300.png",
+      "git_blob_sha1": "d543f77b3a038b34fa5eda4778d662c9c68242b7",
+      "bytes": 8349
+    },
+    {
+      "path": "assets/minimal-audience.js",
+      "git_blob_sha1": "f6e5692ea6e7fce2e1b7e2a76bb5663f92bc9611",
+      "bytes": 2929
+    },
+    {
+      "path": "assets/navigation.js",
+      "git_blob_sha1": "62412ce710559f9a51e08876654b55734aab04d8",
+      "bytes": 2146
+    },
+    {
+      "path": "assets/product-gallery.js",
+      "git_blob_sha1": "8fd87be555bd5017d10356c6e4616864737a9728",
+      "bytes": 2676
+    },
+    {
+      "path": "assets/styles-v2.css",
+      "git_blob_sha1": "2defa81cb77d6830b583cb22d3c3cc7dcc219c6c",
+      "bytes": 50427
+    },
+    {
+      "path": "assets/styles.css",
+      "git_blob_sha1": "5059c202fe586d35da891e8a6dd522d1c7a854a8",
+      "bytes": 33917
+    },
+    {
+      "path": "beta-access.html",
+      "git_blob_sha1": "546537b04e2a35d3af7dd39caafc3ccf7b5ec908",
+      "bytes": 20988
+    },
+    {
+      "path": "cgu.html",
+      "git_blob_sha1": "b993efdd07a0dbfc6a55c921e4bd3f18b4a45d76",
+      "bytes": 22328
+    },
+    {
+      "path": "demo-app.html",
+      "git_blob_sha1": "121677e413501c359f2fb84404a0d7f867ad7d83",
+      "bytes": 5514
+    },
+    {
+      "path": "demo-login-en.html",
+      "git_blob_sha1": "433282870a7bddce1991b30802292d95ea0fa6f4",
+      "bytes": 7719
+    },
+    {
+      "path": "demo-login.html",
+      "git_blob_sha1": "2ce9ea09d9808b5031acaa5c12168094b7498d49",
+      "bytes": 7950
+    },
+    {
+      "path": "demo/README.md",
+      "git_blob_sha1": "14dac2f4edf98d196660cd7447e1802751c2e2cb",
+      "bytes": 938
+    },
+    {
+      "path": "demo/Week_demo_2.json",
+      "git_blob_sha1": "458c267a1661b9ab78c8667e189a814873bc307d",
+      "bytes": 3450
+    },
+    {
+      "path": "demo/activities.html",
+      "git_blob_sha1": "54a3cdf1e8aef0e9e6cc00737a4b39c4422a193e",
+      "bytes": 3614
+    },
+    {
+      "path": "demo/activity.html",
+      "git_blob_sha1": "919b631890d2bdf70156f67ea4fb096bd20e0754",
+      "bytes": 5292
+    },
+    {
+      "path": "demo/app.js",
+      "git_blob_sha1": "7951830d96ff28e122060fec1a91dbc6028e57c9",
+      "bytes": 76387
+    },
+    {
+      "path": "demo/assets/.DS_Store",
+      "git_blob_sha1": "1c3b9561a5d8509156899fd5f81539fa346af1e5",
+      "bytes": 6148
+    },
+    {
+      "path": "demo/assets/img/Photo_profil_circle.png",
+      "git_blob_sha1": "b9e239ae4a8e8682920daa35219ed2a063d696e6",
+      "bytes": 2151001
+    },
+    {
+      "path": "demo/assets/img/rockso_banner.png",
+      "git_blob_sha1": "a0c6be61dfd66aadf1d1999885a7edffc8c5cd7e",
+      "bytes": 1352643
+    },
+    {
+      "path": "demo/assets/img/rockso_logo_full.png",
+      "git_blob_sha1": "1c350f966efb8b49638bb947defa8955e7cdb426",
+      "bytes": 77705
+    },
+    {
+      "path": "demo/assets/img/rockso_logo_mark.png",
+      "git_blob_sha1": "18e67480a5de3effea6f65ae38d0c443d6eb4450",
+      "bytes": 22987
+    },
+    {
+      "path": "demo/index.html",
+      "git_blob_sha1": "a4599cd796b03c6d4bff34b67b1be4a89bba1be4",
+      "bytes": 6311
+    },
+    {
+      "path": "demo/profile.html",
+      "git_blob_sha1": "f5dcc0369940002224b1288f6d7c3e40ee10ed85",
+      "bytes": 5584
+    },
+    {
+      "path": "demo/serveur.py",
+      "git_blob_sha1": "7fc5cc30393d8c4bf523f71e795bcd88f8e38a7e",
+      "bytes": 1405
+    },
+    {
+      "path": "demo/styles.css",
+      "git_blob_sha1": "cab36d7fb02a0a2f374dcdbf850f18b1817a8672",
+      "bytes": 35956
+    },
+    {
+      "path": "demo/sync.html",
+      "git_blob_sha1": "b6e254aa6d0788a5df15e538e05c452bfb832578",
+      "bytes": 9550
+    },
+    {
+      "path": "demo/training-entrainement.html",
+      "git_blob_sha1": "3cb893d2da7d356e1ccce80f0d4d7f52b48376e2",
+      "bytes": 7271
+    },
+    {
+      "path": "demo/training-quotidien.html",
+      "git_blob_sha1": "72f5a209b490f4b2f5def93161dfa01a45df5074",
+      "bytes": 8644
+    },
+    {
+      "path": "demo/training-recuperation.html",
+      "git_blob_sha1": "b0eb0ca5937ba15d3d7878b4eddb4eae94e1e4fe",
+      "bytes": 4685
+    },
+    {
+      "path": "demo/training-tendance.html",
+      "git_blob_sha1": "14075e42cb370038fd948cfad61388f99b6658a1",
+      "bytes": 4231
+    },
+    {
+      "path": "demo/week_demo_1.json",
+      "git_blob_sha1": "ce6dcf662a67ef923b3acd390bc1ffb752f618c7",
+      "bytes": 3099
+    },
+    {
+      "path": "docs/ANALYTICS_ENGAGEMENT_TESTS_2026_10_28.json",
+      "git_blob_sha1": "c010030adec424c48515a0887145332ff4213c44",
+      "bytes": 5994
+    },
+    {
+      "path": "docs/ANALYTICS_FINALISATION_2026_10_23.md",
+      "git_blob_sha1": "0f2646edfc9787e16901ece4468ef43e8c4db825",
+      "bytes": 10340
+    },
+    {
+      "path": "docs/ANALYTICS_POSTHOG.md",
+      "git_blob_sha1": "ae0e28f172fc6e96230b5374f6c4daa696d64cab",
+      "bytes": 33234
+    },
+    {
+      "path": "docs/ANALYTICS_POSTHOG_TESTS_2026_10_20.json",
+      "git_blob_sha1": "e98f2823b55a69467798a21f571baa62b29ffa7b",
+      "bytes": 9408
+    },
+    {
+      "path": "docs/PRIVACY_POLICY_Rockso.md",
+      "git_blob_sha1": "2da8b87bb997c6646fdf2e59c354caa6ea7b30ae",
+      "bytes": 354
+    },
+    {
+      "path": "docs/RESPONSIVE_2026_10_13.md",
+      "git_blob_sha1": "4fb38a2a5b55a40b53db7ed874f9a03a62105eba",
+      "bytes": 6597
+    },
+    {
+      "path": "docs/privacy-policy.html",
+      "git_blob_sha1": "24d72281b6fcc81e72eba6df653a58e2acee3327",
+      "bytes": 461
+    },
+    {
+      "path": "docs/product-gallery-2026-10-13/assistant-ia-390.jpg",
+      "git_blob_sha1": "824436ca730ff92d055e9cf4a546725a61a6738f",
+      "bytes": 16689
+    },
+    {
+      "path": "docs/product-gallery-2026-10-13/assistant-ia-539.jpg",
+      "git_blob_sha1": "5369679f1e9977cb317dc4db50343023d719749c",
+      "bytes": 110388
+    },
+    {
+      "path": "docs/product-gallery-2026-10-13/produit-1440.jpg",
+      "git_blob_sha1": "d5d5fd13562641126396cabea9ceb5a33f1ea988",
+      "bytes": 115328
+    },
+    {
+      "path": "docs/product-gallery-2026-10-13/produit-539-debut.jpg",
+      "git_blob_sha1": "f602ab2410a2d0b41e906839b2d65b3fab7353c7",
+      "bytes": 63609
+    },
+    {
+      "path": "docs/product-gallery-2026-10-13/produit-539-fin.jpg",
+      "git_blob_sha1": "13bc961c49c2436f25a3c87146c8fd714063ed6a",
+      "bytes": 62198
+    },
+    {
+      "path": "docs/product-gallery-2026-10-13/rapport.json",
+      "git_blob_sha1": "2ca316cb02d47e57a3e3f3b26c73f41f46c32c48",
+      "bytes": 29560
+    },
+    {
+      "path": "docs/responsive-2026-10-13/accueil-1440-final.jpg",
+      "git_blob_sha1": "805527bceeb74dd17146a06215a6016e60df88a6",
+      "bytes": 153677
+    },
+    {
+      "path": "docs/responsive-2026-10-13/accueil-539-final.jpg",
+      "git_blob_sha1": "dbf3160042bff874041a680c5dc868e405fa67f2",
+      "bytes": 79180
+    },
+    {
+      "path": "docs/responsive-2026-10-13/produit-390.png",
+      "git_blob_sha1": "a7d196ff029ae9d24195dcc7e01a02482b2f6544",
+      "bytes": 401393
+    },
+    {
+      "path": "docs/responsive-2026-10-13/rapport-collages-final.json",
+      "git_blob_sha1": "aa4a8ddda9a7752c8ae42ae396c5555e9d3e4c70",
+      "bytes": 8024
+    },
+    {
+      "path": "docs/responsive-2026-10-13/rapport.json",
+      "git_blob_sha1": "071f02bc69db6f2fbb0549e02d53d1ac8e178d99",
+      "bytes": 32496
+    },
+    {
+      "path": "index-en-old.html",
+      "git_blob_sha1": "c1793b271b1603cc79d945deda2bf9aa7cbd3199",
+      "bytes": 22206
+    },
+    {
+      "path": "index-en.html",
+      "git_blob_sha1": "76102f62ca4f8099a0d29f7360046be4c3de638e",
+      "bytes": 35733
+    },
+    {
+      "path": "index-old.html",
+      "git_blob_sha1": "c46aa5fa1907791e46e09d6618b25a0f15a8a728",
+      "bytes": 23610
+    },
+    {
+      "path": "index.html",
+      "git_blob_sha1": "49fd1b9bf49f5ac14cdcb7936fab695c0326ac92",
+      "bytes": 37795
+    },
+    {
+      "path": "legal-notice-en.html",
+      "git_blob_sha1": "1f06b4b608ccf82196f3c3733fd2eb60847bd104",
+      "bytes": 6784
+    },
+    {
+      "path": "mentions-legales.html",
+      "git_blob_sha1": "06ce699ccb24de7985ae40792648e72d562d4a2c",
+      "bytes": 7034
+    },
+    {
+      "path": "oauth/coros/callback/index.html",
+      "git_blob_sha1": "1ad8a197bc376f2b4b135c308525138227b40c5b",
+      "bytes": 5372
+    },
+    {
+      "path": "oauth/garmin/callback/index.html",
+      "git_blob_sha1": "1291527e0aa3a6fec8b7569ca72e7a1b374dd99e",
+      "bytes": 5375
+    },
+    {
+      "path": "oauth/polar/callback/index.html",
+      "git_blob_sha1": "1c81988db692ee8b4410de22aa1a18071427bf61",
+      "bytes": 5372
+    },
+    {
+      "path": "oauth/suunto/callback/index.html",
+      "git_blob_sha1": "b03436208cfc3f0c299ee6284a4ac36b67a4d7df",
+      "bytes": 5375
+    },
+    {
+      "path": "privacy-en.html",
+      "git_blob_sha1": "54ec188cb38637512ecf3db92b95dacad7284456",
+      "bytes": 37264
+    },
+    {
+      "path": "privacy.html",
+      "git_blob_sha1": "c21bb12d9c5f515c1e7baf18a33f8a822ddae20c",
+      "bytes": 44515
+    },
+    {
+      "path": "scripts/check-analytics.mjs",
+      "git_blob_sha1": "379bad47e42b36dbae6c87152b293be55f47abe3",
+      "bytes": 61926
+    },
+    {
+      "path": "scripts/check-responsive.mjs",
+      "git_blob_sha1": "1dc9f0050febacb1855305719210c0c4f3351f97",
+      "bytes": 12722
+    },
+    {
+      "path": "terms-en.html",
+      "git_blob_sha1": "ef5bd169d63187563958cea5475be05c1eafd041",
+      "bytes": 19379
+    }
+  ]
+}
